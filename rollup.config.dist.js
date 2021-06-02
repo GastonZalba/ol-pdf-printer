@@ -11,18 +11,9 @@ import { mkdirSync, writeFileSync } from 'fs';
 
 let globals = {
     'ol/Map': 'ol.Map',
-    'ol/source/Vector': 'ol.source.Vector',
-    'ol/layer/Vector': 'ol.layer.Vector',
-    'ol/geom': 'ol.geom',
-    'ol/Feature': 'ol.Feature',
-    'ol/Overlay': 'ol.Overlay',
-    'ol/style': 'ol.style',
     'ol/control': 'ol.control',
     'ol/proj': 'ol.proj',
-    'ol/sphere': 'ol.sphere',
-    'ol/color': 'ol.color',
-    'ol/extent' : 'ol.extent',
-    'ol/Observable': 'ol.Observable'
+    'ol/color': 'ol.color'
 };
 
 module.exports = {
@@ -42,7 +33,7 @@ module.exports = {
             globals: globals
         }
     ],
-    plugins: [    
+    plugins: [
         json(),
         resolve(),
         commonjs(),
@@ -54,7 +45,7 @@ module.exports = {
             presets: [
                 [
                     '@babel/preset-env',
-                    {                        
+                    {
                         targets: {
                             browsers: [
                                 "Chrome >= 52",

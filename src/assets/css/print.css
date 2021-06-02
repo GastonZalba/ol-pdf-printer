@@ -22,7 +22,6 @@
 }
 
 .ol-print-btn-menu svg {
-
 }
 
 .printControlInfo {
@@ -51,6 +50,6 @@
     cursor: pointer;
 }
 
-.printElements label input{
+.printElements label input {
     margin-right: 4px;
 }

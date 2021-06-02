@@ -55,8 +55,5 @@ class ProcessingModal {
     };
 }
 
-export const {
-    showProcessingModal,
-    hideProcessingModal,
-    initProcessingModal
-} = new ProcessingModal();
+export const { showProcessingModal, hideProcessingModal, initProcessingModal } =
+    new ProcessingModal();

@@ -7,28 +7,18 @@ import css from 'rollup-plugin-css-only';
 
 let globals = {
     'ol/Map': 'ol.Map',
-    'ol/source/Vector': 'ol.source.Vector',
-    'ol/layer/Vector': 'ol.layer.Vector',
-    'ol/geom': 'ol.geom',
-    'ol/geom/Polygon': 'ol.geom.Polygon',
-    'ol/Feature': 'ol.Feature',
-    'ol/Overlay': 'ol.Overlay',
-    'ol/style': 'ol.style',
     'ol/control': 'ol.control',
     'ol/proj': 'ol.proj',
-    'ol/sphere': 'ol.sphere',
-    'ol/color': 'ol.color',
-    'ol/extent' : 'ol.extent',
-    'ol/Observable': 'ol.Observable'
+    'ol/color': 'ol.color'
 };
 
 module.exports = {
-    input: 'tmp-lib/ol-dji-geozones.js',
+    input: 'tmp-lib/ol-pdf-printer.js',
     output: [
         {
             file: pkg.module,
             format: 'es',
-            name: 'DjiGeozones',
+            name: 'PdfPrinter',
             globals: globals
         }
     ],
@@ -52,7 +42,7 @@ module.exports = {
         css({
             output: function (styles, styleNodes) {
                 mkdirSync('lib', { recursive: true });
-                writeFileSync('lib/ol-dji-geozones.css', styles)
+                writeFileSync('lib/ol-pdf-printer.css', styles)
             }
         })
     ],

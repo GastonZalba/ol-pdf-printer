@@ -1,5 +1,6 @@
-import Control from 'ol/control/Control';
+import Control, { Options as ControlOptions } from 'ol/control/Control';
 import { getPointResolution } from 'ol/proj';
+import { Image, PluggableMap, View } from 'ol';
 
 import domtoimage from 'dom-to-image-improved';
 import { jsPDF } from 'jspdf';
@@ -16,18 +17,30 @@ import {
 } from './components/ProcessingModal';
 import { addElementsToPDF } from './components/PdfElements';
 
-/*eslint import/namespace: ['error', { allowComputed: true }]*/
 import * as i18n from './components/i18n';
 
 import compassIcon from './assets/images/compass.svg';
 import pdfIcon from './assets/images/pdf.svg';
 import './assets/css/print.css';
 
+/**
+ * @protected
+ */
 const DEFAULT_FILE_NAME = 'Export';
+
+/**
+ * @protected
+ */
 const CLASS_PRINT_MODE = 'printMode';
 
+/**
+ * @protected
+ */
 let initialized = false;
 
+/**
+ * @protected
+ */
 function deepObjectAssign(target, ...sources) {
     sources.forEach((source) => {
         Object.keys(source).forEach((key) => {
@@ -35,9 +48,9 @@ function deepObjectAssign(target, ...sources) {
             const t_val = target[key];
             target[key] =
                 t_val &&
-                    s_val &&
-                    typeof t_val === 'object' &&
-                    typeof s_val === 'object'
+                s_val &&
+                typeof t_val === 'object' &&
+                typeof s_val === 'object'
                     ? deepObjectAssign(t_val, s_val)
                     : s_val;
         });
@@ -46,33 +59,31 @@ function deepObjectAssign(target, ...sources) {
 }
 
 export default class PdfPrinter extends Control {
-    _map;
-    _mapTarget;
-    _view;
-    _target;
-    _form;
-    _i18n;
+    protected _i18n: I18n;
 
-    _btnControl;
+    protected _map: PluggableMap;
+    protected _view: View;
+    protected _mapTarget: HTMLElement;
+    protected _form: Form;
 
-    _timeoutProcessing;
+    protected element: HTMLElement;
 
-    _initialViewResolution;
+    protected _timeoutProcessing: ReturnType<typeof setTimeout>;
 
-    _pdf = {
-        doc: null,
-        width: null,
-        height: null
+    protected _initialViewResolution: number;
+
+    protected _pdf: {
+        doc: jsPDF;
+        width: number;
+        height: number;
     };
 
-    _options;
+    protected _options: Options;
 
-    constructor(opt_options) {
-        const btnControl = document.createElement('button');
-
+    constructor(opt_options?: Options) {
         super({
             target: opt_options.target,
-            element: btnControl
+            element: document.createElement('button')
         });
 
         // Check if the selected language exists
@@ -106,7 +117,7 @@ export default class PdfPrinter extends Control {
                 description: true,
                 attributions: true,
                 scalebar: true,
-                compass: compassIcon
+                compass: compassIcon as string
             },
             watermark: {
                 title: 'Ol Pdf Printer',
@@ -137,8 +148,7 @@ export default class PdfPrinter extends Control {
                 transition: 300,
                 backdropTransition: 150,
                 templates: {
-                    dialog:
-                        '<div class="modal-dialog modal-dialog-centered"></div>',
+                    dialog: '<div class="modal-dialog modal-dialog-centered"></div>',
                     headerClose: `
                     <button type="button" class="btn-close" data-dismiss="modal" aria-label="${this._i18n.close}">
                         <span aria-hidden="true">×</span>
@@ -151,11 +161,10 @@ export default class PdfPrinter extends Control {
         // Merge options
         this._options = deepObjectAssign(this._options, opt_options);
 
-        btnControl.className = 'ol-print-btn-menu ol-md-btn';
-        btnControl.innerHTML = `<img crossorigin="anonymous" src="${pdfIcon}"/>`;
-        btnControl.title = this._i18n.printPdf;
-        btnControl.onclick = this.show;
-        this._btnControl = btnControl;
+        this.element.className = 'ol-print-btn-menu ol-md-btn';
+        this.element.innerHTML = `<img crossorigin="anonymous" src="${pdfIcon}"/>`;
+        this.element.title = this._i18n.printPdf;
+        this.element.onclick = this.show;
     }
 
     show = () => {
@@ -177,8 +186,8 @@ export default class PdfPrinter extends Control {
         const pixelsPerMapMillimeter = resolution / 25.4;
         return Math.round(
             1000 *
-            pixelsPerMapMillimeter *
-            this.getMeterPerPixel(scaleResolution)
+                pixelsPerMapMillimeter *
+                this.getMeterPerPixel(scaleResolution)
         );
     };
 
@@ -225,7 +234,7 @@ export default class PdfPrinter extends Control {
         hideProcessingModal();
     };
 
-    printMap = (form) => {
+    printMap = (form: Form) => {
         this.prepareLoading();
 
         this._form = form;
@@ -323,6 +332,97 @@ export default class PdfPrinter extends Control {
         this._map.updateSize();
         this._map.getView().setResolution(scaleResolution);
     };
+}
+
+export interface I18n {
+    printPdf: string;
+    pleaseWait: string;
+    almostThere: string;
+    error: string;
+    printing: string;
+    cancel: string;
+    close: string;
+    print: string;
+    mapElements: string;
+    compass: string;
+    scale: string;
+    layersAttributions: string;
+    addNote: string;
+    resolution: string;
+    orientation: string;
+    paperSize: string;
+    landscape: string;
+    portrait: string;
+    current: string;
+    paper: string;
+}
+
+interface PaperSize {
+    size: number[];
+    value: string;
+    selected?: boolean;
+}
+
+interface Dpi {
+    value: number;
+    selected?: boolean;
+}
+
+/**
+ * @protected
+ */
+interface Form {
+    format: string;
+    orientation: 'landscape' | 'portrait';
+    resolution: number;
+    scale: number;
+    description: string;
+    compass: boolean;
+    attributions: boolean;
+    scalebar: boolean;
+}
+
+export interface Options extends ControlOptions {
+    lang?: string;
+    filename?: string;
+    style?: {
+        margin: number;
+        brcolor: string;
+        bkcolor: string;
+        txcolor: string;
+    };
+    extraInfo?: {
+        date: boolean;
+        url: boolean;
+        scale: boolean;
+    };
+    mapElements?: {
+        description: boolean;
+        attributions: boolean;
+        scalebar: boolean;
+        compass: string | Image;
+    };
+    watermark?: {
+        title?: string;
+        titleColor?: string;
+        subtitle: string;
+        subtitleColor: string;
+        logo: boolean;
+    };
+    paperSizes?: PaperSize[];
+    dpi?: Dpi[];
+    scales?: number[];
+    modal?: {
+        animateClass?: string;
+        animateInClass?: string;
+        transition?: number;
+        backdropTransition?: number;
+        templates?: {
+            dialog?: string | HTMLElement;
+            headerClose?: string | HTMLElement;
+        };
+    };
+    i18n?: I18n;
 }
 
 export { showPrintModal, hidePrintModal };
