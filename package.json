@@ -8,7 +8,13 @@
   "types": "lib/ol-pdf-printer.d.ts",
   "style": "lib/ol-pdf-printer.css",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "precleanstart": "del-cli dist lib tmp-dist tmp-lib",
+    "doc": "documentation readme src/ol-pdf-printer.ts --quiet=true --access=public --access=undefined --section=API --parse-extension ts && node scripts/external-links.js README.md && prettier --write README.md",
+    "format": "eslint --fix src/*.ts && prettier --write src",
+    "lint": "eslint src/*.ts && prettier --check src",
+    "copy-assets": "ncp src/assets/ tmp-dist/assets/ && ncp src/assets/ tmp-lib/assets/",
+    "build": "npm run lint && npm run precleanstart && tsc --pretty --project ./tsconfig.json && tsc --pretty --project ./tsconfig-dist.json && npm run copy-assets && rollup --config rollup.config.dist.js && rollup --config rollup.config.js",
+    "postbuild": "ncp tmp-lib/ol-pdf-printer.d.ts dist/ol-pdf-printer.d.ts && ncp tmp-lib/ol-pdf-printer.d.ts lib/ol-pdf-printer.d.ts && del-cli tmp-dist tmp-lib"
   },
   "repository": {
     "type": "git",
@@ -20,7 +26,8 @@
     "pdf",
     "print",
     "gis",
-    "sig"
+    "sig",
+    "wms"
   ],
   "author": "Gastón Zalba",
   "license": "MIT",

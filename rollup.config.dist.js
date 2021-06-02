@@ -14,7 +14,6 @@ let globals = {
     'ol/source/Vector': 'ol.source.Vector',
     'ol/layer/Vector': 'ol.layer.Vector',
     'ol/geom': 'ol.geom',
-    'ol/geom/Polygon': 'ol.geom.Polygon',
     'ol/Feature': 'ol.Feature',
     'ol/Overlay': 'ol.Overlay',
     'ol/style': 'ol.style',
@@ -27,19 +26,19 @@ let globals = {
 };
 
 module.exports = {
-    input: 'tmp-dist/ol-dji-geozones.js',
+    input: 'tmp-dist/ol-pdf-printer.js',
     output: [
         {
             file: pkg.main,
             format: 'umd',
-            name: 'DjiGeozones',
+            name: 'PdfPrinter',
             globals: globals
         },
         {
             file: pkg.browser,
             format: 'umd',
             plugins: [terser()],
-            name: 'DjiGeozones',
+            name: 'PdfPrinter',
             globals: globals
         }
     ],

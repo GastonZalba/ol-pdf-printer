@@ -3,10 +3,7 @@
 Tested with OpenLayers version 5 and 6.
 
 ## Examples
-
-All the examples are configured using a free Proxy. If you notice some lag or slow performance, try one of your own.
-
--   Basic usage: create an OpenLayers map instance, and pass that map and options to the DjiGeozones constructor.
+-   Basic usage: create an OpenLayers map instance, and pass that map and options to the PdfPrinter constructor.
     -   [Basic](https://raw.githack.com/GastonZalba/ol-pdf-printer/v1.0.0/examples/basic.html)
 
 ## Changelog
@@ -53,3 +50,7 @@ TypeScript types are shipped with the project in the dist directory and should b
 ## Usage
 
 ## API
+
+## TODO
+* Legends support
+* Convert to Typescript
