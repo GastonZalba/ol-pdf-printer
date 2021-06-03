@@ -3465,7 +3465,7 @@
     this.addScaleBar = function (position, offset) {
       // scaleDenominator is the x in 1:x of the map scale
       // hardcode maximal width for now
-      var maxWidth = 80 + _this._style.margin * 2; // in mm
+      var maxWidth = 100 + _this._style.margin * 2; // in mm
       // from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/log10#Polyfill
 
       var log10 = Math.log10 || // more precise, but unsupported by IE

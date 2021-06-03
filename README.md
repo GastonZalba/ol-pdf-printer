@@ -1,6 +1,10 @@
-# OpenLayers Pdf PRinter
+# OpenLayers Pdf Printer
+Basic Pdf Printer for Open Layers.
 
 Tested with OpenLayers version 5 and 6.
+
+## IMPORTANT
+Layer source and Icons that use external sites must be setted to `crossOrigin: 'anonymous'`. Otherwise, it will ocurr a `DOMException: Failed to execute 'toDataURL' on 'HTMLCanvasElement': Tainted canvases may not be exported`.
 
 ## Examples
 -   Basic usage: create an OpenLayers map instance, and pass that map and options to the PdfPrinter constructor.
@@ -51,5 +55,7 @@ TypeScript types are shipped with the project in the dist directory and should b
 ## API
 
 ## TODO
+* Convert all files to Typescript
+* Interface comments
+* Example screenshots
 * Legends support
-* Convert to Typescript

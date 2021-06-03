@@ -1,6 +1,5 @@
 import { Image, PluggableMap, View } from 'ol';
-import { Options as ControlOptions } from 'ol/control/Control';
-import Control from 'ol/control/Control';
+import Control, { Options as ControlOptions } from 'ol/control/Control';
 import { getPointResolution } from 'ol/proj';
 
 // External
@@ -31,6 +30,8 @@ import './assets/css/ol-pdf-printer.css';
  */
 const DEFAULT_FILE_NAME = 'Export';
 
+const DEFAULT_LANGUAGE = 'en';
+
 /**
  * @protected
  */
@@ -46,9 +47,9 @@ function deepObjectAssign(target, ...sources) {
             const t_val = target[key];
             target[key] =
                 t_val &&
-                s_val &&
-                typeof t_val === 'object' &&
-                typeof s_val === 'object'
+                    s_val &&
+                    typeof t_val === 'object' &&
+                    typeof s_val === 'object'
                     ? deepObjectAssign(t_val, s_val)
                     : s_val;
         });
@@ -90,7 +91,9 @@ export default class PdfPrinter extends Control {
 
         // Check if the selected language exists
         this._i18n =
-            opt_options.lang in i18n ? i18n[opt_options.lang] : i18n['en'];
+            opt_options.language && opt_options.language in i18n
+                ? i18n[opt_options.language]
+                : i18n[DEFAULT_LANGUAGE ];
 
         if (opt_options.i18n) {
             // Merge custom translations
@@ -102,7 +105,7 @@ export default class PdfPrinter extends Control {
 
         // Default options
         this._options = {
-            lang: 'en',
+            language: DEFAULT_LANGUAGE,
             filename: DEFAULT_FILE_NAME,
             style: {
                 margin: 10,
@@ -169,15 +172,20 @@ export default class PdfPrinter extends Control {
         controlElement.className = `ol-print-btn-menu ${this._options.ctrlBtnClass}`;
         controlElement.innerHTML = `<img src="${pdfIcon}"/>`;
         controlElement.title = this._i18n.printPdf;
-        controlElement.onclick = () => this.show();
+        controlElement.onclick = () => this._show();
     }
-
-    show(): void {
-        if (!this._initialized) this.init();
+    /**
+     * @protected
+     */
+    _show(): void {
+        if (!this._initialized) this._init();
         showPrintModal();
     }
 
-    init(): void {
+    /**
+     * @protected
+     */
+    _init(): void {
         this._map = this.getMap();
         this._view = this._map.getView();
         this._mapTarget = this._map.getTargetElement();
@@ -185,38 +193,45 @@ export default class PdfPrinter extends Control {
             this._map,
             this._options,
             this._i18n,
-            this.printMap.bind(this)
+            this._printMap.bind(this)
         );
         initProcessingModal(
             this._i18n,
             this._options,
-            this.onEndPrint.bind(this)
+            this._onEndPrint.bind(this)
         );
         this._initialized = true;
     }
 
-    // Adapted from http://hg.intevation.de/gemma/file/tip/client/src/components/Pdftool.vue#l252
-    calculateScaleDenominator(
+    /**
+     *   Adapted from http://hg.intevation.de/gemma/file/tip/client/src/components/Pdftool.vue#l252
+     * @protected
+     */
+    _calculateScaleDenominator(
         resolution: number,
         scaleResolution: number
     ): number {
         const pixelsPerMapMillimeter = resolution / 25.4;
         return Math.round(
             1000 *
-                pixelsPerMapMillimeter *
-                this.getMeterPerPixel(scaleResolution)
+            pixelsPerMapMillimeter *
+            this._getMeterPerPixel(scaleResolution)
         );
     }
-
-    getMeterPerPixel(scaleResolution: number): number {
+    /**
+     * @protected
+     */
+    _getMeterPerPixel(scaleResolution: number): number {
         const proj = this._view.getProjection();
         return (
             getPointResolution(proj, scaleResolution, this._view.getCenter()) *
             proj.getMetersPerUnit()
         );
     }
-
-    setMapSizForPrint(resolution: number): number[] {
+    /**
+     * @protected
+     */
+    _setMapSizForPrint(resolution: number): number[] {
         const pixelsPerMapMillimeter = resolution / 25.4;
         return [
             Math.round(this._pdf.width * pixelsPerMapMillimeter),
@@ -227,7 +242,7 @@ export default class PdfPrinter extends Control {
     /**
      * Restore inital view, remove classes, disable loading
      */
-    onEndPrint(): void {
+    _onEndPrint(): void {
         this._mapTarget.style.width = '';
         this._mapTarget.style.height = '';
         this._map.updateSize();
@@ -238,21 +253,27 @@ export default class PdfPrinter extends Control {
 
         clearTimeout(this._timeoutProcessing);
     }
-
-    prepareLoading(): void {
+    /**
+     * @protected
+     */
+    _prepareLoading(): void {
         showProcessingModal(this._i18n.pleaseWait);
 
         this._timeoutProcessing = setTimeout(() => {
             showProcessingModal(this._i18n.almostThere);
         }, 3500);
     }
-
-    disableLoading(): void {
+    /**
+     * @protected
+     */
+    _disableLoading(): void {
         hideProcessingModal();
     }
-
-    printMap(form: Form): void {
-        this.prepareLoading();
+    /**
+     * @protected
+     */
+    _printMap(form: Form): void {
+        this._prepareLoading();
 
         this._form = form;
 
@@ -269,7 +290,7 @@ export default class PdfPrinter extends Control {
         this._pdf.width = dim[0];
         this._pdf.height = dim[1];
 
-        const mapSizeForPrint = this.setMapSizForPrint(this._form.resolution);
+        const mapSizeForPrint = this._setMapSizForPrint(this._form.resolution);
         const [width, height] = mapSizeForPrint;
 
         // UMD support
@@ -313,7 +334,7 @@ export default class PdfPrinter extends Control {
                         this._pdf.height - this._options.style.margin * 2
                     );
 
-                    const scaleDenominator = this.calculateScaleDenominator(
+                    const scaleDenominator = this._calculateScaleDenominator(
                         this._form.resolution,
                         scaleResolution
                     );
@@ -330,12 +351,12 @@ export default class PdfPrinter extends Control {
                     this._pdf.doc.save(this._options.filename + '.pdf');
 
                     // Reset original map size
-                    this.onEndPrint();
-                    this.disableLoading();
+                    this._onEndPrint();
+                    this._disableLoading();
                 })
                 .catch((err) => {
                     console.error(err);
-                    this.onEndPrint();
+                    this._onEndPrint();
                     showProcessingModal(this._i18n.error, /** footer */ true);
                 });
         });
@@ -346,16 +367,24 @@ export default class PdfPrinter extends Control {
         this._map.updateSize();
         this._map.getView().setResolution(scaleResolution);
     }
-
+    /**
+     * @public
+     */
     showPrintModal(): void {
         showPrintModal();
     }
-
+    /**
+     * @public
+     */
     hidePrintModal(): void {
         hidePrintModal();
     }
 }
 
+/**
+ * **_[interface]_** - Custom Language specified when creating a WFST instance
+ * @protected
+ */
 export interface I18n {
     printPdf: string;
     pleaseWait: string;
@@ -379,18 +408,27 @@ export interface I18n {
     paper: string;
 }
 
+/**
+ * **_[interface]_** 
+ * @protected
+ */
 interface PaperSize {
     size: number[];
     value: string;
     selected?: boolean;
 }
 
+/**
+ * **_[interface]_** 
+ * @protected
+ */
 interface Dpi {
     value: number;
     selected?: boolean;
 }
 
 /**
+ * **_[interface]_** 
  * @protected
  */
 interface Form {
@@ -404,12 +442,19 @@ interface Form {
     scalebar: boolean;
 }
 
+/**
+ * **_[interface]_** 
+ * @protected
+ */
 interface MyWindow extends Window {
     jspdf: any;
 }
 
+/**
+ * **_[interface]_** - Options specified when creating an instance
+ */
 export interface Options extends ControlOptions {
-    lang?: string;
+    language?: string;
     filename?: string;
     style?: {
         margin: number;

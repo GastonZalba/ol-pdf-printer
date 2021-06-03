@@ -417,7 +417,7 @@ class ElementsPDF {
         // scaleDenominator is the x in 1:x of the map scale
 
         // hardcode maximal width for now
-        const maxWidth = 80 + this._style.margin * 2; // in mm
+        const maxWidth = 100 + this._style.margin * 2; // in mm
 
         // from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/log10#Polyfill
         const log10 =
