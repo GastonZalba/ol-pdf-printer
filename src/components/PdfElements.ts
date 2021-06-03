@@ -1,17 +1,22 @@
+import { TextOptionsLight } from 'jspdf';
+import { View } from 'ol';
+import { I18n, Options, Pdf } from 'src/ol-pdf-printer';
+
 class ElementsPDF {
-    _pdf;
-    _printMargin;
-    _scaleDenominator;
-    _form;
-    _style;
+    protected _pdf: Pdf;
+    protected _scaleDenominator: number;
+    protected _form;
+    protected _style;
+    protected _view: View;
+    protected _i18n: I18n;
 
     addElementsToPDF = async (
-        view,
-        pdf,
+        view: View,
+        pdf: Pdf,
         form,
-        scaleDenominator,
-        options,
-        i18n
+        scaleDenominator: number,
+        options: Options,
+        i18n: I18n
     ) => {
         this._view = view;
         this._pdf = pdf;
@@ -110,8 +115,12 @@ class ElementsPDF {
         }
     };
 
-    calculateOffsetByPosition = (position, offset, size = 0) => {
-        let x, y;
+    calculateOffsetByPosition = (
+        position,
+        offset,
+        size = 0
+    ): { x: number; y: number } => {
+        let x: number, y: number;
 
         switch (position) {
             case 'topleft':
@@ -138,7 +147,14 @@ class ElementsPDF {
         return { x, y };
     };
 
-    addRoundedBox = (x, y, width, height, bkcolor, brcolor) => {
+    addRoundedBox = (
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+        bkcolor: string,
+        brcolor: string
+    ): void => {
         const rounding = 1;
 
         this._pdf.doc.setDrawColor(brcolor);
@@ -155,7 +171,15 @@ class ElementsPDF {
         );
     };
 
-    addText = (x, y, width, fontSize, color, align = 'left', str) => {
+    addText = (
+        x: number,
+        y: number,
+        width: number,
+        fontSize: number,
+        color: string,
+        align: TextOptionsLight['align'] = 'left',
+        str: string
+    ) => {
         this._pdf.doc.setTextColor(color);
         this._pdf.doc.setFontSize(fontSize);
 
@@ -166,19 +190,25 @@ class ElementsPDF {
     };
 
     addTextByOffset = (
-        position,
+        position: number,
         offset,
-        width,
-        fontSize,
-        color,
-        align,
-        str
+        width: number,
+        fontSize: number,
+        color: string,
+        align: TextOptionsLight['align'],
+        str: string
     ) => {
         const { x, y } = this.calculateOffsetByPosition(position, offset);
         this.addText(x, y, width, fontSize, color, align, str);
     };
 
-    addTextWithBack = (str, position, offset, fontSize, maxWidth) => {
+    addTextWithBack = (
+        str: string,
+        position: string,
+        offset,
+        fontSize: number,
+        maxWidth: number
+    ): void => {
         const paddingBack = 4;
 
         const { x, y } = this.calculateOffsetByPosition(position, offset);
@@ -213,7 +243,7 @@ class ElementsPDF {
      * @param {number} fontSize
      * @returns
      */
-    addWatermark = (watermark, position, offset, fontSize) => {
+    addWatermark = (watermark, position, offset, fontSize): Promise<void> => {
         return new Promise((resolve) => {
             const imageSize = 12;
             const fontSizeSubtitle = fontSize / 1.8;
@@ -345,7 +375,14 @@ class ElementsPDF {
         });
     };
 
-    addDate = (position, width, offset, fontSize, txcolor, align) => {
+    addDate = (
+        position,
+        width,
+        offset,
+        fontSize,
+        txcolor,
+        align: TextOptionsLight['align']
+    ) => {
         this._pdf.doc.setFont('helvetica', 'normal');
         const str = new Date(Date.now()).toLocaleDateString();
         this.addTextByOffset(
@@ -359,7 +396,14 @@ class ElementsPDF {
         );
     };
 
-    addUrl = (position, width, offset, fontSize, txcolor, align) => {
+    addUrl = (
+        position,
+        width,
+        offset,
+        fontSize,
+        txcolor,
+        align: TextOptionsLight['align'] = 'left'
+    ): void => {
         this._pdf.doc.setFont('helvetica', 'italic');
         const str = window.location.href;
         this.addTextByOffset(
@@ -373,7 +417,14 @@ class ElementsPDF {
         );
     };
 
-    addScale = (position, width, offset, fontSize, txcolor, align) => {
+    addScale = (
+        position,
+        width,
+        offset,
+        fontSize,
+        txcolor,
+        align: TextOptionsLight['align']
+    ): void => {
         this._pdf.doc.setFont('helvetica', 'bold');
         const str = `${
             this._i18n.scale
@@ -391,7 +442,14 @@ class ElementsPDF {
         );
     };
 
-    addAttributions = (position, width, offset, fontSize, txcolor, align) => {
+    addAttributions = (
+        position,
+        width,
+        offset,
+        fontSize,
+        txcolor,
+        align: TextOptionsLight['align']
+    ): void => {
         this._pdf.doc.setFont('helvetica', 'normal');
         const attArr = [];
         const attributions = document.querySelectorAll('.ol-attribution li');
@@ -413,7 +471,7 @@ class ElementsPDF {
     };
 
     // Adapted from http://hg.intevation.de/gemma/file/tip/client/src/components/Pdftool.vue#l252
-    addScaleBar = (position, offset) => {
+    addScaleBar = (position, offset): void => {
         // hardcode maximal width for now
         const maxWidth = 100 + this._style.margin * 2; // in mm
 
@@ -515,26 +573,32 @@ class ElementsPDF {
         // draw numeric labels above scalebar
         this._pdf.doc.setTextColor(this._style.txcolor);
         this._pdf.doc.setFontSize(6);
-        this._pdf.doc.text(scaleBarX, scaleBarY - 1, '0');
+        this._pdf.doc.text('0', scaleBarX, scaleBarY - 1);
         // /4 and could give 2.5. We still round, because of floating point arith
         this._pdf.doc.text(
+            String(Math.round((length * 10) / 4) / 10),
             scaleBarX + size - 1,
-            scaleBarY - 1,
-            (Math.round((length * 10) / 4) / 10).toString()
+            scaleBarY - 1
         );
         this._pdf.doc.text(
-            scaleBarX + size * 2 - 2,
-            scaleBarY - 1,
-            Math.round(length / 2).toString()
+            String(scaleBarY - 1),
+            Math.round(length / 2),
+            scaleBarX + size * 2 - 2
         );
         this._pdf.doc.text(
+            Math.round(length).toString() + ' ' + unit,
             scaleBarX + size * 4 - 4,
-            scaleBarY - 1,
-            Math.round(length).toString() + ' ' + unit
+            scaleBarY - 1
         );
     };
 
-    addCompass = (imgSrc, position, offset, size, rotationRadians) => {
+    addCompass = (
+        imgSrc: HTMLImageElement | string,
+        position: String,
+        offset,
+        size: number,
+        rotationRadians: number
+    ): Promise<void> => {
         return new Promise((resolve) => {
             const imageSize = 100;
 
@@ -544,7 +608,7 @@ class ElementsPDF {
                 size
             );
 
-            const addRotation = (image) => {
+            const addRotation = (image: CanvasImageSource) => {
                 const canvas = document.createElement('canvas');
 
                 // Must be bigger than the image to prevent clipping
@@ -573,7 +637,7 @@ class ElementsPDF {
                 return canvas;
             };
 
-            const addImage = (image) => {
+            const addImage = (image: CanvasImageSource): void => {
                 const rotatedCanvas = addRotation(image);
 
                 const sizeImage = size * 1.5;
@@ -593,7 +657,7 @@ class ElementsPDF {
             if (imgSrc instanceof Image) {
                 addImage(imgSrc);
                 resolve();
-            } else {
+            } else if (typeof imgSrc === 'string') {
                 const image = new Image(imageSize, imageSize);
 
                 image.onload = () => {

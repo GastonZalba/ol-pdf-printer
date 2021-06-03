@@ -1,4 +1,4 @@
-import { Image, PluggableMap, View } from 'ol';
+import { PluggableMap, View } from 'ol';
 import Control, { Options as ControlOptions } from 'ol/control/Control';
 import { getPointResolution } from 'ol/proj';
 
@@ -71,11 +71,7 @@ export default class PdfPrinter extends Control {
 
     protected _initialViewResolution: number;
 
-    protected _pdf: {
-        doc: jsPDF;
-        width: number;
-        height: number;
-    };
+    protected _pdf: Pdf;
 
     protected _options: Options;
 
@@ -453,6 +449,12 @@ interface MyWindow extends Window {
     jspdf: any;
 }
 
+export interface Pdf {
+    doc: jsPDF;
+    width: number;
+    height: number;
+}
+
 /**
  * **_[interface]_** - Options specified when creating an instance
  */
@@ -474,7 +476,7 @@ export interface Options extends ControlOptions {
         description: boolean;
         attributions: boolean;
         scalebar: boolean;
-        compass: string | Image;
+        compass: string | HTMLImageElement;
     };
     watermark?: {
         title?: string;
