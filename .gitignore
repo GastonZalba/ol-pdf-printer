@@ -4,3 +4,5 @@ package-lock.json
 tmp
 tmp-dist
 tmp-lib
+dist
+lib
