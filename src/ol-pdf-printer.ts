@@ -1,7 +1,9 @@
-import Control, { Options as ControlOptions } from 'ol/control/Control';
-import { getPointResolution } from 'ol/proj';
 import { Image, PluggableMap, View } from 'ol';
+import { Options as ControlOptions } from 'ol/control/Control';
+import Control from 'ol/control/Control';
+import { getPointResolution } from 'ol/proj';
 
+// External
 import domtoimage from 'dom-to-image-improved';
 import { jsPDF } from 'jspdf';
 
@@ -17,7 +19,7 @@ import {
 } from './components/ProcessingModal';
 import { addElementsToPDF } from './components/PdfElements';
 
-import * as i18n from './components/i18n';
+import * as i18n from './components/i18n/index.js';
 
 import compassIcon from './assets/images/compass.svg';
 import pdfIcon from './assets/images/pdf.svg';
@@ -32,11 +34,6 @@ const DEFAULT_FILE_NAME = 'Export';
  * @protected
  */
 const CLASS_PRINT_MODE = 'printMode';
-
-/**
- * @protected
- */
-let initialized = false;
 
 /**
  * @protected
@@ -68,6 +65,8 @@ export default class PdfPrinter extends Control {
 
     protected element: HTMLElement;
 
+    protected _initialized: boolean;
+
     protected _timeoutProcessing: ReturnType<typeof setTimeout>;
 
     protected _initialViewResolution: number;
@@ -81,9 +80,11 @@ export default class PdfPrinter extends Control {
     protected _options: Options;
 
     constructor(opt_options?: Options) {
+        const controlElement = document.createElement('button');
+
         super({
             target: opt_options.target,
-            element: document.createElement('button')
+            element: controlElement
         });
 
         // Check if the selected language exists
@@ -142,6 +143,7 @@ export default class PdfPrinter extends Control {
                 { value: 300 }
             ],
             scales: [10000, 5000, 1000, 500, 250, 100, 50, 25, 10],
+            ctrlBtnClass: '',
             modal: {
                 animateClass: 'fade',
                 animateInClass: 'show',
@@ -161,56 +163,56 @@ export default class PdfPrinter extends Control {
         // Merge options
         this._options = deepObjectAssign(this._options, opt_options);
 
-        this.element.className = 'ol-print-btn-menu ol-md-btn';
-        this.element.innerHTML = `<img crossorigin="anonymous" src="${pdfIcon}"/>`;
-        this.element.title = this._i18n.printPdf;
-        this.element.onclick = this.show;
+        controlElement.className = `ol-print-btn-menu ${this._options.ctrlBtnClass}`;
+        controlElement.innerHTML = `<img src="${pdfIcon}"/>`;
+        controlElement.title = this._i18n.printPdf;
+        controlElement.onclick = () => this.show();
     }
 
-    show = () => {
-        if (!initialized) this.init();
+    show(): void {
+        if (!this._initialized) this.init();
         showPrintModal();
-    };
+    }
 
-    init = () => {
+    init(): void {
         this._map = this.getMap();
         this._view = this._map.getView();
         this._mapTarget = this._map.getTargetElement();
         initPrintModal(this._map, this._options, this._i18n, this.printMap);
         initProcessingModal(this._i18n, this._options, this.onEndPrint);
-        initialized = true;
-    };
+        this._initialized = true;
+    }
 
     // Adapted from http://hg.intevation.de/gemma/file/tip/client/src/components/Pdftool.vue#l252
-    calculateScaleDenominator = (resolution, scaleResolution) => {
+    calculateScaleDenominator(resolution, scaleResolution) {
         const pixelsPerMapMillimeter = resolution / 25.4;
         return Math.round(
             1000 *
                 pixelsPerMapMillimeter *
                 this.getMeterPerPixel(scaleResolution)
         );
-    };
+    }
 
-    getMeterPerPixel = (scaleResolution) => {
+    getMeterPerPixel(scaleResolution) {
         const proj = this._view.getProjection();
         return (
             getPointResolution(proj, scaleResolution, this._view.getCenter()) *
             proj.getMetersPerUnit()
         );
-    };
+    }
 
-    setMapSizForPrint = (resolution) => {
+    setMapSizForPrint(resolution): number[] {
         const pixelsPerMapMillimeter = resolution / 25.4;
         return [
             Math.round(this._pdf.width * pixelsPerMapMillimeter),
             Math.round(this._pdf.height * pixelsPerMapMillimeter)
         ];
-    };
+    }
 
     /**
      * Restore inital view, remove classes, disable loading
      */
-    onEndPrint = () => {
+    onEndPrint(): void {
         this._mapTarget.style.width = '';
         this._mapTarget.style.height = '';
         this._map.updateSize();
@@ -220,21 +222,21 @@ export default class PdfPrinter extends Control {
         this._view.setConstrainResolution(true);
 
         clearTimeout(this._timeoutProcessing);
-    };
+    }
 
-    prepareLoading = () => {
+    prepareLoading(): void {
         showProcessingModal(this._i18n.pleaseWait);
 
         this._timeoutProcessing = setTimeout(() => {
             showProcessingModal(this._i18n.almostThere);
         }, 3500);
-    };
+    }
 
-    disableLoading = () => {
+    disableLoading(): void {
         hideProcessingModal();
-    };
+    }
 
-    printMap = (form: Form) => {
+    printMap(form: Form): void {
         this.prepareLoading();
 
         this._form = form;
@@ -331,7 +333,15 @@ export default class PdfPrinter extends Control {
         this._mapTarget.style.height = height + 'px';
         this._map.updateSize();
         this._map.getView().setResolution(scaleResolution);
-    };
+    }
+
+    showPrintModal() {
+        showPrintModal();
+    }
+
+    hidePrintModal() {
+        hidePrintModal();
+    }
 }
 
 export interface I18n {
@@ -412,6 +422,7 @@ export interface Options extends ControlOptions {
     paperSizes?: PaperSize[];
     dpi?: Dpi[];
     scales?: number[];
+    ctrlBtnClass?: string;
     modal?: {
         animateClass?: string;
         animateInClass?: string;
@@ -424,5 +435,3 @@ export interface Options extends ControlOptions {
     };
     i18n?: I18n;
 }
-
-export { showPrintModal, hidePrintModal };

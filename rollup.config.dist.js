@@ -2,8 +2,8 @@ import pkg from './package.json';
 import babel from '@rollup/plugin-babel';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
-import json from "@rollup/plugin-json";
 import image from '@rollup/plugin-image';
+import builtins from 'rollup-plugin-node-builtins';
 import { terser } from "rollup-plugin-terser";
 import CleanCss from 'clean-css';
 import css from 'rollup-plugin-css-only';
@@ -11,9 +11,14 @@ import { mkdirSync, writeFileSync } from 'fs';
 
 let globals = {
     'ol/Map': 'ol.Map',
-    'ol/control': 'ol.control',
+    'ol/control/Control': 'ol.control.Control',
     'ol/proj': 'ol.proj',
-    'ol/color': 'ol.color'
+    'ol/proj/Units': 'ol.proj.Units',
+    'jspdf': 'jsPDF',
+    'dom-to-image-improved': 'domtoimage',
+    'modal-vanilla': 'Modal',
+    'events': 'EventEmitter',
+    'myPragma': 'myPragma'
 };
 
 module.exports = {
@@ -34,12 +39,28 @@ module.exports = {
         }
     ],
     plugins: [
-        json(),
+        builtins(), // Events
         resolve(),
         commonjs(),
         babel({
-            babelrc: false,
-            plugins: ["@babel/plugin-transform-runtime"],
+            plugins: [
+                "@babel/plugin-transform-runtime",
+                [
+                    '@babel/plugin-transform-react-jsx',
+                    {
+                        pragma: 'myPragma',
+                        pragmaFrag: "'fragment'"
+                    }
+                ],
+                [
+                    'babel-plugin-jsx-pragmatic',
+                    {
+                        module: '/src/myPragma',
+                        import: 'myPragma',
+                        export: 'myPragma'
+                    }
+                ]
+            ],
             babelHelpers: 'runtime',
             exclude: 'node_modules/**',
             presets: [
@@ -69,8 +90,12 @@ module.exports = {
             }
         })
     ],
-    external: function (id) {
-        console.log('id', id);
-        return /ol\//.test(id);
-    }
+    external: [
+        'ol',
+        'ol/Map',
+        'ol/control/Control',
+        'ol/proj',
+        'ol/proj/Units',
+        'jspdf'
+    ]
 };

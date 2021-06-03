@@ -23,6 +23,24 @@ time, mark, audio, video {
 	font: inherit;
 	vertical-align: baseline;
 }
+html,
+body {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  font-family: sans-serif;
+}
+body {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
 /* HTML5 display-role reset for older browsers */
 article, aside, details, figcaption, figure, 
 footer, header, hgroup, menu, nav, section {
@@ -45,4 +63,8 @@ q:before, q:after {
 table {
 	border-collapse: collapse;
 	border-spacing: 0;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
 }

@@ -1,4 +1,5 @@
 import Modal from 'modal-vanilla';
+import myPragma from '../myPragma';
 
 import { getMapScale } from './Helpers';
 
@@ -10,7 +11,7 @@ const Content = (i18n, params) => {
     return (
         <form id="printMap">
             <div>
-                <div className="half">
+                <div className="printFieldHalf">
                     <label htmlFor="printFormat">{i18n.paperSize}</label>
                     <select id="printFormat">
                         {paperSizes.map((paper) => (
@@ -25,7 +26,7 @@ const Content = (i18n, params) => {
                         ))}
                     </select>
                 </div>
-                <div className="half">
+                <div className="printFieldHalf">
                     <label htmlFor="printOrientation">{i18n.orientation}</label>
                     <select id="printOrientation">
                         <option value="landscape" selected>
@@ -36,7 +37,7 @@ const Content = (i18n, params) => {
                 </div>
             </div>
             <div>
-                <div className="half">
+                <div className="printFieldHalf">
                     <label htmlFor="printResolution">{i18n.resolution}</label>
                     <select id="printResolution">
                         {dpi.map((d) => (
@@ -51,7 +52,7 @@ const Content = (i18n, params) => {
                         ))}
                     </select>
                 </div>
-                <div className="half">
+                <div className="printFieldHalf">
                     <label htmlFor="printScale">{i18n.scale}</label>
                     <select id="printScale">
                         <option
@@ -118,7 +119,6 @@ const Footer = (lang) => {
     return `
         <div>
             <button
-                id="imp_cancel"
                 type="button"
                 class="btn-sm btn btn-secondary"
                 data-dismiss="modal"

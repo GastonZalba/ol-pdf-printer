@@ -8,6 +8,7 @@
   "types": "lib/ol-pdf-printer.d.ts",
   "style": "lib/ol-pdf-printer.css",
   "scripts": {
+    "watch": "chokidar 'src/**' --initial --command 'WATCH=1 rollup --config rollup.config.dist.js'",
     "precleanstart": "del-cli dist lib tmp-dist tmp-lib",
     "doc": "documentation readme src/ol-pdf-printer.ts --quiet=true --access=public --access=undefined --section=API --parse-extension ts && node scripts/external-links.js README.md && prettier --write README.md",
     "format": "eslint --fix src/*.ts && prettier --write src",
@@ -41,6 +42,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.12.3",
+    "@babel/plugin-transform-react-jsx": "^7.14.3",
     "@babel/plugin-transform-runtime": "^7.12.15",
     "@babel/preset-env": "^7.12.1",
     "@rollup/plugin-babel": "^5.2.1",
@@ -51,6 +53,7 @@
     "@types/ol": "^6.4.2",
     "@typescript-eslint/eslint-plugin": "^4.8.2",
     "@typescript-eslint/parser": "^4.8.2",
+    "babel-plugin-jsx-pragmatic": "^1.0.2",
     "clean-css": "^4.2.3",
     "del-cli": "^3.0.1",
     "documentation": "^13.1.0",

@@ -9,7 +9,9 @@
       "lib": ["esnext", "dom"],
       "resolveJsonModule": true,
       "esModuleInterop": true,
-      "moduleResolution": "node"
+      "moduleResolution": "node",      
+      "jsx": "react",
+      "jsxFactory": "myPragma"
     },
     "include": ["./src"],
   }

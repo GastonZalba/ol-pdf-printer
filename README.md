@@ -23,7 +23,7 @@ Load `ol-pdf-printer.js` after OpenLayers. Dji Geozones is available as `DjiGeoz
 ```
 
 #### CSS
-
+This use the css of boostrap.
 ```HTML
 <link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.0.0/dist/ol-pdf-printer.css" />
 ```
