@@ -1,10 +1,3 @@
-/**
-Bootstrap
-@import "~bootstrap/scss/_modal";
-@import "~bootstrap/scss/_buttons";
-@import "~bootstrap/scss/_close";
-@import "~bootstrap/scss/_transitions";
-*/
 .modal {
     position: fixed;
     top: 0;

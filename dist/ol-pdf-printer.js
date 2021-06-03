@@ -2891,10 +2891,11 @@
   }
 
   /**
-   * @param {number} resolution Resolution.
-   * @param {string} units Units
-   * @param {boolean=} opt_round Whether to round the scale or not.
-   * @return {number} Scale
+   *
+   * @param map
+   * @param opt_round
+   * @returns
+   * @protected
    */
 
   var getMapScale = function getMapScale(map) {
@@ -3042,54 +3043,85 @@
     if (!modal._visible) modal.show();
   };
 
-  var ProcessingModal = function ProcessingModal() {
-    var _this = this;
+  var ProcessingModal = /*#__PURE__*/function () {
+    /**
+     *
+     * @param i18n
+     * @param options
+     * @param onEndPrint
+     * @protected
+     */
+    function ProcessingModal(i18n, options, onEndPrint) {
+      _classCallCheck(this, ProcessingModal);
 
-    _classCallCheck(this, ProcessingModal);
-
-    this.initProcessingModal = function (i18n, options, onEndPrint) {
-      _this._i18n = i18n;
-      _this._footer = "\n            <button\n                type=\"button\"\n                class=\"btn-sm btn btn-secondary\"\n                data-dismiss=\"modal\"\n            >\n                ".concat(_this._i18n.cancel, "\n            </button>\n        ");
-      _this._modal = new modalVanilla(Object.assign({
+      this._i18n = i18n;
+      this._footer = "\n            <button\n                type=\"button\"\n                class=\"btn-sm btn btn-secondary\"\n                data-dismiss=\"modal\"\n            >\n                ".concat(this._i18n.cancel, "\n            </button>\n        ");
+      this._modal = new modalVanilla(Object.assign({
         headerClose: false,
         animate: false,
-        title: _this._i18n.printing,
+        title: this._i18n.printing,
         backdrop: 'static',
         content: ' ',
         footer: ' '
       }, options.modal));
 
-      _this._modal.on('dismiss', function () {
+      this._modal.on('dismiss', function () {
         onEndPrint();
       });
-    };
+    }
+    /**
+     *
+     * @param string
+     * @protected
+     */
 
-    this.setContentModal = function (string) {
-      _this._modal._html.body.innerHTML = string;
-    };
 
-    this.setFooterModal = function (string) {
-      _this._modal._html.footer.innerHTML = string;
-    };
+    _createClass(ProcessingModal, [{
+      key: "_setContentModal",
+      value: function _setContentModal(string) {
+        this._modal._html.body.innerHTML = string;
+      }
+      /**
+       *
+       * @param string
+       * @protected
+       */
 
-    this.showProcessingModal = function (string) {
-      var footer = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+    }, {
+      key: "_setFooterModal",
+      value: function _setFooterModal(string) {
+        this._modal._html.footer.innerHTML = string;
+      }
+      /**
+       *
+       * @param string
+       * @param footer
+       * @protected
+       */
 
-      _this.setContentModal(string);
+    }, {
+      key: "show",
+      value: function show(string) {
+        var footer = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
-      if (footer) _this.setFooterModal(_this._footer);else _this.setFooterModal(' ');
-      if (!_this._modal._visible) _this._modal.show();
-    };
+        this._setContentModal(string);
 
-    this.hideProcessingModal = function () {
-      _this._modal.hide();
-    };
-  };
+        if (footer) this._setFooterModal(this._footer);else this._setFooterModal(' ');
+        if (!this._modal._visible) this._modal.show();
+      }
+      /**
+       * @protected
+       */
 
-  var _ProcessingModal = new ProcessingModal(),
-      showProcessingModal = _ProcessingModal.showProcessingModal,
-      hideProcessingModal = _ProcessingModal.hideProcessingModal,
-      initProcessingModal = _ProcessingModal.initProcessingModal;
+    }, {
+      key: "hide",
+      value: function hide() {
+        this._modal.hide();
+      }
+    }]);
+
+    return ProcessingModal;
+  }();
 
   var __awaiter$1 = undefined && undefined.__awaiter || function (thisArg, _arguments, P, generator) {
     function adopt(value) {
@@ -3463,7 +3495,6 @@
 
 
     this.addScaleBar = function (position, offset) {
-      // scaleDenominator is the x in 1:x of the map scale
       // hardcode maximal width for now
       var maxWidth = 100 + _this._style.margin * 2; // in mm
       // from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/log10#Polyfill
@@ -3477,7 +3508,7 @@
       var unit = 'mm';
       var unitConversionFactor = 1;
 
-      if (maxLength >= 1e7) {
+      if (maxLength >= 1e5) {
         // >= 10 km
         unit = 'km';
         unitConversionFactor = 1e6;
@@ -3721,6 +3752,7 @@
    */
 
   var DEFAULT_FILE_NAME = 'Export';
+  var DEFAULT_LANGUAGE = 'en';
   /**
    * @protected
    */
@@ -3761,7 +3793,7 @@
         element: controlElement
       }); // Check if the selected language exists
 
-      _this._i18n = opt_options.lang in i18n ? i18n[opt_options.lang] : en;
+      _this._i18n = opt_options.language && opt_options.language in i18n ? i18n[opt_options.language] : i18n[DEFAULT_LANGUAGE];
 
       if (opt_options.i18n) {
         // Merge custom translations
@@ -3770,7 +3802,7 @@
 
 
       _this._options = {
-        lang: 'en',
+        language: DEFAULT_LANGUAGE,
         filename: DEFAULT_FILE_NAME,
         style: {
           margin: 10,
@@ -3849,46 +3881,66 @@
       controlElement.title = _this._i18n.printPdf;
 
       controlElement.onclick = function () {
-        return _this.show();
+        return _this._show();
       };
 
       return _this;
     }
+    /**
+     * @protected
+     */
+
 
     _createClass(PdfPrinter, [{
-      key: "show",
-      value: function show() {
-        if (!this._initialized) this.init();
+      key: "_show",
+      value: function _show() {
+        if (!this._initialized) this._init();
 
         showPrintModal();
       }
+      /**
+       * @protected
+       */
+
     }, {
-      key: "init",
-      value: function init() {
+      key: "_init",
+      value: function _init() {
         this._map = this.getMap();
         this._view = this._map.getView();
         this._mapTarget = this._map.getTargetElement();
-        initPrintModal(this._map, this._options, this._i18n, this.printMap.bind(this));
-        initProcessingModal(this._i18n, this._options, this.onEndPrint.bind(this));
+        initPrintModal(this._map, this._options, this._i18n, this._printMap.bind(this));
+        this._processingModal = new ProcessingModal(this._i18n, this._options, this._onEndPrint.bind(this));
         this._initialized = true;
-      } // Adapted from http://hg.intevation.de/gemma/file/tip/client/src/components/Pdftool.vue#l252
+      }
+      /**
+       *   Adapted from http://hg.intevation.de/gemma/file/tip/client/src/components/Pdftool.vue#l252
+       * @protected
+       */
 
     }, {
-      key: "calculateScaleDenominator",
-      value: function calculateScaleDenominator(resolution, scaleResolution) {
+      key: "_calculateScaleDenominator",
+      value: function _calculateScaleDenominator(resolution, scaleResolution) {
         var pixelsPerMapMillimeter = resolution / 25.4;
-        return Math.round(1000 * pixelsPerMapMillimeter * this.getMeterPerPixel(scaleResolution));
+        return Math.round(1000 * pixelsPerMapMillimeter * this._getMeterPerPixel(scaleResolution));
       }
+      /**
+       * @protected
+       */
+
     }, {
-      key: "getMeterPerPixel",
-      value: function getMeterPerPixel(scaleResolution) {
+      key: "_getMeterPerPixel",
+      value: function _getMeterPerPixel(scaleResolution) {
         var proj$1 = this._view.getProjection();
 
         return proj.getPointResolution(proj$1, scaleResolution, this._view.getCenter()) * proj$1.getMetersPerUnit();
       }
+      /**
+       * @protected
+       */
+
     }, {
-      key: "setMapSizForPrint",
-      value: function setMapSizForPrint(resolution) {
+      key: "_setMapSizForPrint",
+      value: function _setMapSizForPrint(resolution) {
         var pixelsPerMapMillimeter = resolution / 25.4;
         return [Math.round(this._pdf.width * pixelsPerMapMillimeter), Math.round(this._pdf.height * pixelsPerMapMillimeter)];
       }
@@ -3897,8 +3949,8 @@
        */
 
     }, {
-      key: "onEndPrint",
-      value: function onEndPrint() {
+      key: "_onEndPrint",
+      value: function _onEndPrint() {
         this._mapTarget.style.width = '';
         this._mapTarget.style.height = '';
 
@@ -3912,29 +3964,43 @@
 
         clearTimeout(this._timeoutProcessing);
       }
+      /**
+       * @protected
+       */
+
     }, {
-      key: "prepareLoading",
-      value: function prepareLoading() {
+      key: "_prepareLoading",
+      value: function _prepareLoading() {
         var _this2 = this;
 
-        showProcessingModal(this._i18n.pleaseWait);
+        this._processingModal.show(this._i18n.pleaseWait);
+
         this._timeoutProcessing = setTimeout(function () {
-          showProcessingModal(_this2._i18n.almostThere);
+          _this2._processingModal.show(_this2._i18n.almostThere);
         }, 3500);
       }
+      /**
+       * @protected
+       */
+
     }, {
-      key: "disableLoading",
-      value: function disableLoading() {
-        hideProcessingModal();
+      key: "_disableLoading",
+      value: function _disableLoading() {
+        this._processingModal.hide();
       }
+      /**
+       * @protected
+       */
+
     }, {
-      key: "printMap",
-      value: function printMap(form) {
+      key: "_printMap",
+      value: function _printMap(form) {
         var _this3 = this;
 
         var _a;
 
-        this.prepareLoading();
+        this._prepareLoading();
+
         this._form = form; // To allow intermediate zoom levels
 
         this._view.setConstrainResolution(false);
@@ -3948,7 +4014,8 @@
         dim = this._form.orientation === 'landscape' ? dim : dim.reverse();
         this._pdf.width = dim[0];
         this._pdf.height = dim[1];
-        var mapSizeForPrint = this.setMapSizForPrint(this._form.resolution);
+
+        var mapSizeForPrint = this._setMapSizForPrint(this._form.resolution);
 
         var _mapSizeForPrint = _slicedToArray(mapSizeForPrint, 2),
             width = _mapSizeForPrint[0],
@@ -3980,7 +4047,7 @@
                       this._pdf.doc.addImage(dataUrl, 'JPEG', this._options.style.margin, // Add margins
                       this._options.style.margin, this._pdf.width - this._options.style.margin * 2, this._pdf.height - this._options.style.margin * 2);
 
-                      scaleDenominator = this.calculateScaleDenominator(this._form.resolution, scaleResolution);
+                      scaleDenominator = this._calculateScaleDenominator(this._form.resolution, scaleResolution);
                       _context.next = 4;
                       return addElementsToPDF(this._view, this._pdf, this._form, scaleDenominator, this._options, this._i18n);
 
@@ -3988,8 +4055,9 @@
                       this._pdf.doc.save(this._options.filename + '.pdf'); // Reset original map size
 
 
-                      this.onEndPrint();
-                      this.disableLoading();
+                      this._onEndPrint();
+
+                      this._disableLoading();
 
                     case 7:
                     case "end":
@@ -4001,9 +4069,9 @@
           }).catch(function (err) {
             console.error(err);
 
-            _this3.onEndPrint();
+            _this3._onEndPrint();
 
-            showProcessingModal(_this3._i18n.error,
+            _this3._processingModal.show(_this3._i18n.error,
             /** footer */
             true);
           });
@@ -4017,11 +4085,19 @@
 
         this._map.getView().setResolution(scaleResolution);
       }
+      /**
+       * @public
+       */
+
     }, {
       key: "showPrintModal",
       value: function showPrintModal$1() {
         showPrintModal();
       }
+      /**
+       * @public
+       */
+
     }, {
       key: "hidePrintModal",
       value: function hidePrintModal$1() {

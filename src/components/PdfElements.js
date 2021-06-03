@@ -414,8 +414,6 @@ class ElementsPDF {
 
     // Adapted from http://hg.intevation.de/gemma/file/tip/client/src/components/Pdftool.vue#l252
     addScaleBar = (position, offset) => {
-        // scaleDenominator is the x in 1:x of the map scale
-
         // hardcode maximal width for now
         const maxWidth = 100 + this._style.margin * 2; // in mm
 

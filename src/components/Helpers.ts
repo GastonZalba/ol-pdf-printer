@@ -1,12 +1,14 @@
+import { PluggableMap } from 'ol';
 import { METERS_PER_UNIT } from 'ol/proj/Units';
 
 /**
- * @param {number} resolution Resolution.
- * @param {string} units Units
- * @param {boolean=} opt_round Whether to round the scale or not.
- * @return {number} Scale
+ *
+ * @param map
+ * @param opt_round
+ * @returns
+ * @protected
  */
-export const getMapScale = (map, opt_round = true) => {
+export const getMapScale = (map: PluggableMap, opt_round = true): number => {
     const dpi = 25.4 / 0.28;
 
     const view = map.getView();

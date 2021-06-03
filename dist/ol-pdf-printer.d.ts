@@ -1,6 +1,5 @@
 import { Image, PluggableMap, View } from 'ol';
-import { Options as ControlOptions } from 'ol/control/Control';
-import Control from 'ol/control/Control';
+import Control, { Options as ControlOptions } from 'ol/control/Control';
 import { jsPDF } from 'jspdf';
 import './assets/css/ol-pdf-printer.css';
 export default class PdfPrinter extends Control {
@@ -10,6 +9,7 @@ export default class PdfPrinter extends Control {
     protected _mapTarget: HTMLElement;
     protected _form: Form;
     protected element: HTMLElement;
+    protected _processingModal: any;
     protected _initialized: boolean;
     protected _timeoutProcessing: ReturnType<typeof setTimeout>;
     protected _initialViewResolution: number;
@@ -20,21 +20,56 @@ export default class PdfPrinter extends Control {
     };
     protected _options: Options;
     constructor(opt_options?: Options);
-    show(): void;
-    init(): void;
-    calculateScaleDenominator(resolution: number, scaleResolution: number): number;
-    getMeterPerPixel(scaleResolution: number): number;
-    setMapSizForPrint(resolution: number): number[];
+    /**
+     * @protected
+     */
+    _show(): void;
+    /**
+     * @protected
+     */
+    _init(): void;
+    /**
+     *   Adapted from http://hg.intevation.de/gemma/file/tip/client/src/components/Pdftool.vue#l252
+     * @protected
+     */
+    _calculateScaleDenominator(resolution: number, scaleResolution: number): number;
+    /**
+     * @protected
+     */
+    _getMeterPerPixel(scaleResolution: number): number;
+    /**
+     * @protected
+     */
+    _setMapSizForPrint(resolution: number): number[];
     /**
      * Restore inital view, remove classes, disable loading
      */
-    onEndPrint(): void;
-    prepareLoading(): void;
-    disableLoading(): void;
-    printMap(form: Form): void;
+    _onEndPrint(): void;
+    /**
+     * @protected
+     */
+    _prepareLoading(): void;
+    /**
+     * @protected
+     */
+    _disableLoading(): void;
+    /**
+     * @protected
+     */
+    _printMap(form: Form): void;
+    /**
+     * @public
+     */
     showPrintModal(): void;
+    /**
+     * @public
+     */
     hidePrintModal(): void;
 }
+/**
+ * **_[interface]_** - Custom Language specified when creating a WFST instance
+ * @protected
+ */
 export interface I18n {
     printPdf: string;
     pleaseWait: string;
@@ -57,16 +92,25 @@ export interface I18n {
     current: string;
     paper: string;
 }
+/**
+ * **_[interface]_**
+ * @protected
+ */
 interface PaperSize {
     size: number[];
     value: string;
     selected?: boolean;
 }
+/**
+ * **_[interface]_**
+ * @protected
+ */
 interface Dpi {
     value: number;
     selected?: boolean;
 }
 /**
+ * **_[interface]_**
  * @protected
  */
 interface Form {
@@ -79,8 +123,11 @@ interface Form {
     attributions: boolean;
     scalebar: boolean;
 }
+/**
+ * **_[interface]_** - Options specified when creating an instance
+ */
 export interface Options extends ControlOptions {
-    lang?: string;
+    language?: string;
     filename?: string;
     style?: {
         margin: number;

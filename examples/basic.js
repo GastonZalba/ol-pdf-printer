@@ -1,10 +1,37 @@
 (function () {
 
+  var examplePoint = new ol.Feature({
+    geometry: new ol.geom.Point([-6503744, -4115148])
+  })
+
+  examplePoint.setStyle(
+    new ol.style.Style(
+      {
+        image: new ol.style.Icon({
+          anchor: [0.32, 64],
+          anchorXUnits: 'fraction',
+          anchorYUnits: 'pixels',
+          src: 'https://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png',
+          size: [64, 64],
+          scale: 0.5,
+          crossOrigin: 'anonymous' // Important
+        })
+      }
+    )
+  )
+
   var layers = [
     new ol.layer.Tile({
       source: new ol.source.OSM()
     }),
+    new ol.layer.Vector({
+      zIndex: 3,
+      source: new ol.source.Vector({
+        features: [examplePoint]
+      })
+    }),
     new ol.layer.Tile({
+      zIndex: 2,
       source: new ol.source.TileWMS({
         url: 'http://wms.ign.gob.ar/geoserver/geodesia-demarcacion/wms',
         params: { 'LAYERS': 'nivelacion_alta_precision', 'TILED': true },
@@ -20,7 +47,7 @@
     view: new ol.View({
       projection: 'EPSG:3857',
       center: [-6503744, -4115148],
-      zoom: 13
+      zoom: 8
     })
   });
 

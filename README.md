@@ -59,3 +59,5 @@ TypeScript types are shipped with the project in the dist directory and should b
 * Interface comments
 * Example screenshots
 * Legends support
+* Tests!
+* Improve Scalebar

@@ -11,11 +11,7 @@ import {
     showPrintModal,
     hidePrintModal
 } from './components/PrintModal';
-import {
-    initProcessingModal,
-    showProcessingModal,
-    hideProcessingModal
-} from './components/ProcessingModal';
+import ProcessingModal from './components/ProcessingModal';
 import { addElementsToPDF } from './components/PdfElements';
 
 import * as i18n from './components/i18n/index.js';
@@ -47,9 +43,9 @@ function deepObjectAssign(target, ...sources) {
             const t_val = target[key];
             target[key] =
                 t_val &&
-                    s_val &&
-                    typeof t_val === 'object' &&
-                    typeof s_val === 'object'
+                s_val &&
+                typeof t_val === 'object' &&
+                typeof s_val === 'object'
                     ? deepObjectAssign(t_val, s_val)
                     : s_val;
         });
@@ -66,6 +62,8 @@ export default class PdfPrinter extends Control {
     protected _form: Form;
 
     protected element: HTMLElement;
+
+    protected _processingModal;
 
     protected _initialized: boolean;
 
@@ -93,7 +91,7 @@ export default class PdfPrinter extends Control {
         this._i18n =
             opt_options.language && opt_options.language in i18n
                 ? i18n[opt_options.language]
-                : i18n[DEFAULT_LANGUAGE ];
+                : i18n[DEFAULT_LANGUAGE];
 
         if (opt_options.i18n) {
             // Merge custom translations
@@ -195,11 +193,13 @@ export default class PdfPrinter extends Control {
             this._i18n,
             this._printMap.bind(this)
         );
-        initProcessingModal(
+
+        this._processingModal = new ProcessingModal(
             this._i18n,
             this._options,
             this._onEndPrint.bind(this)
         );
+
         this._initialized = true;
     }
 
@@ -214,8 +214,8 @@ export default class PdfPrinter extends Control {
         const pixelsPerMapMillimeter = resolution / 25.4;
         return Math.round(
             1000 *
-            pixelsPerMapMillimeter *
-            this._getMeterPerPixel(scaleResolution)
+                pixelsPerMapMillimeter *
+                this._getMeterPerPixel(scaleResolution)
         );
     }
     /**
@@ -257,17 +257,17 @@ export default class PdfPrinter extends Control {
      * @protected
      */
     _prepareLoading(): void {
-        showProcessingModal(this._i18n.pleaseWait);
+        this._processingModal.show(this._i18n.pleaseWait);
 
         this._timeoutProcessing = setTimeout(() => {
-            showProcessingModal(this._i18n.almostThere);
+            this._processingModal.show(this._i18n.almostThere);
         }, 3500);
     }
     /**
      * @protected
      */
     _disableLoading(): void {
-        hideProcessingModal();
+        this._processingModal.hide();
     }
     /**
      * @protected
@@ -357,7 +357,10 @@ export default class PdfPrinter extends Control {
                 .catch((err) => {
                     console.error(err);
                     this._onEndPrint();
-                    showProcessingModal(this._i18n.error, /** footer */ true);
+                    this._processingModal.show(
+                        this._i18n.error,
+                        /** footer */ true
+                    );
                 });
         });
 
@@ -409,7 +412,7 @@ export interface I18n {
 }
 
 /**
- * **_[interface]_** 
+ * **_[interface]_**
  * @protected
  */
 interface PaperSize {
@@ -419,7 +422,7 @@ interface PaperSize {
 }
 
 /**
- * **_[interface]_** 
+ * **_[interface]_**
  * @protected
  */
 interface Dpi {
@@ -428,7 +431,7 @@ interface Dpi {
 }
 
 /**
- * **_[interface]_** 
+ * **_[interface]_**
  * @protected
  */
 interface Form {
@@ -443,7 +446,7 @@ interface Form {
 }
 
 /**
- * **_[interface]_** 
+ * **_[interface]_**
  * @protected
  */
 interface MyWindow extends Window {
