@@ -47,20 +47,13 @@ module.exports = {
                         pragma: 'myPragma',
                         pragmaFrag: "'fragment'"
                     }
-                ],
-                [
-                    'babel-plugin-jsx-pragmatic',
-                    {
-                        module: '/src/myPragma',
-                        import: 'myPragma'
-                    }
                 ]
             ]
         }),
         css({
             output: function (styles, styleNodes) {
-                mkdirSync('lib', { recursive: true });
-                writeFileSync('lib/ol-pdf-printer.css', styles)
+                mkdirSync('lib/css', { recursive: true });
+                writeFileSync('lib/css/ol-pdf-printer.css', styles)
             }
         })
     ],

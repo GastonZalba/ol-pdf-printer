@@ -15,7 +15,7 @@
     "lint": "eslint src/*.ts && prettier --check src",
     "copy-assets": "ncp src/assets/ tmp-dist/assets/ && ncp src/assets/ tmp-lib/assets/",
     "build": "npm run lint && npm run precleanstart && tsc --pretty --project ./tsconfig.json && tsc --pretty --project ./tsconfig-dist.json && npm run copy-assets && rollup --config rollup.config.dist.js && rollup --config rollup.config.js",
-    "postbuild": "ncp tmp-lib/ol-pdf-printer.d.ts dist/ol-pdf-printer.d.ts && ncp tmp-lib/ol-pdf-printer.d.ts lib/ol-pdf-printer.d.ts && del-cli tmp-dist tmp-lib"
+    "postbuild": "ncp tmp-lib/ol-pdf-printer.d.ts dist/ol-pdf-printer.d.ts && ncp tmp-lib/ol-pdf-printer.d.ts lib/ol-pdf-printer.d.ts && ncp src/assets/css/bootstrap.min.css dist/css/bootstrap.min.css && ncp src/assets/css/bootstrap.min.css lib/css/bootstrap.min.css && del-cli tmp-dist tmp-lib"
   },
   "repository": {
     "type": "git",
@@ -53,7 +53,7 @@
     "@types/ol": "^6.4.2",
     "@typescript-eslint/eslint-plugin": "^4.8.2",
     "@typescript-eslint/parser": "^4.8.2",
-    "babel-plugin-jsx-pragmatic": "^1.0.2",
+    "chokidar-cli": "^2.1.0",
     "clean-css": "^4.2.3",
     "del-cli": "^3.0.1",
     "documentation": "^13.1.0",

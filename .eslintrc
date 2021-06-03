@@ -18,6 +18,7 @@
     },
     "globals": {
         "ol": "readonly",
+        "jspdf": "readonly",
         "document": "writable"
     }
 }

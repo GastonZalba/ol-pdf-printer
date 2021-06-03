@@ -15,17 +15,16 @@ See [CHANGELOG](./CHANGELOG.md) for details of changes in each release.
 ### Browser
 
 #### JS
-
-Load `ol-pdf-printer.js` after OpenLayers. Dji Geozones is available as `DjiGeozones`.
+Load `ol-pdf-printer.js` after [OpenLayers](https://www.npmjs.com/package/ol) and [jspdf](https://www.npmjs.com/package/jspdf). Ol Pdf Printer is available as `PdfPrinter`.
 
 ```HTML
 <script src="https://unpkg.com/ol-pdf-printer@1.0.0"></script>
 ```
 
 #### CSS
-This use the css of boostrap.
 ```HTML
 <link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.0.0/dist/ol-pdf-printer.css" />
+<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.0.0/dist/bootstrap.min.css" />
 ```
 
 ### Parcel, Webpack, etc.
@@ -40,7 +39,7 @@ Install the package via `npm`
 
 #### CSS
 
-The CSS file `ol-pdf-printer.css` can be found in `./node_modules/ol-pdf-printer/dist/css`
+The CSS files `ol-pdf-printer.css` and `boostrap.min.css` can be found in `./node_modules/ol-pdf-printer/dist/css`
 
 ##### TypeScript type definition
 

@@ -1,4 +1,6 @@
-export const es = {
+import { I18n } from '../../ol-pdf-printer';
+
+export const es: I18n = {
     printPdf: 'Imprimir PDF',
     pleaseWait: 'Por favor espere...',
     almostThere: 'Ya casi...',

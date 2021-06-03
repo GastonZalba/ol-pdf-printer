@@ -23,7 +23,8 @@ import * as i18n from './components/i18n/index.js';
 
 import compassIcon from './assets/images/compass.svg';
 import pdfIcon from './assets/images/pdf.svg';
-import './assets/css/print.css';
+
+import './assets/css/ol-pdf-printer.css';
 
 /**
  * @protected
@@ -151,13 +152,15 @@ export default class PdfPrinter extends Control {
                 backdropTransition: 150,
                 templates: {
                     dialog: '<div class="modal-dialog modal-dialog-centered"></div>',
-                    headerClose: `
-                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="${this._i18n.close}">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                    `
+                    headerClose: `<button type="button" class="btn-close" data-dismiss="modal" aria-label="${this._i18n.close}"><span aria-hidden="true">×</span></button>`
                 }
             }
+        };
+
+        this._pdf = {
+            doc: null,
+            width: null,
+            height: null
         };
 
         // Merge options
@@ -178,13 +181,25 @@ export default class PdfPrinter extends Control {
         this._map = this.getMap();
         this._view = this._map.getView();
         this._mapTarget = this._map.getTargetElement();
-        initPrintModal(this._map, this._options, this._i18n, this.printMap);
-        initProcessingModal(this._i18n, this._options, this.onEndPrint);
+        initPrintModal(
+            this._map,
+            this._options,
+            this._i18n,
+            this.printMap.bind(this)
+        );
+        initProcessingModal(
+            this._i18n,
+            this._options,
+            this.onEndPrint.bind(this)
+        );
         this._initialized = true;
     }
 
     // Adapted from http://hg.intevation.de/gemma/file/tip/client/src/components/Pdftool.vue#l252
-    calculateScaleDenominator(resolution, scaleResolution) {
+    calculateScaleDenominator(
+        resolution: number,
+        scaleResolution: number
+    ): number {
         const pixelsPerMapMillimeter = resolution / 25.4;
         return Math.round(
             1000 *
@@ -193,7 +208,7 @@ export default class PdfPrinter extends Control {
         );
     }
 
-    getMeterPerPixel(scaleResolution) {
+    getMeterPerPixel(scaleResolution: number): number {
         const proj = this._view.getProjection();
         return (
             getPointResolution(proj, scaleResolution, this._view.getCenter()) *
@@ -201,7 +216,7 @@ export default class PdfPrinter extends Control {
         );
     }
 
-    setMapSizForPrint(resolution): number[] {
+    setMapSizForPrint(resolution: number): number[] {
         const pixelsPerMapMillimeter = resolution / 25.4;
         return [
             Math.round(this._pdf.width * pixelsPerMapMillimeter),
@@ -257,7 +272,11 @@ export default class PdfPrinter extends Control {
         const mapSizeForPrint = this.setMapSizForPrint(this._form.resolution);
         const [width, height] = mapSizeForPrint;
 
-        this._pdf.doc = new jsPDF({
+        // UMD support
+        const _jsPDF =
+            (window as MyWindow & typeof globalThis).jspdf?.jsPDF || jsPDF;
+
+        this._pdf.doc = new _jsPDF({
             orientation: this._form.orientation,
             format: this._form.format
         });
@@ -275,58 +294,51 @@ export default class PdfPrinter extends Control {
                 this._view.getCenter()
             );
 
-        this._map.once(
-            'rendercomplete',
-            function () {
-                domtoimage
-                    .toJpeg(
-                        this._mapTarget.querySelector(
-                            '.ol-unselectable.ol-layers'
-                        ),
-                        {
-                            width,
-                            height
-                        }
-                    )
-                    .then(async (dataUrl) => {
-                        this._pdf.doc.addImage(
-                            dataUrl,
-                            'JPEG',
-                            this._options.style.margin, // Add margins
-                            this._options.style.margin,
-                            this._pdf.width - this._options.style.margin * 2,
-                            this._pdf.height - this._options.style.margin * 2
-                        );
+        this._map.once('rendercomplete', () => {
+            domtoimage
+                .toJpeg(
+                    this._mapTarget.querySelector('.ol-unselectable.ol-layers'),
+                    {
+                        width,
+                        height
+                    }
+                )
+                .then(async (dataUrl) => {
+                    this._pdf.doc.addImage(
+                        dataUrl,
+                        'JPEG',
+                        this._options.style.margin, // Add margins
+                        this._options.style.margin,
+                        this._pdf.width - this._options.style.margin * 2,
+                        this._pdf.height - this._options.style.margin * 2
+                    );
 
-                        const scaleDenominator = this.calculateScaleDenominator(
-                            this._form.resolution,
-                            scaleResolution
-                        );
+                    const scaleDenominator = this.calculateScaleDenominator(
+                        this._form.resolution,
+                        scaleResolution
+                    );
 
-                        await addElementsToPDF(
-                            this._view,
-                            this._pdf,
-                            this._form,
-                            scaleDenominator,
-                            this._options
-                        );
+                    await addElementsToPDF(
+                        this._view,
+                        this._pdf,
+                        this._form,
+                        scaleDenominator,
+                        this._options,
+                        this._i18n
+                    );
 
-                        this._pdf.doc.save(this._options.filename + '.pdf');
+                    this._pdf.doc.save(this._options.filename + '.pdf');
 
-                        // Reset original map size
-                        this.onEndPrint();
-                        this.disableLoading();
-                    })
-                    .catch((err) => {
-                        console.error(err);
-                        this.onEndPrint();
-                        showProcessingModal(
-                            this._118n.error,
-                            /** footer */ true
-                        );
-                    });
-            }.bind(this)
-        );
+                    // Reset original map size
+                    this.onEndPrint();
+                    this.disableLoading();
+                })
+                .catch((err) => {
+                    console.error(err);
+                    this.onEndPrint();
+                    showProcessingModal(this._i18n.error, /** footer */ true);
+                });
+        });
 
         // Set print size
         this._mapTarget.style.width = width + 'px';
@@ -335,11 +347,11 @@ export default class PdfPrinter extends Control {
         this._map.getView().setResolution(scaleResolution);
     }
 
-    showPrintModal() {
+    showPrintModal(): void {
         showPrintModal();
     }
 
-    hidePrintModal() {
+    hidePrintModal(): void {
         hidePrintModal();
     }
 }
@@ -390,6 +402,10 @@ interface Form {
     compass: boolean;
     attributions: boolean;
     scalebar: boolean;
+}
+
+interface MyWindow extends Window {
+    jspdf: any;
 }
 
 export interface Options extends ControlOptions {

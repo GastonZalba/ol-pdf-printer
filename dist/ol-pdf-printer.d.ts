@@ -2,7 +2,7 @@ import { Image, PluggableMap, View } from 'ol';
 import { Options as ControlOptions } from 'ol/control/Control';
 import Control from 'ol/control/Control';
 import { jsPDF } from 'jspdf';
-import './assets/css/print.css';
+import './assets/css/ol-pdf-printer.css';
 export default class PdfPrinter extends Control {
     protected _i18n: I18n;
     protected _map: PluggableMap;
@@ -22,9 +22,9 @@ export default class PdfPrinter extends Control {
     constructor(opt_options?: Options);
     show(): void;
     init(): void;
-    calculateScaleDenominator(resolution: any, scaleResolution: any): number;
-    getMeterPerPixel(scaleResolution: any): number;
-    setMapSizForPrint(resolution: any): number[];
+    calculateScaleDenominator(resolution: number, scaleResolution: number): number;
+    getMeterPerPixel(scaleResolution: number): number;
+    setMapSizForPrint(resolution: number): number[];
     /**
      * Restore inital view, remove classes, disable loading
      */

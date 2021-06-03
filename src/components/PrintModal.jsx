@@ -140,6 +140,7 @@ const Footer = (lang) => {
 export const initPrintModal = (map, options, lang, printMap) => {
     modal = new Modal({
         headerClose: true,
+        header: true,
         animate: true,
         title: lang.printPdf,
         content: Content(lang, options),

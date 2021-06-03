@@ -51,14 +51,6 @@ module.exports = {
                         pragma: 'myPragma',
                         pragmaFrag: "'fragment'"
                     }
-                ],
-                [
-                    'babel-plugin-jsx-pragmatic',
-                    {
-                        module: '/src/myPragma',
-                        import: 'myPragma',
-                        export: 'myPragma'
-                    }
                 ]
             ],
             babelHelpers: 'runtime',
@@ -83,10 +75,10 @@ module.exports = {
         image(),
         css({
             output: function (styles, styleNodes) {
-                mkdirSync('dist', { recursive: true });
-                writeFileSync('dist/ol-pdf-printer.css', styles)
+                mkdirSync('dist/css', { recursive: true });
+                writeFileSync('dist/css/ol-pdf-printer.css', styles)
                 const compressed = new CleanCss().minify(styles).styles;
-                writeFileSync('dist/ol-pdf-printer.min.css', compressed)
+                writeFileSync('dist/css/ol-pdf-printer.min.css', compressed)
             }
         })
     ],

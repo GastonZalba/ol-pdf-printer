@@ -5,11 +5,19 @@ class ElementsPDF {
     _form;
     _style;
 
-    addElementsToPDF = async (view, pdf, form, scaleDenominator, options) => {
+    addElementsToPDF = async (
+        view,
+        pdf,
+        form,
+        scaleDenominator,
+        options,
+        i18n
+    ) => {
         this._view = view;
         this._pdf = pdf;
         this._form = form;
         this._scaleDenominator = scaleDenominator;
+        this._i18n = i18n;
 
         const { mapElements, extraInfo, style, watermark } = options;
 
@@ -170,22 +178,12 @@ class ElementsPDF {
         this.addText(x, y, width, fontSize, color, align, str);
     };
 
-    addTextWithBack = (
-        str,
-        position,
-        offset,
-        fontSize,
-        txcolor,
-        bkcolor,
-        brcolor,
-        maxWidth,
-        align
-    ) => {
+    addTextWithBack = (str, position, offset, fontSize, maxWidth) => {
         const paddingBack = 4;
 
         const { x, y } = this.calculateOffsetByPosition(position, offset);
 
-        this._pdf.doc.setTextColor(txcolor);
+        this._pdf.doc.setTextColor(this._style.txcolor);
         this._pdf.doc.setFontSize(fontSize);
 
         const { w, h } = this._pdf.doc.getTextDimensions(str, {
@@ -197,12 +195,12 @@ class ElementsPDF {
             y,
             w + paddingBack * 2,
             h + paddingBack,
-            bkcolor,
-            brcolor
+            this._style.bkcolor,
+            this._style.brcolor
         );
 
         this._pdf.doc.text(str, x + paddingBack, y + paddingBack + 1, {
-            align: align,
+            align: 'left',
             maxWidth: maxWidth
         });
     };
@@ -377,9 +375,11 @@ class ElementsPDF {
 
     addScale = (position, width, offset, fontSize, txcolor, align) => {
         this._pdf.doc.setFont('helvetica', 'bold');
-        const str = `Escala 1:${this._scaleDenominator.toLocaleString(
-            'de'
-        )} - Hoja ${this._form.format.toUpperCase()}`;
+        const str = `${
+            this._i18n.scale
+        } 1:${this._scaleDenominator.toLocaleString('de')} - ${
+            this._i18n.paper
+        } ${this._form.format.toUpperCase()}`;
         this.addTextByOffset(
             position,
             offset,

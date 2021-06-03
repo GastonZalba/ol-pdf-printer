@@ -3006,6 +3006,7 @@
   var initPrintModal = function initPrintModal(map, options, lang, printMap) {
     modal = new modalVanilla(Object.assign({
       headerClose: true,
+      header: true,
       animate: true,
       title: lang.printPdf,
       content: Content(lang, options),
@@ -3127,7 +3128,7 @@
 
     _classCallCheck(this, ElementsPDF);
 
-    this.addElementsToPDF = function (view, pdf, form, scaleDenominator, options) {
+    this.addElementsToPDF = function (view, pdf, form, scaleDenominator, options, i18n) {
       return __awaiter$1(_this, void 0, void 0, /*#__PURE__*/regenerator.mark(function _callee() {
         var mapElements, extraInfo, style, watermark, offset, centerX;
         return regenerator.wrap(function _callee$(_context) {
@@ -3138,6 +3139,7 @@
                 this._pdf = pdf;
                 this._form = form;
                 this._scaleDenominator = scaleDenominator;
+                this._i18n = i18n;
                 mapElements = options.mapElements, extraInfo = options.extraInfo, style = options.style, watermark = options.watermark;
                 this._style = style; // Defaults
 
@@ -3148,33 +3150,33 @@
                 centerX = this._pdf.width / 2;
 
                 if (!(mapElements.compass && this._form.compass)) {
-                  _context.next = 11;
+                  _context.next = 12;
                   break;
                 }
 
-                _context.next = 11;
+                _context.next = 12;
                 return this.addCompass(mapElements.compass, 'bottomright', {
                   x: 2,
                   y: 6
                 }, 6, this._view.getRotation());
 
-              case 11:
+              case 12:
                 if (mapElements.description && this._form.description) {
                   this.addTextWithBack(this._form.description, 'topleft', offset, 8, 50);
                 }
 
                 if (!watermark) {
-                  _context.next = 15;
+                  _context.next = 16;
                   break;
                 }
 
-                _context.next = 15;
+                _context.next = 16;
                 return this.addWatermark(watermark, 'topright', {
                   x: 0,
                   y: 0
                 }, 14);
 
-              case 15:
+              case 16:
                 if (mapElements.scalebar && this._form.scalebar) {
                   this.addScaleBar('bottomleft', offset);
                 }
@@ -3208,7 +3210,7 @@
                   }, 7, '#000000', 'center');
                 }
 
-              case 20:
+              case 21:
               case "end":
                 return _context.stop();
             }
@@ -3281,14 +3283,14 @@
       _this.addText(x, y, width, fontSize, color, align, str);
     };
 
-    this.addTextWithBack = function (str, position, offset, fontSize, txcolor, bkcolor, brcolor, maxWidth, align) {
+    this.addTextWithBack = function (str, position, offset, fontSize, maxWidth) {
       var paddingBack = 4;
 
       var _this$calculateOffset2 = _this.calculateOffsetByPosition(position, offset),
           x = _this$calculateOffset2.x,
           y = _this$calculateOffset2.y;
 
-      _this._pdf.doc.setTextColor(txcolor);
+      _this._pdf.doc.setTextColor(_this._style.txcolor);
 
       _this._pdf.doc.setFontSize(fontSize);
 
@@ -3298,10 +3300,10 @@
           w = _this$_pdf$doc$getTex.w,
           h = _this$_pdf$doc$getTex.h;
 
-      _this.addRoundedBox(x, y, w + paddingBack * 2, h + paddingBack, bkcolor, brcolor);
+      _this.addRoundedBox(x, y, w + paddingBack * 2, h + paddingBack, _this._style.bkcolor, _this._style.brcolor);
 
       _this._pdf.doc.text(str, x + paddingBack, y + paddingBack + 1, {
-        align: align,
+        align: 'left',
         maxWidth: maxWidth
       });
     };
@@ -3441,7 +3443,7 @@
     this.addScale = function (position, width, offset, fontSize, txcolor, align) {
       _this._pdf.doc.setFont('helvetica', 'bold');
 
-      var str = "Escala 1:".concat(_this._scaleDenominator.toLocaleString('de'), " - Hoja ").concat(_this._form.format.toUpperCase());
+      var str = "".concat(_this._i18n.scale, " 1:").concat(_this._scaleDenominator.toLocaleString('de'), " - ").concat(_this._i18n.paper, " ").concat(_this._form.format.toUpperCase());
 
       _this.addTextByOffset(position, offset, width, fontSize, txcolor, align, str);
     };
@@ -3831,9 +3833,14 @@
           backdropTransition: 150,
           templates: {
             dialog: '<div class="modal-dialog modal-dialog-centered"></div>',
-            headerClose: "\n                    <button type=\"button\" class=\"btn-close\" data-dismiss=\"modal\" aria-label=\"".concat(_this._i18n.close, "\">\n                        <span aria-hidden=\"true\">\xD7</span>\n                    </button>\n                    ")
+            headerClose: "<button type=\"button\" class=\"btn-close\" data-dismiss=\"modal\" aria-label=\"".concat(_this._i18n.close, "\"><span aria-hidden=\"true\">\xD7</span></button>")
           }
         }
+      };
+      _this._pdf = {
+        doc: null,
+        width: null,
+        height: null
       }; // Merge options
 
       _this._options = deepObjectAssign(_this._options, opt_options);
@@ -3861,8 +3868,8 @@
         this._map = this.getMap();
         this._view = this._map.getView();
         this._mapTarget = this._map.getTargetElement();
-        initPrintModal(this._map, this._options, this._i18n, this.printMap);
-        initProcessingModal(this._i18n, this._options, this.onEndPrint);
+        initPrintModal(this._map, this._options, this._i18n, this.printMap.bind(this));
+        initProcessingModal(this._i18n, this._options, this.onEndPrint.bind(this));
         this._initialized = true;
       } // Adapted from http://hg.intevation.de/gemma/file/tip/client/src/components/Pdftool.vue#l252
 
@@ -3925,6 +3932,8 @@
       value: function printMap(form) {
         var _this3 = this;
 
+        var _a;
+
         this.prepareLoading();
         this._form = form; // To allow intermediate zoom levels
 
@@ -3943,9 +3952,12 @@
 
         var _mapSizeForPrint = _slicedToArray(mapSizeForPrint, 2),
             width = _mapSizeForPrint[0],
-            height = _mapSizeForPrint[1];
+            height = _mapSizeForPrint[1]; // UMD support
 
-        this._pdf.doc = new jspdf.jsPDF({
+
+        var _jsPDF = ((_a = window.jspdf) === null || _a === void 0 ? void 0 : _a.jsPDF) || jspdf.jsPDF;
+
+        this._pdf.doc = new _jsPDF({
           orientation: this._form.orientation,
           format: this._form.format
         }); // Save current resolution to restore it later
@@ -3955,13 +3967,11 @@
         var scaleResolution = this._form.scale / proj.getPointResolution(this._view.getProjection(), pixelsPerMapMillimeter, this._view.getCenter());
 
         this._map.once('rendercomplete', function () {
-          var _this4 = this;
-
-          domToImageImproved.toJpeg(this._mapTarget.querySelector('.ol-unselectable.ol-layers'), {
+          domToImageImproved.toJpeg(_this3._mapTarget.querySelector('.ol-unselectable.ol-layers'), {
             width: width,
             height: height
           }).then(function (dataUrl) {
-            return __awaiter(_this4, void 0, void 0, /*#__PURE__*/regenerator.mark(function _callee() {
+            return __awaiter(_this3, void 0, void 0, /*#__PURE__*/regenerator.mark(function _callee() {
               var scaleDenominator;
               return regenerator.wrap(function _callee$(_context) {
                 while (1) {
@@ -3972,7 +3982,7 @@
 
                       scaleDenominator = this.calculateScaleDenominator(this._form.resolution, scaleResolution);
                       _context.next = 4;
-                      return addElementsToPDF(this._view, this._pdf, this._form, scaleDenominator, this._options);
+                      return addElementsToPDF(this._view, this._pdf, this._form, scaleDenominator, this._options, this._i18n);
 
                     case 4:
                       this._pdf.doc.save(this._options.filename + '.pdf'); // Reset original map size
@@ -3991,13 +4001,13 @@
           }).catch(function (err) {
             console.error(err);
 
-            _this4.onEndPrint();
+            _this3.onEndPrint();
 
-            showProcessingModal(_this4._118n.error,
+            showProcessingModal(_this3._i18n.error,
             /** footer */
             true);
           });
-        }.bind(this)); // Set print size
+        }); // Set print size
 
 
         this._mapTarget.style.width = width + 'px';
