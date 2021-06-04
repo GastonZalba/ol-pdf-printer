@@ -234,7 +234,7 @@ class ElementsPDF {
             this._style.brcolor
         );
 
-        this._pdf.doc.text(str, x + paddingBack, y + paddingBack + 1, {
+        this._pdf.doc.text(str, x + paddingBack, y + paddingBack, {
             align: 'left',
             maxWidth: maxWidth
         });
@@ -251,7 +251,7 @@ class ElementsPDF {
         const offset = { x: 0, y: 0 };
         const fontSize = 14;
 
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             const imageSize = 12;
             const fontSizeSubtitle = fontSize / 1.8;
             let back = false;
@@ -370,9 +370,17 @@ class ElementsPDF {
                     resolve();
                 } else {
                     const image = new Image(imageSize, imageSize);
+                    image.crossOrigin = 'Anonymous';
                     image.onload = () => {
-                        addImage(image);
+                        try {
+                            addImage(image);
+                        } catch (err) {
+                            return reject(err);
+                        }
                         resolve();
+                    };
+                    image.onerror = () => {
+                        return reject(this._i18n.errorImage);
                     };
                     image.src = watermark.logo;
                 }
@@ -631,9 +639,9 @@ class ElementsPDF {
             scaleBarY - 1
         );
         this._pdf.doc.text(
-            String(scaleBarY - 1),
-            Math.round(length / 2),
-            scaleBarX + size * 2 - 2
+            String(Math.round(length / 2)),
+            scaleBarX + size * 2 - 2,
+            scaleBarY - 1
         );
         this._pdf.doc.text(
             Math.round(length).toString() + ' ' + unit,
@@ -654,7 +662,7 @@ class ElementsPDF {
         const size = 6;
         const rotationRadians = this._view.getRotation();
 
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             const imageSize = 100;
 
             const { x, y } = this.calculateOffsetByPosition(
@@ -714,10 +722,15 @@ class ElementsPDF {
                 resolve();
             } else if (typeof imgSrc === 'string') {
                 const image = new Image(imageSize, imageSize);
-
                 image.onload = () => {
-                    addImage(image);
-                    resolve();
+                    try {
+                        addImage(image);
+                    } catch (err) {
+                        return reject(err);
+                    }
+                };
+                image.onerror = () => {
+                    return reject(this._i18n.errorImage);
                 };
 
                 image.src = imgSrc;

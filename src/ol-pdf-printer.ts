@@ -347,13 +347,12 @@ export default class PdfPrinter extends Control {
                     this._onEndPrint();
                     this._disableLoading();
                 })
-                .catch((err) => {
+                .catch((err: Error) => {
+                    const message =
+                        typeof err === 'string' ? err : this._i18n.error;
                     console.error(err);
                     this._onEndPrint();
-                    this._processingModal.show(
-                        this._i18n.error,
-                        /** footer */ true
-                    );
+                    this._processingModal.show(message, /** footer */ true);
                 });
         });
 
@@ -386,6 +385,7 @@ export interface I18n {
     pleaseWait: string;
     almostThere: string;
     error: string;
+    errorImage: string;
     printing: string;
     cancel: string;
     close: string;

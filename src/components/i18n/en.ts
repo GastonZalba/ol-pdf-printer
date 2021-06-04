@@ -5,6 +5,7 @@ export const en: I18n = {
     pleaseWait: 'Please wait...',
     almostThere: 'Almost there...',
     error: 'An error occurred while printing',
+    errorImage: 'An error ocurred while loading an image',
     printing: 'Printing',
     cancel: 'Cancel',
     close: 'Close',

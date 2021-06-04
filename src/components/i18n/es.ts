@@ -5,6 +5,7 @@ export const es: I18n = {
     pleaseWait: 'Por favor espere...',
     almostThere: 'Ya casi...',
     error: 'Error al generar pdf',
+    errorImage: 'Ocurrió un error al tratar de cargar una imagen',
     printing: 'Imprimiendo',
     cancel: 'Cancelar',
     close: 'Cerrar',

@@ -55,9 +55,9 @@ TypeScript types are shipped with the project in the dist directory and should b
 ## API
 
 ## TODO
-* Convert all files to Typescript
 * Interface comments
 * Example screenshots
 * Legends support
-* Tests!
 * Improve Scalebar
+* Imperial units option for scalebar
+* Tests!
