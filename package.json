@@ -1,7 +1,7 @@
 {
   "name": "ol-pdf-printer",
   "version": "1.0.0",
-  "description": "PDF printer for Open Layers",
+  "description": "PDF Printer for Open Layers",
   "browser": "dist/ol-pdf-printer.min.js",
   "main": "dist/ol-pdf-printer.js",
   "module": "lib/ol-pdf-printer.js",

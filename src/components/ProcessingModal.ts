@@ -1,6 +1,9 @@
 import Modal from 'modal-vanilla';
 import { I18n, Options } from 'src/ol-pdf-printer';
 
+/**
+ * @private
+ */
 export default class ProcessingModal {
     protected _modal: typeof Modal;
     protected _footer: string;

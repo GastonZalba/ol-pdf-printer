@@ -22,7 +22,16 @@
 
   var layers = [
     new ol.layer.Tile({
-      source: new ol.source.OSM()
+      source: new ol.source.OSM({
+        maxZoom: 19,
+        url:
+        'https://mt{0-3}.google.com/vt/?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}',
+        attributions:
+        '&copy; ' +
+        new Date().getFullYear() +
+        ' Google Maps ' +
+        '<a href="https://www.google.com/intl/en/help/terms_maps" target="_blank">Terms of Service</a>'
+      })
     }),
     new ol.layer.Vector({
       zIndex: 3,
@@ -36,6 +45,7 @@
         url: 'http://wms.ign.gob.ar/geoserver/geodesia-demarcacion/wms',
         params: { 'LAYERS': 'nivelacion_alta_precision', 'TILED': true },
         serverType: 'geoserver',
+        attributions: '<a href="https://mapa.ign.gob.ar/">Instituto Geográfico Nacional</a>',
         crossOrigin: 'anonymous' // Important
       }),
     })

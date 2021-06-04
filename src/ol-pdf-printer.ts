@@ -6,11 +6,7 @@ import { getPointResolution } from 'ol/proj';
 import domtoimage from 'dom-to-image-improved';
 import { jsPDF } from 'jspdf';
 
-import {
-    initPrintModal,
-    showPrintModal,
-    hidePrintModal
-} from './components/PrintModal';
+import SettingsModal from './components/SettingsModal';
 import ProcessingModal from './components/ProcessingModal';
 import { addElementsToPDF } from './components/PdfElements';
 
@@ -63,7 +59,8 @@ export default class PdfPrinter extends Control {
 
     protected element: HTMLElement;
 
-    protected _processingModal;
+    protected _processingModal: ProcessingModal;
+    protected _settingsModal: SettingsModal;
 
     protected _initialized: boolean;
 
@@ -173,7 +170,7 @@ export default class PdfPrinter extends Control {
      */
     _show(): void {
         if (!this._initialized) this._init();
-        showPrintModal();
+        this._settingsModal.show();
     }
 
     /**
@@ -183,7 +180,7 @@ export default class PdfPrinter extends Control {
         this._map = this.getMap();
         this._view = this._map.getView();
         this._mapTarget = this._map.getTargetElement();
-        initPrintModal(
+        this._settingsModal = new SettingsModal(
             this._map,
             this._options,
             this._i18n,
@@ -370,13 +367,13 @@ export default class PdfPrinter extends Control {
      * @public
      */
     showPrintModal(): void {
-        showPrintModal();
+        this._settingsModal.show();
     }
     /**
      * @public
      */
     hidePrintModal(): void {
-        hidePrintModal();
+        this._settingsModal.hide();
     }
 }
 
@@ -476,14 +473,14 @@ export interface Options extends ControlOptions {
         description: boolean;
         attributions: boolean;
         scalebar: boolean;
-        compass: string | HTMLImageElement;
+        compass: false | string | HTMLImageElement;
     };
     watermark?: {
         title?: string;
         titleColor?: string;
         subtitle: string;
         subtitleColor: string;
-        logo: boolean;
+        logo: false | string | HTMLImageElement;
     };
     paperSizes?: PaperSize[];
     dpi?: Dpi[];
