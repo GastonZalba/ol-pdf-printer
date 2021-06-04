@@ -200,7 +200,8 @@ class ElementsPDF {
         align: TextOptionsLight['align'],
         str: string
     ) => {
-        const { x, y } = this.calculateOffsetByPosition(position, offset);
+        let { x, y } = this.calculateOffsetByPosition(position, offset);
+        x = align === 'center' ? x - width / 2 : x;
         this.addText(x, y, width, fontSize, color, align, str);
     };
 
@@ -246,12 +247,11 @@ class ElementsPDF {
      * @protected
      */
     addWatermark = (): Promise<void> => {
-        const watermark = this._watermark;
-        const position = 'topright';
-        const offset = { x: 0, y: 0 };
-        const fontSize = 14;
-
         return new Promise((resolve, reject) => {
+            const watermark = this._watermark;
+            const position = 'topright';
+            const offset = { x: 0, y: 0 };
+            const fontSize = 14;
             const imageSize = 12;
             const fontSizeSubtitle = fontSize / 1.8;
             let back = false;
@@ -341,51 +341,48 @@ class ElementsPDF {
                 );
             }
 
-            if (watermark.logo) {
-                const addImage = (image) => {
-                    this._pdf.doc.addImage(
-                        image,
-                        'PNG',
-                        x - acumulativeWidth + paddingBack * 2 - 1,
-                        y - 1,
-                        imageSize,
-                        imageSize
-                    );
-                };
+            if (!watermark.logo) return resolve();
 
-                if (!back) {
-                    const widthBack = acumulativeWidth + paddingBack;
-                    this.addRoundedBox(
-                        x - widthBack + 4,
-                        y - 4,
-                        widthBack,
-                        16,
-                        '#ffffff',
-                        '#ffffff'
-                    );
-                }
+            const addImage = (image) => {
+                this._pdf.doc.addImage(
+                    image,
+                    'PNG',
+                    x - acumulativeWidth + paddingBack * 2 - 1,
+                    y - 1,
+                    imageSize,
+                    imageSize
+                );
+            };
 
-                if (watermark.logo instanceof Image) {
-                    addImage(watermark.logo);
-                    resolve();
-                } else {
-                    const image = new Image(imageSize, imageSize);
-                    image.crossOrigin = 'Anonymous';
-                    image.onload = () => {
-                        try {
-                            addImage(image);
-                        } catch (err) {
-                            return reject(err);
-                        }
-                        resolve();
-                    };
-                    image.onerror = () => {
-                        return reject(this._i18n.errorImage);
-                    };
-                    image.src = watermark.logo;
-                }
-            } else {
+            if (!back) {
+                const widthBack = acumulativeWidth + paddingBack;
+                this.addRoundedBox(
+                    x - widthBack + 4,
+                    y - 4,
+                    widthBack,
+                    16,
+                    '#ffffff',
+                    '#ffffff'
+                );
+            }
+
+            if (watermark.logo instanceof Image) {
+                addImage(watermark.logo);
                 resolve();
+            } else {
+                const image = new Image(imageSize, imageSize);
+                image.onload = () => {
+                    try {
+                        addImage(image);
+                        resolve();
+                    } catch (err) {
+                        return reject(err);
+                    }
+                };
+                image.onerror = () => {
+                    return reject(this._i18n.errorImage);
+                };
+                image.src = watermark.logo;
             }
         });
     };
@@ -448,9 +445,8 @@ class ElementsPDF {
      */
     addScale = (): void => {
         const position = 'bottomleft';
-        const width = 250;
         const offset = {
-            x: this._pdf.width / 2,
+            x: this._pdf.width / 2 + this._style.margin,
             y: -5
         };
         const fontSize = 7;
@@ -458,6 +454,7 @@ class ElementsPDF {
         const align = 'center';
 
         this._pdf.doc.setFont('helvetica', 'bold');
+        this._pdf.doc.setFontSize(fontSize);
 
         const str = `${
             this._i18n.scale
@@ -465,10 +462,12 @@ class ElementsPDF {
             this._i18n.paper
         } ${this._form.format.toUpperCase()}`;
 
+        const { w } = this._pdf.doc.getTextDimensions(str);
+
         this.addTextByOffset(
             position,
             offset,
-            width,
+            w,
             fontSize,
             txcolor,
             align,
@@ -657,12 +656,11 @@ class ElementsPDF {
      * @protected
      */
     addCompass = (imgSrc: HTMLImageElement | string): Promise<void> => {
-        const position = 'bottomright';
-        const offset = { x: 2, y: 6 };
-        const size = 6;
-        const rotationRadians = this._view.getRotation();
-
         return new Promise((resolve, reject) => {
+            const position = 'bottomright';
+            const offset = { x: 2, y: 6 };
+            const size = 6;
+            const rotationRadians = this._view.getRotation();
             const imageSize = 100;
 
             const { x, y } = this.calculateOffsetByPosition(
@@ -725,6 +723,7 @@ class ElementsPDF {
                 image.onload = () => {
                     try {
                         addImage(image);
+                        resolve();
                     } catch (err) {
                         return reject(err);
                     }

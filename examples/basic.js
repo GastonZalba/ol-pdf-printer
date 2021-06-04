@@ -37,16 +37,7 @@
 
   var layers = [
     new ol.layer.Tile({
-      source: new ol.source.OSM({
-        maxZoom: 19,
-        url:
-          'https://mt{0-3}.google.com/vt/?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}',
-        attributions:
-          '&copy; ' +
-          new Date().getFullYear() +
-          ' Google Maps ' +
-          '<a href="https://www.google.com/intl/en/help/terms_maps" target="_blank">Terms of Service</a>'
-      })
+      source: new ol.source.OSM()
     }),
     new ol.layer.Vector({
       zIndex: 3,

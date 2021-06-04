@@ -6,6 +6,10 @@ Tested with OpenLayers version 5 and 6.
 ## IMPORTANT
 Layer source and Icons that use external sites must be setted to `crossOrigin: 'anonymous'`. Otherwise, it will ocurr a `DOMException: Failed to execute 'toDataURL' on 'HTMLCanvasElement': Tainted canvases may not be exported`.
 
+<img src="screenshots/example-1.jpg" style="width:50%; float:left;">
+<img src="screenshots/example-2.jpg" style="width:50%; float:left;">
+<img src="screenshots/example-3.jpg" style="width:50%; float:left;">
+
 ## Examples
 -   Basic usage: create an OpenLayers map instance, and pass that map and options to the PdfPrinter constructor.
     -   [Basic](https://raw.githack.com/GastonZalba/ol-pdf-printer/v1.0.0/examples/basic.html)
@@ -56,7 +60,6 @@ TypeScript types are shipped with the project in the dist directory and should b
 
 ## TODO
 * Interface comments
-* Example screenshots
 * Legends support
 * Improve Scalebar
 * Imperial units option for scalebar
