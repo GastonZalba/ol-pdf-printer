@@ -10,7 +10,7 @@
   "scripts": {
     "watch": "chokidar 'src/**' --initial --command 'WATCH=1 rollup --config rollup.config.dist.js'",
     "precleanstart": "del-cli dist lib tmp-dist tmp-lib",
-    "doc": "documentation readme src/ol-pdf-printer.ts --quiet=true --access=public --access=undefined --section=API --parse-extension ts && node scripts/external-links.js README.md && prettier --write README.md",
+    "doc": "documentation readme src/ol-pdf-printer.ts --shallow --quiet=true --access=public --access=undefined --section=API --parse-extension ts && node scripts/external-links.js README.md && prettier --write README.md",
     "format": "eslint --fix src/*.ts && prettier --write src",
     "lint": "eslint src/*.ts && prettier --check src",
     "copy-assets": "ncp src/assets/ tmp-dist/assets/ && ncp src/assets/ tmp-lib/assets/",
@@ -37,8 +37,7 @@
   },
   "homepage": "https://github.com/GastonZalba/ol-pdf-printer#readme",
   "peerDependencies": {
-    "ol": ">=5.0.0",
-    "modal-vanilla": ">=0.0.0"
+    "ol": ">=5.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.3",

@@ -1,15 +1,12 @@
 import { PluggableMap, View } from 'ol';
-import Control, { Options as ControlOptions } from 'ol/control/Control';
 import { getPointResolution } from 'ol/proj';
+import Control, { Options as ControlOptions } from 'ol/control/Control';
 
-// External
 import domtoimage from 'dom-to-image-improved';
-import { jsPDF } from 'jspdf';
 
+import Pdf from './components/Pdf';
 import SettingsModal from './components/SettingsModal';
 import ProcessingModal from './components/ProcessingModal';
-import { addElementsToPDF } from './components/PdfElements';
-
 import * as i18n from './components/i18n/index.js';
 
 import compassIcon from './assets/images/compass.svg';
@@ -20,8 +17,6 @@ import './assets/css/ol-pdf-printer.css';
 /**
  * @protected
  */
-const DEFAULT_FILE_NAME = 'Export';
-
 const DEFAULT_LANGUAGE = 'en';
 
 /**
@@ -39,9 +34,9 @@ function deepObjectAssign(target, ...sources) {
             const t_val = target[key];
             target[key] =
                 t_val &&
-                s_val &&
-                typeof t_val === 'object' &&
-                typeof s_val === 'object'
+                    s_val &&
+                    typeof t_val === 'object' &&
+                    typeof s_val === 'object'
                     ? deepObjectAssign(t_val, s_val)
                     : s_val;
         });
@@ -55,9 +50,9 @@ export default class PdfPrinter extends Control {
     protected _map: PluggableMap;
     protected _view: View;
     protected _mapTarget: HTMLElement;
-    protected _form: Form;
+    protected _form: IPrintOptions;
 
-    protected element: HTMLElement;
+    protected _pdf: Pdf;
 
     protected _processingModal: ProcessingModal;
     protected _settingsModal: SettingsModal;
@@ -67,8 +62,6 @@ export default class PdfPrinter extends Control {
     protected _timeoutProcessing: ReturnType<typeof setTimeout>;
 
     protected _initialViewResolution: number;
-
-    protected _pdf: Pdf;
 
     protected _options: Options;
 
@@ -97,9 +90,9 @@ export default class PdfPrinter extends Control {
         // Default options
         this._options = {
             language: DEFAULT_LANGUAGE,
-            filename: DEFAULT_FILE_NAME,
+            filename: 'Ol Pdf Printer',
             style: {
-                margin: 10,
+                paperMargin: 10,
                 brcolor: '#000000',
                 bkcolor: '#273f50',
                 txcolor: '#ffffff'
@@ -107,7 +100,7 @@ export default class PdfPrinter extends Control {
             extraInfo: {
                 date: true,
                 url: true,
-                scale: true
+                specs: true
             },
             mapElements: {
                 description: true,
@@ -123,8 +116,8 @@ export default class PdfPrinter extends Control {
                 logo: false
             },
             paperSizes: [
-                //a0: { size: [1189, 841], value: 'A0' },
-                //a1: { size: [841, 594], value: 'A1' },
+                // { size: [1189, 841], value: 'A0' },
+                // { size: [841, 594], value: 'A1' },
                 { size: [594, 420], value: 'A2' },
                 { size: [420, 297], value: 'A3' },
                 { size: [297, 210], value: 'A4', selected: true },
@@ -151,12 +144,6 @@ export default class PdfPrinter extends Control {
             }
         };
 
-        this._pdf = {
-            doc: null,
-            width: null,
-            height: null
-        };
-
         // Merge options
         this._options = deepObjectAssign(this._options, opt_options);
 
@@ -165,6 +152,7 @@ export default class PdfPrinter extends Control {
         controlElement.title = this._i18n.printPdf;
         controlElement.onclick = () => this._show();
     }
+
     /**
      * @protected
      */
@@ -197,43 +185,23 @@ export default class PdfPrinter extends Control {
     }
 
     /**
-     *   Adapted from http://hg.intevation.de/gemma/file/tip/client/src/components/Pdftool.vue#l252
      * @protected
      */
-    _calculateScaleDenominator(
-        resolution: number,
-        scaleResolution: number
-    ): number {
-        const pixelsPerMapMillimeter = resolution / 25.4;
-        return Math.round(
-            1000 *
-                pixelsPerMapMillimeter *
-                this._getMeterPerPixel(scaleResolution)
-        );
-    }
-    /**
-     * @protected
-     */
-    _getMeterPerPixel(scaleResolution: number): number {
-        const proj = this._view.getProjection();
-        return (
-            getPointResolution(proj, scaleResolution, this._view.getCenter()) *
-            proj.getMetersPerUnit()
-        );
-    }
-    /**
-     * @protected
-     */
-    _setMapSizForPrint(resolution: number): number[] {
+    _setMapSizForPrint(
+        width: number,
+        height: number,
+        resolution: number
+    ): number[] {
         const pixelsPerMapMillimeter = resolution / 25.4;
         return [
-            Math.round(this._pdf.width * pixelsPerMapMillimeter),
-            Math.round(this._pdf.height * pixelsPerMapMillimeter)
+            Math.round(width * pixelsPerMapMillimeter),
+            Math.round(height * pixelsPerMapMillimeter)
         ];
     }
 
     /**
      * Restore inital view, remove classes, disable loading
+     * @protected
      */
     _onEndPrint(): void {
         this._mapTarget.style.width = '';
@@ -256,17 +224,21 @@ export default class PdfPrinter extends Control {
             this._processingModal.show(this._i18n.almostThere);
         }, 3500);
     }
+
     /**
      * @protected
      */
     _disableLoading(): void {
         this._processingModal.hide();
     }
+
     /**
      * @protected
      */
-    _printMap(form: Form): void {
-        this._prepareLoading();
+    _printMap(form: IPrintOptions, showLoading = true): void {
+        if (showLoading) {
+            this._prepareLoading();
+        }
 
         this._form = form;
 
@@ -278,22 +250,20 @@ export default class PdfPrinter extends Control {
         let dim = this._options.paperSizes.find(
             (e) => e.value === this._form.format
         ).size;
-        dim = this._form.orientation === 'landscape' ? dim : dim.reverse();
+        dim =
+            this._form.orientation === 'landscape'
+                ? dim
+                : (dim.reverse() as [number, number]);
 
-        this._pdf.width = dim[0];
-        this._pdf.height = dim[1];
+        const widthPaper = dim[0];
+        const heightPaper = dim[1];
 
-        const mapSizeForPrint = this._setMapSizForPrint(this._form.resolution);
+        const mapSizeForPrint = this._setMapSizForPrint(
+            widthPaper,
+            heightPaper,
+            this._form.resolution
+        );
         const [width, height] = mapSizeForPrint;
-
-        // UMD support
-        const _jsPDF =
-            (window as MyWindow & typeof globalThis).jspdf?.jsPDF || jsPDF;
-
-        this._pdf.doc = new _jsPDF({
-            orientation: this._form.orientation,
-            format: this._form.format
-        });
 
         // Save current resolution to restore it later
         this._initialViewResolution = this._view.getResolution();
@@ -318,34 +288,24 @@ export default class PdfPrinter extends Control {
                     }
                 )
                 .then(async (dataUrl) => {
-                    this._pdf.doc.addImage(
-                        dataUrl,
-                        'JPEG',
-                        this._options.style.margin, // Add margins
-                        this._options.style.margin,
-                        this._pdf.width - this._options.style.margin * 2,
-                        this._pdf.height - this._options.style.margin * 2
-                    );
-
-                    const scaleDenominator = this._calculateScaleDenominator(
-                        this._form.resolution,
+                    this._pdf = new Pdf({
+                        view: this._view,
+                        i18n: this._i18n,
+                        config: this._options,
+                        form: this._form,
+                        height: heightPaper,
+                        width: widthPaper,
                         scaleResolution
-                    );
+                    });
 
-                    await addElementsToPDF(
-                        this._view,
-                        this._pdf,
-                        this._form,
-                        scaleDenominator,
-                        this._options,
-                        this._i18n
-                    );
-
-                    this._pdf.doc.save(this._options.filename + '.pdf');
+                    this._pdf.addMapImage(dataUrl);
+                    await this._pdf.addMapHelpers();
+                    this._pdf.savePdf();
 
                     // Reset original map size
                     this._onEndPrint();
-                    this._disableLoading();
+
+                    if (showLoading) this._disableLoading();
                 })
                 .catch((err: Error) => {
                     const message =
@@ -363,22 +323,85 @@ export default class PdfPrinter extends Control {
         this._map.getView().setResolution(scaleResolution);
     }
     /**
+     * Show the Settings Modal
      * @public
      */
-    showPrintModal(): void {
+    showPrintSettingsModal(): void {
         this._settingsModal.show();
     }
     /**
+     * Hide the Settings Modal
      * @public
      */
-    hidePrintModal(): void {
+    hidePrintSettingsModal(): void {
         this._settingsModal.hide();
+    }
+
+    /**
+     * Create PDF programatically without displaying the Settings Modal
+     * @param options
+     * @public
+     */
+    createPdf(options: IPrintOptions, showLoading: boolean): void {
+        options = {
+            format: (
+                this._options.paperSizes.find((p) => p.selected) ||
+                this._options.paperSizes[0]
+            ).value,
+            resolution: (
+                this._options.dpi.find((p) => p.selected) ||
+                this._options.dpi[0]
+            ).value,
+            orientation: 'landscape',
+            compass: true,
+            attributions: true,
+            scale: true,
+            ...options
+        };
+        this._printMap(options, showLoading);
     }
 }
 
 /**
- * **_[interface]_** - Custom Language specified when creating a WFST instance
- * @protected
+ * **_[interface]_**
+ */
+export interface IPrintOptions {
+    /**
+     *
+     */
+    format?: IPaperSize['value'];
+    /**
+     *
+     */
+    orientation?: 'landscape' | 'portrait';
+    /**
+     *
+     */
+    resolution?: IDpi['value'];
+    /**
+     *
+     */
+    scale: IScale;
+    /**
+     *
+     */
+    description?: string;
+    /**
+     *
+     */
+    compass?: boolean;
+    /**
+     *
+     */
+    attributions?: boolean;
+    /**
+     *
+     */
+    scalebar?: boolean;
+}
+
+/**
+ * **_[interface]_** - Custom translations specified when creating an instance
  */
 export interface I18n {
     printPdf: string;
@@ -406,95 +429,223 @@ export interface I18n {
 
 /**
  * **_[interface]_**
- * @protected
  */
-interface PaperSize {
-    size: number[];
+interface IPaperSize {
+    /**
+     *
+     */
+    size: [number, number];
+    /**
+     *
+     */
     value: string;
+    /**
+     *
+     */
     selected?: boolean;
 }
 
 /**
- * **_[interface]_**
- * @protected
+ * **_[type]_**
  */
-interface Dpi {
+type IScale = number;
+
+/**
+ * **_[interface]_**
+ */
+interface IDpi {
+    /**
+     *
+     */
     value: number;
+    /**
+     *
+     */
     selected?: boolean;
 }
 
 /**
  * **_[interface]_**
- * @protected
  */
-interface Form {
-    format: string;
-    orientation: 'landscape' | 'portrait';
-    resolution: number;
-    scale: number;
-    description: string;
-    compass: boolean;
-    attributions: boolean;
-    scalebar: boolean;
+interface IStyle {
+    /**
+     *
+     */
+    paperMargin?: number;
+    /**
+     *
+     */
+    brcolor?: string;
+    /**
+     *
+     */
+    bkcolor?: string;
+    /**
+     *
+     */
+    txcolor?: string;
 }
 
 /**
  * **_[interface]_**
- * @protected
  */
-interface MyWindow extends Window {
-    jspdf: any;
+interface IModal {
+    /**
+     *
+     */
+    animateClass?: string;
+    /**
+     *
+     */
+    animateInClass?: string;
+    /**
+     *
+     */
+    transition?: number;
+    /**
+     *
+     */
+    backdropTransition?: number;
+    /**
+     *
+     */
+    templates?: {
+        dialog?: string | HTMLElement;
+        headerClose?: string | HTMLElement;
+    };
 }
 
-export interface Pdf {
-    doc: jsPDF;
-    width: number;
-    height: number;
+/**
+ * **_[interface]_**
+ */
+export interface IWatermark {
+    /**
+     *
+     */
+    title?: string;
+    /**
+     *
+     */
+    titleColor?: string;
+    /**
+     *
+     */
+    subtitle?: string;
+    /**
+     *
+     */
+    subtitleColor?: string;
+    /**
+     *
+     */
+    logo?: false | string | HTMLImageElement;
+}
+
+/**
+ * **_[interface]_** - Print information at the bottom of the PDF
+ */
+interface IExtraInfo {
+    /**
+     * Print Date
+     */
+    date?: boolean;
+    /**
+     *
+     */
+    url?: boolean;
+    /**
+     * DPI, Format and Scale information
+     */
+    specs?: boolean;
+}
+
+/**
+ * **_[interface]_** - MapElements
+ * @public
+ */
+export interface IMapElements {
+    /**
+     * Print description
+     */
+    description?: boolean;
+    /**
+     * Layers attributions
+     */
+    attributions?: boolean;
+    /**
+     * Scalebar
+     */
+    scalebar?: boolean;
+    /**
+     * Compass image. North must be pointing to the top
+     */
+    compass?: false | string | HTMLImageElement;
 }
 
 /**
  * **_[interface]_** - Options specified when creating an instance
  */
 export interface Options extends ControlOptions {
-    language?: string;
+    /**
+     * Export filename
+     */
     filename?: string;
-    style?: {
-        margin: number;
-        brcolor: string;
-        bkcolor: string;
-        txcolor: string;
-    };
-    extraInfo?: {
-        date: boolean;
-        url: boolean;
-        scale: boolean;
-    };
-    mapElements?: {
-        description: boolean;
-        attributions: boolean;
-        scalebar: boolean;
-        compass: false | string | HTMLImageElement;
-    };
-    watermark?: {
-        title?: string;
-        titleColor?: string;
-        subtitle: string;
-        subtitleColor: string;
-        logo: false | string | HTMLImageElement;
-    };
-    paperSizes?: PaperSize[];
-    dpi?: Dpi[];
-    scales?: number[];
+
+    /**
+     * Some basic PDF style configuration
+     */
+    style?: IStyle;
+
+    /**
+     * Information to be inserted at the bottom of the PDF
+     * False to disable
+     */
+    extraInfo?: false | IExtraInfo;
+
+    /**
+     * Elements to be showed on the PDF and in the Settings Modal.
+     * False to disable
+     */
+    mapElements?: false | IMapElements;
+
+    /**
+     * Watermark to be inserted in the PDF.
+     * False to disable
+     */
+    watermark?: false | IWatermark;
+
+    /**
+     * Paper sizes options to be shown in the settings modal
+     */
+    paperSizes?: IPaperSize[];
+
+    /**
+     * DPI resolutions options to be shown in the settings modal
+     */
+    dpi?: IDpi[];
+
+    /**
+     * Map scales options to be shown in the settings modal
+     */
+    scales?: IScale[];
+
+    /**
+     * ClassName to add to the Btn Control
+     */
     ctrlBtnClass?: string;
-    modal?: {
-        animateClass?: string;
-        animateInClass?: string;
-        transition?: number;
-        backdropTransition?: number;
-        templates?: {
-            dialog?: string | HTMLElement;
-            headerClose?: string | HTMLElement;
-        };
-    };
+
+    /**
+     * Modal configuration
+     */
+    modal?: IModal;
+
+    /**
+     * Language support
+     */
+    language?: 'es' | 'en';
+
+    /**
+     * Add custom translations
+     */
     i18n?: I18n;
 }

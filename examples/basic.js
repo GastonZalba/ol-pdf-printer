@@ -37,7 +37,16 @@
 
   var layers = [
     new ol.layer.Tile({
-      source: new ol.source.OSM()
+      //source: new ol.source.OSM()
+      source: new ol.source.OSM({
+        url:
+          'https://mt{0-3}.google.com/vt/?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}',
+        maxZoom: 19,
+        attributions:
+          '&copy; ' +
+          new Date().getFullYear() +
+          ' Google Maps <a href="https://www.google.com/help/terms_maps.html" target="_blank">Terms of service</a>'
+      })
     }),
     new ol.layer.Vector({
       zIndex: 3,
@@ -68,12 +77,9 @@
     })
   });
 
-  var options = {
+  var opt_options = {
     filename: 'Example export',
     language: 'en',
-    watermark: {
-      title: 'Example Ol Pdf Printer'
-    },
     paperSizes: [
       { size: [594, 420], value: 'A2' },
       { size: [420, 297], value: 'A3' },
@@ -90,10 +96,8 @@
     scales: [10000, 5000, 1000, 500, 250, 100, 50, 25, 10]
   }
 
-  var pdfPrinter = new PdfPrinter(options);
+  var pdfPrinter = new PdfPrinter(opt_options);
 
   map.addControl(pdfPrinter);
-
-  console.log(pdfPrinter);
 
 })();

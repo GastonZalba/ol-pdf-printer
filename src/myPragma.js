@@ -17,6 +17,7 @@ export default function createElement(tagName, attrs = {}, ...children) {
     });
 
     for (const child of children) {
+        if (!child) continue;
         if (Array.isArray(child)) elem.append(...child);
         else {
             elem.appendChild(

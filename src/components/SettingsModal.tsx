@@ -2,7 +2,6 @@ import Modal from 'modal-vanilla';
 import { PluggableMap } from 'ol';
 import { I18n, Options } from 'src/ol-pdf-printer';
 import myPragma from '../myPragma';
-
 import { getMapScale } from './Helpers';
 
 /**
@@ -31,33 +30,22 @@ export default class SettingsModal {
             const print = event.target.dataset.print;
             if (!print) return;
 
-            const form = (
-                document.getElementById('printMap') as HTMLFormElement
-            ).elements;
+            const form = document.getElementById('printMap') as HTMLFormElement;
 
-            const formData = {
-                format: (form.namedItem('printFormat') as HTMLInputElement)
-                    .value,
-                orientation: (
-                    form.namedItem('printOrientation') as HTMLInputElement
-                ).value,
-                resolution: (
-                    form.namedItem('printResolution') as HTMLInputElement
-                ).value,
-                scale: (form.namedItem('printScale') as HTMLInputElement).value,
-                description: (
-                    form.namedItem('printDescription') as HTMLTextAreaElement
-                ).value.trim(),
-                compass: (form.namedItem('printCompass') as HTMLInputElement)
-                    .checked,
-                attributions: (
-                    form.namedItem('printAttributions') as HTMLInputElement
-                ).checked,
-                scalebar: (form.namedItem('printScalebar') as HTMLInputElement)
-                    .checked
+            const formData = new FormData(form);
+
+            const values = {
+                format: formData.get('printFormat'),
+                orientation: formData.get('printOrientation'),
+                resolution: formData.get('printResolution'),
+                scale: formData.get('printScale'),
+                description: formData.get('printDescription'),
+                compass: formData.get('printCompass'),
+                attributions: formData.get('printAttributions'),
+                scalebar: formData.get('printScalebar')
             };
 
-            printMap(formData);
+            printMap(values);
         });
 
         this._modal.on('shown', (): void => {
@@ -87,7 +75,7 @@ export default class SettingsModal {
                 <div>
                     <div className="printFieldHalf">
                         <label htmlFor="printFormat">{i18n.paperSize}</label>
-                        <select id="printFormat">
+                        <select name="printFormat" id="printFormat">
                             {paperSizes.map((paper) => (
                                 <option
                                     value={paper.value}
@@ -104,7 +92,7 @@ export default class SettingsModal {
                         <label htmlFor="printOrientation">
                             {i18n.orientation}
                         </label>
-                        <select id="printOrientation">
+                        <select name="printOrientation" id="printOrientation">
                             <option value="landscape" selected>
                                 {i18n.landscape}
                             </option>
@@ -117,7 +105,7 @@ export default class SettingsModal {
                         <label htmlFor="printResolution">
                             {i18n.resolution}
                         </label>
-                        <select id="printResolution">
+                        <select name="printResolution" id="printResolution">
                             {dpi.map((d) => (
                                 <option
                                     value={d.value}
@@ -132,7 +120,7 @@ export default class SettingsModal {
                     </div>
                     <div className="printFieldHalf">
                         <label htmlFor="printScale">{i18n.scale}</label>
-                        <select id="printScale">
+                        <select name="printScale" id="printScale">
                             <option
                                 className="actualScale"
                                 value=""
@@ -146,14 +134,20 @@ export default class SettingsModal {
                         </select>
                     </div>
                 </div>
-                {mapElements.description && (
-                    <div>
-                        <label htmlFor="printDescription">{i18n.addNote}</label>
-                        <textarea id="printDescription" rows="4"></textarea>
-                    </div>
-                )}
                 {mapElements && (
                     <div>
+                        {mapElements.description && (
+                            <div>
+                                <label htmlFor="printDescription">
+                                    {i18n.addNote}
+                                </label>
+                                <textarea
+                                    id="printDescription"
+                                    name="printDescription"
+                                    rows="4"
+                                ></textarea>
+                            </div>
+                        )}
                         <div>{i18n.mapElements}</div>
                         <div className="printElements">
                             {mapElements.compass && (
@@ -161,6 +155,7 @@ export default class SettingsModal {
                                     <input
                                         type="checkbox"
                                         id="printCompass"
+                                        name="printCompass"
                                         checked
                                     />
                                     {i18n.compass}
@@ -171,6 +166,7 @@ export default class SettingsModal {
                                     <input
                                         type="checkbox"
                                         id="printScalebar"
+                                        name="printScalebar"
                                         checked
                                     />
                                     {i18n.scale}
@@ -181,6 +177,7 @@ export default class SettingsModal {
                                     <input
                                         type="checkbox"
                                         id="printAttributions"
+                                        name="printAttributions"
                                         checked
                                     />
                                     {i18n.layersAttributions}

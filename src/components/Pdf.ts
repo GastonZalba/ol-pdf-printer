@@ -1,81 +1,166 @@
 import { TextOptionsLight } from 'jspdf';
 import { View } from 'ol';
-import { I18n, Options, Pdf } from 'src/ol-pdf-printer';
+import { getPointResolution } from 'ol/proj';
+import { I18n, Options, IPrintOptions, IWatermark } from 'src/ol-pdf-printer';
+import { jsPDF } from 'jspdf';
 
 /**
  * @private
  */
-class ElementsPDF {
-    protected _pdf: Pdf;
-    protected _scaleDenominator: number;
-    protected _form;
-    protected _style;
+export default class Pdf {
+    protected _pdf: IPdf;
     protected _view: View;
+    protected _scaleDenominator: number;
+    protected _form: IPrintOptions;
+    protected _style: Options['style'];
     protected _i18n: I18n;
-    protected _watermark: Options['watermark'];
+
+    protected _config: Options;
+
+    constructor(params: IPdfOptions) {
+        const { view, form, i18n, config, height, width, scaleResolution } =
+            params;
+
+        this._view = view;
+        this._form = form;
+        this._i18n = i18n;
+        this._config = config;
+
+        this._pdf = this.createPdf(
+            this._form.orientation,
+            this._form.format,
+            height,
+            width
+        );
+
+        this._scaleDenominator = this._calculateScaleDenominator(
+            this._form.resolution,
+            scaleResolution
+        );
+    }
 
     /**
      *
-     * @param view
-     * @param pdf
-     * @param form
-     * @param scaleDenominator
-     * @param options
-     * @param i18n
+     * @param orientation
+     * @param format
+     * @param width
+     * @param height
+     * @returns
      * @protected
      */
-    addElementsToPDF = async (
-        view: View,
-        pdf: Pdf,
-        form,
-        scaleDenominator: number,
-        options: Options,
-        i18n: I18n
-    ) => {
-        this._view = view;
-        this._pdf = pdf;
-        this._form = form;
-        this._scaleDenominator = scaleDenominator;
-        this._i18n = i18n;
+    createPdf(
+        orientation: IPrintOptions['orientation'],
+        format: IPrintOptions['format'],
+        height: number,
+        width: number
+    ): IPdf {
+        // UMD support
+        const _jsPDF =
+            (window as IWindow & typeof globalThis).jspdf?.jsPDF || jsPDF;
 
-        const { mapElements, extraInfo, style, watermark } = options;
+        return {
+            doc: new _jsPDF({ orientation, format }),
+            height: height,
+            width: width
+        };
+    }
+
+    /**
+     *
+     * @param dataUrl
+     * @protected
+     */
+    addMapImage(dataUrl: string): void {
+        this._pdf.doc.addImage(
+            dataUrl,
+            'JPEG',
+            this._config.style.paperMargin, // Add margins
+            this._config.style.paperMargin,
+            this._pdf.width - this._config.style.paperMargin * 2,
+            this._pdf.height - this._config.style.paperMargin * 2
+        );
+    }
+
+    /**
+     *
+     * @protected
+     */
+    addMapHelpers = async (): Promise<void> => {
+        const { mapElements, extraInfo, style, watermark } = this._config;
 
         this._style = style;
-        this._watermark = watermark;
 
         if (watermark) {
-            await this.addWatermark();
+            await this._addWatermark(watermark);
         }
 
-        if (mapElements.compass && this._form.compass) {
-            await this.addCompass(mapElements.compass);
+        if (mapElements) {
+            if (mapElements.compass && this._form.compass) {
+                await this._addCompass(mapElements.compass);
+            }
+
+            if (mapElements.description && this._form.description) {
+                this._addDescription();
+            }
+
+            if (mapElements.scalebar && this._form.scalebar) {
+                this._addScaleBar();
+            }
+
+            if (mapElements.attributions && this._form.attributions) {
+                this._addAttributions();
+            }
         }
 
-        if (mapElements.description && this._form.description) {
-            this.addDescription();
-        }
+        if (extraInfo) {
+            // Bottom info
+            if (extraInfo.url) {
+                this._addUrl();
+            }
 
-        if (mapElements.scalebar && this._form.scalebar) {
-            this.addScaleBar();
-        }
+            if (extraInfo.date) {
+                this._addDate();
+            }
 
-        if (mapElements.attributions && this._form.attributions) {
-            this.addAttributions();
-        }
-
-        // Bottom info
-        if (extraInfo.url) {
-            this.addUrl();
-        }
-
-        if (extraInfo.date) {
-            this.addDate();
-        }
-
-        if (extraInfo.scale) {
-            this.addScale();
+            if (extraInfo.specs) {
+                this._addSpecs();
+            }
         }
     };
+
+    /**
+     * @protected
+     */
+    savePdf(): void {
+        this._pdf.doc.save(this._config.filename + '.pdf');
+    }
+
+    /**
+     *   Adapted from http://hg.intevation.de/gemma/file/tip/client/src/components/Pdftool.vue#l252
+     * @protected
+     */
+    _calculateScaleDenominator(
+        resolution: number,
+        scaleResolution: number
+    ): number {
+        const pixelsPerMapMillimeter = resolution / 25.4;
+        return Math.round(
+            1000 *
+                pixelsPerMapMillimeter *
+                this._getMeterPerPixel(scaleResolution)
+        );
+    }
+
+    /**
+     * @protected
+     */
+    _getMeterPerPixel(scaleResolution: number): number {
+        const proj = this._view.getProjection();
+        return (
+            getPointResolution(proj, scaleResolution, this._view.getCenter()) *
+            proj.getMetersPerUnit()
+        );
+    }
 
     /**
      *
@@ -85,7 +170,7 @@ class ElementsPDF {
      * @returns
      * @protected
      */
-    calculateOffsetByPosition = (
+    _calculateOffsetByPosition = (
         position: string,
         offset,
         size = 0
@@ -94,23 +179,31 @@ class ElementsPDF {
 
         switch (position) {
             case 'topleft':
-                x = offset.x + this._style.margin;
-                y = offset.y + this._style.margin + size;
+                x = offset.x + this._style.paperMargin;
+                y = offset.y + this._style.paperMargin + size;
                 break;
 
             case 'topright':
-                x = this._pdf.width - offset.x - this._style.margin;
-                y = offset.y + this._style.margin + size;
+                x = this._pdf.width - offset.x - this._style.paperMargin;
+                y = offset.y + this._style.paperMargin + size;
                 break;
 
             case 'bottomright':
-                x = this._pdf.width - offset.x - this._style.margin;
-                y = this._pdf.height - offset.y - this._style.margin - size;
+                x = this._pdf.width - offset.x - this._style.paperMargin;
+                y =
+                    this._pdf.height -
+                    offset.y -
+                    this._style.paperMargin -
+                    size;
                 break;
 
             case 'bottomleft':
-                y = this._pdf.height - offset.y - this._style.margin - size;
-                x = offset.x + this._style.margin;
+                y =
+                    this._pdf.height -
+                    offset.y -
+                    this._style.paperMargin -
+                    size;
+                x = offset.x + this._style.paperMargin;
                 break;
         }
 
@@ -127,7 +220,7 @@ class ElementsPDF {
      * @param brcolor
      * @protected
      */
-    addRoundedBox = (
+    _addRoundedBox = (
         x: number,
         y: number,
         width: number,
@@ -162,7 +255,7 @@ class ElementsPDF {
      * @param str
      * @protected
      */
-    addText = (
+    _addText = (
         x: number,
         y: number,
         width: number,
@@ -191,7 +284,7 @@ class ElementsPDF {
      * @param str
      * @protected
      */
-    addTextByOffset = (
+    _addTextByOffset = (
         position: string,
         offset,
         width: number,
@@ -200,16 +293,16 @@ class ElementsPDF {
         align: TextOptionsLight['align'],
         str: string
     ) => {
-        let { x, y } = this.calculateOffsetByPosition(position, offset);
+        let { x, y } = this._calculateOffsetByPosition(position, offset);
         x = align === 'center' ? x - width / 2 : x;
-        this.addText(x, y, width, fontSize, color, align, str);
+        this._addText(x, y, width, fontSize, color, align, str);
     };
 
     /**
      * @protected
      */
-    addDescription = (): void => {
-        const str = this._form.description;
+    _addDescription = (): void => {
+        const str = this._form.description.trim();
         const position = 'topleft';
         const offset = { x: 2, y: 2 };
         const fontSize = 8;
@@ -217,7 +310,7 @@ class ElementsPDF {
 
         const paddingBack = 4;
 
-        const { x, y } = this.calculateOffsetByPosition(position, offset);
+        const { x, y } = this._calculateOffsetByPosition(position, offset);
 
         this._pdf.doc.setTextColor(this._style.txcolor);
         this._pdf.doc.setFontSize(fontSize);
@@ -226,7 +319,7 @@ class ElementsPDF {
             maxWidth: maxWidth
         });
 
-        this.addRoundedBox(
+        this._addRoundedBox(
             x,
             y,
             w + paddingBack * 2,
@@ -246,9 +339,8 @@ class ElementsPDF {
      * @returns
      * @protected
      */
-    addWatermark = (): Promise<void> => {
+    _addWatermark = (watermark: IWatermark): Promise<void> => {
         return new Promise((resolve, reject) => {
-            const watermark = this._watermark;
             const position = 'topright';
             const offset = { x: 0, y: 0 };
             const fontSize = 14;
@@ -256,7 +348,7 @@ class ElementsPDF {
             const fontSizeSubtitle = fontSize / 1.8;
             let back = false;
 
-            const { x, y } = this.calculateOffsetByPosition(position, offset);
+            const { x, y } = this._calculateOffsetByPosition(position, offset);
 
             const paddingBack = 2;
 
@@ -285,7 +377,7 @@ class ElementsPDF {
                 const height = 16;
                 const widthBack = w + paddingBack;
 
-                this.addRoundedBox(
+                this._addRoundedBox(
                     x - widthBack + 4 - acumulativeWidth,
                     y - 4,
                     widthBack + acumulativeWidth,
@@ -317,7 +409,7 @@ class ElementsPDF {
                         watermark.subtitle
                     );
                     const widthBack = paddingBack * 2 + w;
-                    this.addRoundedBox(
+                    this._addRoundedBox(
                         x - widthBack + 3 - acumulativeWidth,
                         y - 4,
                         widthBack + acumulativeWidth,
@@ -356,7 +448,7 @@ class ElementsPDF {
 
             if (!back) {
                 const widthBack = acumulativeWidth + paddingBack;
-                this.addRoundedBox(
+                this._addRoundedBox(
                     x - widthBack + 4,
                     y - 4,
                     widthBack,
@@ -390,7 +482,7 @@ class ElementsPDF {
     /**
      * @protected
      */
-    addDate = () => {
+    _addDate = () => {
         const position = 'bottomright';
         const width = 250;
         const offset = {
@@ -403,7 +495,7 @@ class ElementsPDF {
 
         this._pdf.doc.setFont('helvetica', 'normal');
         const str = new Date(Date.now()).toLocaleDateString();
-        this.addTextByOffset(
+        this._addTextByOffset(
             position,
             offset,
             width,
@@ -417,7 +509,7 @@ class ElementsPDF {
     /**
      * @protected
      */
-    addUrl = (): void => {
+    _addUrl = (): void => {
         const position = 'bottomleft';
         const width = 250;
         const offset = {
@@ -430,7 +522,7 @@ class ElementsPDF {
 
         this._pdf.doc.setFont('helvetica', 'italic');
         const str = window.location.href;
-        this.addTextByOffset(
+        this._addTextByOffset(
             position,
             offset,
             width,
@@ -443,10 +535,10 @@ class ElementsPDF {
     /**
      * @protected
      */
-    addScale = (): void => {
+    _addSpecs = (): void => {
         const position = 'bottomleft';
         const offset = {
-            x: this._pdf.width / 2 + this._style.margin,
+            x: this._pdf.width / 2 + this._style.paperMargin,
             y: -5
         };
         const fontSize = 7;
@@ -456,15 +548,18 @@ class ElementsPDF {
         this._pdf.doc.setFont('helvetica', 'bold');
         this._pdf.doc.setFontSize(fontSize);
 
-        const str = `${
+        const scale = `${
             this._i18n.scale
-        } 1:${this._scaleDenominator.toLocaleString('de')} - ${
-            this._i18n.paper
-        } ${this._form.format.toUpperCase()}`;
+        } 1:${this._scaleDenominator.toLocaleString('de')}`;
+        const paper = `${this._i18n.paper} ${this._form.format.toUpperCase()}`;
+        const dpi = `${this._form.resolution} DPI`;
+
+        const specs = [scale, dpi, paper];
+        const str = specs.join(' - ');
 
         const { w } = this._pdf.doc.getTextDimensions(str);
 
-        this.addTextByOffset(
+        this._addTextByOffset(
             position,
             offset,
             w,
@@ -478,7 +573,7 @@ class ElementsPDF {
     /**
      * @protected
      */
-    addAttributions = (): void => {
+    _addAttributions = (): void => {
         const position = 'bottomright';
         const offset = { x: 1, y: 1 };
         const fontSize = 7;
@@ -494,7 +589,7 @@ class ElementsPDF {
 
         const str = attArr.join(' | ');
 
-        const { x, y } = this.calculateOffsetByPosition(position, offset);
+        const { x, y } = this._calculateOffsetByPosition(position, offset);
 
         this._pdf.doc.setTextColor('#666666');
         this._pdf.doc.setFontSize(fontSize);
@@ -505,7 +600,7 @@ class ElementsPDF {
 
         const paddingBack = 4;
 
-        this.addRoundedBox(
+        this._addRoundedBox(
             x - w - 2,
             y - 3,
             w + paddingBack,
@@ -524,13 +619,12 @@ class ElementsPDF {
      * Adapted from http://hg.intevation.de/gemma/file/tip/client/src/components/Pdftool.vue#l252
      * @protected
      */
-    addScaleBar = (): void => {
+    _addScaleBar = (): void => {
         const position = 'bottomleft';
 
         const offset = { x: 2, y: 2 };
 
-        // hardcode maximal width for now
-        const maxWidth = 100 + this._style.margin * 2; // in mm
+        const maxWidth = 100; // in mm
 
         // from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/log10#Polyfill
         const log10 =
@@ -555,7 +649,7 @@ class ElementsPDF {
 
         maxLength /= unitConversionFactor;
 
-        const porcentageMargin = this._pdf.width / this._style.margin;
+        const porcentageMargin = this._pdf.width / this._style.paperMargin;
 
         const unroundedLength = maxLength;
         const numberOfDigits = Math.floor(log10(unroundedLength));
@@ -581,8 +675,8 @@ class ElementsPDF {
         const fullSize = size * 4;
 
         // x/y defaults to offset for topleft corner (normal x/y coordinates)
-        let x = offset.x + this._style.margin;
-        let y = offset.y + this._style.margin;
+        let x = offset.x + this._style.paperMargin;
+        let y = offset.y + this._style.paperMargin;
 
         // if position is on the right, x needs to be calculate with pdf width and
         // the size of the element
@@ -592,10 +686,10 @@ class ElementsPDF {
                 offset.x -
                 fullSize -
                 8 -
-                this._style.margin * 2;
+                this._style.paperMargin * 2;
         }
         if (['bottomright', 'bottomleft'].indexOf(position) !== -1) {
-            y = this._pdf.height - offset.y - 10 - this._style.margin;
+            y = this._pdf.height - offset.y - 10 - this._style.paperMargin;
         }
 
         // to give the outer white box 4mm padding
@@ -603,7 +697,7 @@ class ElementsPDF {
         const scaleBarY = y + 5; // 5 because above the scalebar will be the numbers
 
         // draw outer box
-        this.addRoundedBox(
+        this._addRoundedBox(
             x,
             y,
             fullSize + 8,
@@ -655,7 +749,7 @@ class ElementsPDF {
      * @returns
      * @protected
      */
-    addCompass = (imgSrc: HTMLImageElement | string): Promise<void> => {
+    _addCompass = (imgSrc: HTMLImageElement | string): Promise<void> => {
         return new Promise((resolve, reject) => {
             const position = 'bottomright';
             const offset = { x: 2, y: 6 };
@@ -663,7 +757,7 @@ class ElementsPDF {
             const rotationRadians = this._view.getRotation();
             const imageSize = 100;
 
-            const { x, y } = this.calculateOffsetByPosition(
+            const { x, y } = this._calculateOffsetByPosition(
                 position,
                 offset,
                 size
@@ -738,4 +832,30 @@ class ElementsPDF {
     };
 }
 
-export const { addElementsToPDF } = new ElementsPDF();
+/**
+ * **_[interface]_**
+ * @protected
+ */
+interface IWindow extends Window {
+    jspdf: any;
+}
+
+/**
+ * **_[interface]_**
+ * @protected
+ */
+export interface IPdf {
+    doc: jsPDF;
+    width: number;
+    height: number;
+}
+
+interface IPdfOptions {
+    view: View;
+    form: IPrintOptions;
+    i18n: I18n;
+    config: Options;
+    height: number;
+    width: number;
+    scaleResolution: number;
+}
