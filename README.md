@@ -495,6 +495,5 @@ Type: [I18n](#i18n)
 
 -   Interface comments
 -   Legends support
--   Improve Scalebar
 -   Imperial units option for scalebar
 -   Tests!

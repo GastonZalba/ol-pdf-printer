@@ -620,11 +620,9 @@ export default class Pdf {
      * @protected
      */
     _addScaleBar = (): void => {
-        const position = 'bottomleft';
-
         const offset = { x: 2, y: 2 };
 
-        const maxWidth = 100; // in mm
+        const maxWidth = 90; // in mm
 
         // from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/log10#Polyfill
         const log10 =
@@ -649,12 +647,10 @@ export default class Pdf {
 
         maxLength /= unitConversionFactor;
 
-        const porcentageMargin = this._pdf.width / this._style.paperMargin;
-
         const unroundedLength = maxLength;
         const numberOfDigits = Math.floor(log10(unroundedLength));
         const factor = Math.pow(10, numberOfDigits);
-        const mapped = unroundedLength / factor / porcentageMargin;
+        const mapped = unroundedLength / factor;
 
         let length = Math.floor(maxLength); // just to have an upper limit
 
@@ -670,27 +666,24 @@ export default class Pdf {
             length = factor;
         }
 
-        const size =
-            (length * unitConversionFactor) / this._scaleDenominator / 4;
+        let size = (length * unitConversionFactor) / this._scaleDenominator / 4;
+
+        const percentageMargin = this._style.paperMargin
+            ? ((this._style.paperMargin * 2) / this._pdf.width) * 100
+            : null;
+
+        // Reduce length acording to margins
+        size = percentageMargin
+            ? (size / 100) * (100 - percentageMargin)
+            : size;
+
         const fullSize = size * 4;
 
         // x/y defaults to offset for topleft corner (normal x/y coordinates)
         let x = offset.x + this._style.paperMargin;
         let y = offset.y + this._style.paperMargin;
 
-        // if position is on the right, x needs to be calculate with pdf width and
-        // the size of the element
-        if (['topright', 'bottomright'].indexOf(position) !== -1) {
-            x =
-                this._pdf.width -
-                offset.x -
-                fullSize -
-                8 -
-                this._style.paperMargin * 2;
-        }
-        if (['bottomright', 'bottomleft'].indexOf(position) !== -1) {
-            y = this._pdf.height - offset.y - 10 - this._style.paperMargin;
-        }
+        y = this._pdf.height - offset.y - 10 - this._style.paperMargin;
 
         // to give the outer white box 4mm padding
         const scaleBarX = x + 4;

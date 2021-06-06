@@ -19,7 +19,12 @@ export default class ProcessingModal {
     constructor(i18n: I18n, options: Options, onEndPrint: Function) {
         this._i18n = i18n;
 
-        this._footer = `
+        this._modal = new Modal({
+            headerClose: false,
+            title: this._i18n.printing,
+            backdrop: 'static', // To prevent close on clicking backdrop
+            content: ' ',
+            footer: `
             <button
                 type="button"
                 class="btn-sm btn btn-secondary"
@@ -27,14 +32,7 @@ export default class ProcessingModal {
             >
                 ${this._i18n.cancel}
             </button>
-        `;
-
-        this._modal = new Modal({
-            headerClose: false,
-            title: this._i18n.printing,
-            backdrop: 'static', // To prevent close on clicking backdrop
-            content: ' ',
-            footer: ' ',
+            `,
             ...options.modal
         });
 
@@ -69,9 +67,6 @@ export default class ProcessingModal {
      */
     show(string: string): void {
         this._setContentModal(string);
-
-        this._setFooterModal(this._footer);
-
         if (!this._modal._visible) this._modal.show();
     }
 

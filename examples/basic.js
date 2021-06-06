@@ -72,7 +72,7 @@
     view: new ol.View({
       projection: 'EPSG:3857',
       center: [-6721313, -4349376],
-      zoom: 8,
+      zoom: 15,
       rotation: 0.1
     })
   });
@@ -80,6 +80,9 @@
   var opt_options = {
     filename: 'Example export',
     language: 'en',
+    style: {
+      paperMargin: 0
+    },
     paperSizes: [
       { size: [594, 420], value: 'A2' },
       { size: [420, 297], value: 'A3' },
