@@ -31,7 +31,6 @@ export default class ProcessingModal {
 
         this._modal = new Modal({
             headerClose: false,
-            animate: false,
             title: this._i18n.printing,
             backdrop: 'static', // To prevent close on clicking backdrop
             content: ' ',
@@ -68,11 +67,10 @@ export default class ProcessingModal {
      * @param footer
      * @protected
      */
-    show(string: string, footer = false): void {
+    show(string: string): void {
         this._setContentModal(string);
 
-        if (footer) this._setFooterModal(this._footer);
-        else this._setFooterModal(' ');
+        this._setFooterModal(this._footer);
 
         if (!this._modal._visible) this._modal.show();
     }

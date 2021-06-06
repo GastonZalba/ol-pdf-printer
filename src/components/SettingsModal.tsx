@@ -45,7 +45,11 @@ export default class SettingsModal {
                 scalebar: formData.get('printScalebar')
             };
 
-            printMap(values);
+            printMap(
+                values,
+                /* showLaoding */ true,
+                /* delay */ options.modal.transition
+            );
         });
 
         this._modal.on('shown', (): void => {

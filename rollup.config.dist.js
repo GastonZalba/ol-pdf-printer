@@ -14,6 +14,8 @@ let globals = {
     'ol/control/Control': 'ol.control.Control',
     'ol/proj': 'ol.proj',
     'ol/proj/Units': 'ol.proj.Units',
+    'ol/events': 'ol.events',
+    'ol/Observable' : 'ol.Observable',
     'jspdf': 'jsPDF',
     'dom-to-image-improved': 'domtoimage',
     'modal-vanilla': 'Modal',
@@ -88,6 +90,8 @@ module.exports = {
         'ol/control/Control',
         'ol/proj',
         'ol/proj/Units',
+        'ol/events',
+        'ol/Observable',
         'jspdf'
     ]
 };

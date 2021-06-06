@@ -4,21 +4,25 @@
 }
 
 .printMode {
-    overflow: hidden;
-}
-
-.printMode .ol-viewport {
-    opacity: 0;
     transition: none !important;
 }
 
-.waterMark {
-    display: none;
+.printMode:before {
+    content: '';
+    right: 0;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    position: absolute;
+    background-color: #181818;
+    opacity: 0;
 }
 
-.printMode .waterMark {
-    display: block;
+.printMode .ol-viewport {
+    opacity: 0 !important;
+    transition: opacity 0.1s !important;
 }
+
 .ol-print-btn-menu {
     color: #fff;
     background: #d65959;
@@ -27,25 +31,6 @@
 
 .ol-print-btn-menu img {
     height: 1.3em;
-}
-
-.printControlInfo {
-    position: absolute;
-    left: 10px;
-    bottom: 10px;
-    max-width: 550px;
-    padding: 15px 20px;
-    border-radius: 5px;
-    background-color: rgb(0, 0, 0, 50%);
-}
-
-.printDescription {
-    color: #c0c0c0;
-}
-
-.printWatermark {
-    color: #fff;
-    margin-bottom: 5px;
 }
 
 .printElements {

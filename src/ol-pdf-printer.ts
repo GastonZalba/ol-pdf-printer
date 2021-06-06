@@ -1,6 +1,8 @@
 import { PluggableMap, View } from 'ol';
 import { getPointResolution } from 'ol/proj';
 import Control, { Options as ControlOptions } from 'ol/control/Control';
+import { EventsKey } from 'ol/events';
+import { unByKey } from 'ol/Observable';
 
 import domtoimage from 'dom-to-image-improved';
 
@@ -34,9 +36,9 @@ function deepObjectAssign(target, ...sources) {
             const t_val = target[key];
             target[key] =
                 t_val &&
-                    s_val &&
-                    typeof t_val === 'object' &&
-                    typeof s_val === 'object'
+                s_val &&
+                typeof t_val === 'object' &&
+                typeof s_val === 'object'
                     ? deepObjectAssign(t_val, s_val)
                     : s_val;
         });
@@ -50,7 +52,6 @@ export default class PdfPrinter extends Control {
     protected _map: PluggableMap;
     protected _view: View;
     protected _mapTarget: HTMLElement;
-    protected _form: IPrintOptions;
 
     protected _pdf: Pdf;
 
@@ -64,6 +65,10 @@ export default class PdfPrinter extends Control {
     protected _initialViewResolution: number;
 
     protected _options: Options;
+
+    protected _renderCompleteKey: EventsKey;
+
+    protected _isCanceled: boolean;
 
     constructor(opt_options?: Options) {
         const controlElement = document.createElement('button');
@@ -135,8 +140,8 @@ export default class PdfPrinter extends Control {
             modal: {
                 animateClass: 'fade',
                 animateInClass: 'show',
-                transition: 300,
-                backdropTransition: 150,
+                transition: 150,
+                backdropTransition: 100,
                 templates: {
                     dialog: '<div class="modal-dialog modal-dialog-centered"></div>',
                     headerClose: `<button type="button" class="btn-close" data-dismiss="modal" aria-label="${this._i18n.close}"><span aria-hidden="true">×</span></button>`
@@ -213,6 +218,8 @@ export default class PdfPrinter extends Control {
         this._view.setConstrainResolution(true);
 
         clearTimeout(this._timeoutProcessing);
+
+        this._cancel();
     }
     /**
      * @protected
@@ -222,7 +229,7 @@ export default class PdfPrinter extends Control {
 
         this._timeoutProcessing = setTimeout(() => {
             this._processingModal.show(this._i18n.almostThere);
-        }, 3500);
+        }, 4000);
     }
 
     /**
@@ -233,94 +240,120 @@ export default class PdfPrinter extends Control {
     }
 
     /**
+     *
+     * @param form
+     * @param showLoading
+     * @param delay Delay to prevent glitching with modals animation
      * @protected
      */
-    _printMap(form: IPrintOptions, showLoading = true): void {
+    _printMap(form: IPrintOptions, showLoading = true, delay = 0): void {
         if (showLoading) {
-            this._prepareLoading();
+            this._mapTarget.classList.add(CLASS_PRINT_MODE);
         }
 
-        this._form = form;
+        setTimeout(() => {
+            if (showLoading) {
+                this._prepareLoading();
+            }
 
-        // To allow intermediate zoom levels
-        this._view.setConstrainResolution(false);
+            this._isCanceled = false;
 
-        this._mapTarget.classList.add(CLASS_PRINT_MODE);
+            // To allow intermediate zoom levels
+            this._view.setConstrainResolution(false);
 
-        let dim = this._options.paperSizes.find(
-            (e) => e.value === this._form.format
-        ).size;
-        dim =
-            this._form.orientation === 'landscape'
-                ? dim
-                : (dim.reverse() as [number, number]);
+            let dim = this._options.paperSizes.find(
+                (e) => e.value === form.format
+            ).size;
+            dim =
+                form.orientation === 'landscape'
+                    ? dim
+                    : (dim.reverse() as [number, number]);
 
-        const widthPaper = dim[0];
-        const heightPaper = dim[1];
+            const widthPaper = dim[0];
+            const heightPaper = dim[1];
 
-        const mapSizeForPrint = this._setMapSizForPrint(
-            widthPaper,
-            heightPaper,
-            this._form.resolution
-        );
-        const [width, height] = mapSizeForPrint;
-
-        // Save current resolution to restore it later
-        this._initialViewResolution = this._view.getResolution();
-
-        const pixelsPerMapMillimeter = this._form.resolution / 25.4;
-
-        const scaleResolution =
-            this._form.scale /
-            getPointResolution(
-                this._view.getProjection(),
-                pixelsPerMapMillimeter,
-                this._view.getCenter()
+            const mapSizeForPrint = this._setMapSizForPrint(
+                widthPaper,
+                heightPaper,
+                form.resolution
             );
+            const [width, height] = mapSizeForPrint;
 
-        this._map.once('rendercomplete', () => {
-            domtoimage
-                .toJpeg(
-                    this._mapTarget.querySelector('.ol-unselectable.ol-layers'),
-                    {
-                        width,
-                        height
-                    }
-                )
-                .then(async (dataUrl) => {
-                    this._pdf = new Pdf({
-                        view: this._view,
-                        i18n: this._i18n,
-                        config: this._options,
-                        form: this._form,
-                        height: heightPaper,
-                        width: widthPaper,
-                        scaleResolution
+            // Save current resolution to restore it later
+            this._initialViewResolution = this._view.getResolution();
+
+            const pixelsPerMapMillimeter = form.resolution / 25.4;
+
+            const scaleResolution =
+                form.scale /
+                getPointResolution(
+                    this._view.getProjection(),
+                    pixelsPerMapMillimeter,
+                    this._view.getCenter()
+                );
+
+            this._renderCompleteKey = this._map.once('rendercomplete', () => {
+                domtoimage
+                    .toJpeg(
+                        this._mapTarget.querySelector(
+                            '.ol-unselectable.ol-layers'
+                        ),
+                        {
+                            width,
+                            height
+                        }
+                    )
+                    .then(async (dataUrl) => {
+                        if (this._isCanceled) return;
+
+                        this._pdf = new Pdf({
+                            view: this._view,
+                            i18n: this._i18n,
+                            config: this._options,
+                            form: form,
+                            height: heightPaper,
+                            width: widthPaper,
+                            scaleResolution
+                        });
+
+                        this._pdf.addMapImage(dataUrl);
+                        await this._pdf.addMapHelpers();
+
+                        if (this._isCanceled) return;
+
+                        this._pdf.savePdf();
+
+                        // Reset original map size
+                        this._onEndPrint();
+
+                        if (showLoading) this._disableLoading();
+                    })
+                    .catch((err: Error) => {
+                        const message =
+                            typeof err === 'string' ? err : this._i18n.error;
+                        console.error(err);
+                        this._onEndPrint();
+                        this._processingModal.show(message);
                     });
+            });
 
-                    this._pdf.addMapImage(dataUrl);
-                    await this._pdf.addMapHelpers();
-                    this._pdf.savePdf();
+            // Set print size
+            this._mapTarget.style.width = width + 'px';
+            this._mapTarget.style.height = height + 'px';
+            this._map.updateSize();
+            this._map.getView().setResolution(scaleResolution);
+        }, delay);
+    }
 
-                    // Reset original map size
-                    this._onEndPrint();
+    /**
+     * @protected
+     */
+    _cancel(): void {
+        if (this._renderCompleteKey) {
+            unByKey(this._renderCompleteKey);
+        }
 
-                    if (showLoading) this._disableLoading();
-                })
-                .catch((err: Error) => {
-                    const message =
-                        typeof err === 'string' ? err : this._i18n.error;
-                    console.error(err);
-                    this._onEndPrint();
-                    this._processingModal.show(message, /** footer */ true);
-                });
-        });
-
-        // Set print size
-        this._mapTarget.style.width = width + 'px';
-        this._mapTarget.style.height = height + 'px';
-        this._map.updateSize();
-        this._map.getView().setResolution(scaleResolution);
+        this._isCanceled = true;
     }
     /**
      * Show the Settings Modal
@@ -550,7 +583,7 @@ interface IExtraInfo {
      */
     date?: boolean;
     /**
-     *
+     * Current site url
      */
     url?: boolean;
     /**

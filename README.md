@@ -117,6 +117,7 @@ import PdfPrinter from 'ol-pdf-printer';
 ```
 
 #### CSS
+
 ```js
 import 'ol-pdf-printer/dist/css/ol-pdf-printer.min.css';
 import 'ol-pdf-printer/dist/css/bootstrap.min.css'; // Bootstrap bundle
@@ -216,10 +217,6 @@ Create PDF programatically without displaying the Settings Modal
 -   `showLoading` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**
 
 Returns **void**
-
-###
-
-footer
 
 ### IPrintOptions
 
@@ -374,6 +371,8 @@ Print Date
 Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)
 
 #### url
+
+Current site url
 
 Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)
 
