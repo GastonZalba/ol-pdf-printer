@@ -2,3 +2,7 @@
 
 ## v1.0.0
 * Module created
+
+## v1.0.1
+* Fixed README details
+* Removed folder "dist" and "lib" from .gitignore.

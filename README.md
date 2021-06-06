@@ -14,7 +14,7 @@ WMS sources and Icons that use external urls must be setted to `crossOrigin: 'an
 
 ## Examples
 
--   [Basic usage](https://raw.githack.com/GastonZalba/ol-pdf-printer/v1.0.0/examples/basic.html)
+-   [Basic usage](https://raw.githack.com/GastonZalba/ol-pdf-printer/master/examples/basic.html)
 
 ## Usage
 
@@ -93,14 +93,14 @@ See [CHANGELOG](./CHANGELOG.md) for details of changes in each release.
 Load `ol-pdf-printer.js` after [OpenLayers](https://www.npmjs.com/package/ol) and [jspdf](https://www.npmjs.com/package/jspdf). Ol Pdf Printer is available as `PdfPrinter`.
 
 ```HTML
-<script src="https://unpkg.com/ol-pdf-printer@1.0.0"></script>
+<script src="https://unpkg.com/ol-pdf-printer"></script>
 ```
 
 #### CSS
 
 ```HTML
-<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.0.0/dist/ol-pdf-printer.css" />
-<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.0.0/dist/bootstrap.min.css" /> <!-- Bootstrap bundle -->
+<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer/dist/css/ol-pdf-printer.css" />
+<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer/dist/css/bootstrap.min.css" /> <!-- Bootstrap bundle -->
 ```
 
 ### Parcel, Webpack, etc.
