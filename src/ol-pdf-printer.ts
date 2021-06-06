@@ -1,6 +1,9 @@
 import { PluggableMap, View } from 'ol';
 import { getPointResolution } from 'ol/proj';
 import Control, { Options as ControlOptions } from 'ol/control/Control';
+import TileWMS from 'ol/source/TileWMS';
+import Tile from 'ol/layer/Tile';
+
 import { EventsKey } from 'ol/events';
 import { unByKey } from 'ol/Observable';
 
@@ -240,6 +243,25 @@ export default class PdfPrinter extends Control {
     }
 
     /**
+     * This could be used to increment the DPI before printing
+     * @protected
+     */
+    _setFormatOptions(string = ''): void {
+        const layers = this._map.getLayers();
+        layers.forEach((layer) => {
+            if (layer instanceof Tile) {
+                const source = layer.getSource();
+                // Set WMS DPI
+                if (source instanceof TileWMS) {
+                    source.updateParams({
+                        FORMAT_OPTIONS: string
+                    });
+                }
+            }
+        });
+    }
+
+    /**
      *
      * @param form
      * @param showLoading
@@ -260,6 +282,8 @@ export default class PdfPrinter extends Control {
 
             // To allow intermediate zoom levels
             this._view.setConstrainResolution(false);
+
+            // this._prepareLayers(form);
 
             let dim = this._options.paperSizes.find(
                 (e) => e.value === form.format

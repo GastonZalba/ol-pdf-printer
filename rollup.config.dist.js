@@ -16,6 +16,8 @@ let globals = {
     'ol/proj/Units': 'ol.proj.Units',
     'ol/events': 'ol.events',
     'ol/Observable' : 'ol.Observable',
+    'ol/source/TileWMS': 'ol.source.TileWMS',
+    'ol/layer/Tile': 'ol.layer.Tile',
     'jspdf': 'jsPDF',
     'dom-to-image-improved': 'domtoimage',
     'modal-vanilla': 'Modal',
@@ -92,6 +94,8 @@ module.exports = {
         'ol/proj/Units',
         'ol/events',
         'ol/Observable',
+        'ol/source/TileWMS',
+        'ol/layer/Tile',
         'jspdf'
     ]
 };

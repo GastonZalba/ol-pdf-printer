@@ -9,6 +9,12 @@
     [-6702371, -4500916]
   ]
 
+  features.push(
+    new ol.Feature({
+      geometry: new ol.geom.Polygon([pointsCoords])
+    })
+  );
+
   for (i = 0; i < pointsCoords.length; i++) {
     var examplePoint = new ol.Feature({
       geometry: new ol.geom.Point(pointsCoords[i])
@@ -57,7 +63,7 @@
     new ol.layer.Tile({
       zIndex: 2,
       source: new ol.source.TileWMS({
-        url: 'http://wms.ign.gob.ar/geoserver/geodesia-demarcacion/wms',
+        url: 'https://wms.ign.gob.ar/geoserver/geodesia-demarcacion/wms',
         params: { 'LAYERS': 'nivelacion_alta_precision,nivelacion_precision,nivelacion_topografica', 'TILED': true },
         serverType: 'geoserver',
         attributions: '<a href="https://mapa.ign.gob.ar/">Instituto Geográfico Nacional</a>',
@@ -72,7 +78,7 @@
     view: new ol.View({
       projection: 'EPSG:3857',
       center: [-6721313, -4349376],
-      zoom: 15,
+      zoom: 8,
       rotation: 0.1
     })
   });
@@ -81,7 +87,7 @@
     filename: 'Example export',
     language: 'en',
     style: {
-      paperMargin: 0
+      paperMargin: 10
     },
     paperSizes: [
       { size: [594, 420], value: 'A2' },
