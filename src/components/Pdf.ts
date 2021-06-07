@@ -577,26 +577,19 @@ export default class Pdf {
         const position = 'bottomright';
         const offset = { x: 1, y: 1 };
         const fontSize = 7;
-        const maxWidth = 400;
 
         this._pdf.doc.setFont('helvetica', 'normal');
 
-        const attArr = [];
-        const attributions = document.querySelectorAll('.ol-attribution li');
-        attributions.forEach((attribution) => {
-            attArr.push(attribution.textContent);
-        });
-
-        const str = attArr.join(' | ');
-
+        this._pdf.doc.setFontSize(fontSize);
         const { x, y } = this._calculateOffsetByPosition(position, offset);
 
-        this._pdf.doc.setTextColor('#666666');
-        this._pdf.doc.setFontSize(fontSize);
+        let xPos = x;
 
-        const { w, h } = this._pdf.doc.getTextDimensions(str, {
-            maxWidth: maxWidth
-        });
+        const attributionsUl = document.querySelector('.ol-attribution ul');
+
+        const { w, h } = this._pdf.doc.getTextDimensions(
+            attributionsUl.textContent
+        );
 
         const paddingBack = 4;
 
@@ -609,10 +602,40 @@ export default class Pdf {
             '#ffffff'
         );
 
-        this._pdf.doc.text(str, x, y, {
-            align: 'right',
-            maxWidth: maxWidth
-        });
+        const attributions = document.querySelectorAll('.ol-attribution li');
+
+        Array.from(attributions)
+            .reverse()
+            .forEach((attribution) => {
+                Array.from(attribution.childNodes)
+                    .reverse()
+                    .forEach((node) => {
+                        let content = node.textContent;
+
+                        if (('href' in node) as any) {
+                            this._pdf.doc.setTextColor('#0077cc');
+                            this._pdf.doc.textWithLink(content, xPos, y, {
+                                align: 'right',
+                                url: (node as any).href
+                            });
+                        } else {
+                            this._pdf.doc.setTextColor('#666666');
+                            this._pdf.doc.text(content, xPos, y, {
+                                align: 'right'
+                            });
+                        }
+
+                        const { w } = this._pdf.doc.getTextDimensions(content);
+                        xPos -= w;
+                    });
+
+                // To add separation between diferents attributtions
+                this._pdf.doc.text(' ', xPos, y, {
+                    align: 'right'
+                });
+                const { w } = this._pdf.doc.getTextDimensions(' ');
+                xPos -= w;
+            });
     };
 
     /**

@@ -2257,28 +2257,19 @@
           y: 1
         };
         var fontSize = 7;
-        var maxWidth = 400;
 
         _this._pdf.doc.setFont('helvetica', 'normal');
 
-        var attArr = [];
-        var attributions = document.querySelectorAll('.ol-attribution li');
-        attributions.forEach(function (attribution) {
-          attArr.push(attribution.textContent);
-        });
-        var str = attArr.join(' | ');
+        _this._pdf.doc.setFontSize(fontSize);
 
         var _this$_calculateOffse4 = _this._calculateOffsetByPosition(position, offset),
             x = _this$_calculateOffse4.x,
             y = _this$_calculateOffse4.y;
 
-        _this._pdf.doc.setTextColor('#666666');
+        var xPos = x;
+        var attributionsUl = document.querySelector('.ol-attribution ul');
 
-        _this._pdf.doc.setFontSize(fontSize);
-
-        var _this$_pdf$doc$getTex5 = _this._pdf.doc.getTextDimensions(str, {
-          maxWidth: maxWidth
-        }),
+        var _this$_pdf$doc$getTex5 = _this._pdf.doc.getTextDimensions(attributionsUl.textContent),
             w = _this$_pdf$doc$getTex5.w,
             h = _this$_pdf$doc$getTex5.h;
 
@@ -2286,9 +2277,40 @@
 
         _this._addRoundedBox(x - w - 2, y - 3, w + paddingBack, h + paddingBack, '#ffffff', '#ffffff');
 
-        _this._pdf.doc.text(str, x, y, {
-          align: 'right',
-          maxWidth: maxWidth
+        var attributions = document.querySelectorAll('.ol-attribution li');
+        Array.from(attributions).reverse().forEach(function (attribution) {
+          Array.from(attribution.childNodes).reverse().forEach(function (node) {
+            var content = node.textContent;
+
+            if ('href' in node) {
+              _this._pdf.doc.setTextColor('#0077cc');
+
+              _this._pdf.doc.textWithLink(content, xPos, y, {
+                align: 'right',
+                url: node.href
+              });
+            } else {
+              _this._pdf.doc.setTextColor('#666666');
+
+              _this._pdf.doc.text(content, xPos, y, {
+                align: 'right'
+              });
+            }
+
+            var _this$_pdf$doc$getTex6 = _this._pdf.doc.getTextDimensions(content),
+                w = _this$_pdf$doc$getTex6.w;
+
+            xPos -= w;
+          }); // To add separation between diferents attributtions
+
+          _this._pdf.doc.text(' ', xPos, y, {
+            align: 'right'
+          });
+
+          var _this$_pdf$doc$getTex7 = _this._pdf.doc.getTextDimensions(' '),
+              w = _this$_pdf$doc$getTex7.w;
+
+          xPos -= w;
         });
       };
       /**
