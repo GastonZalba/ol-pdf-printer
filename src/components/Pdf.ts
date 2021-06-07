@@ -571,21 +571,23 @@ export default class Pdf {
     };
 
     /**
+     * The attributions are obtained from the Control in the DOM.
      * @protected
      */
     _addAttributions = (): void => {
+        const attributionsUl = document.querySelector('.ol-attribution ul');
+
+        if (!attributionsUl) return;
+
         const position = 'bottomright';
         const offset = { x: 1, y: 1 };
         const fontSize = 7;
 
         this._pdf.doc.setFont('helvetica', 'normal');
-
         this._pdf.doc.setFontSize(fontSize);
         const { x, y } = this._calculateOffsetByPosition(position, offset);
 
         let xPos = x;
-
-        const attributionsUl = document.querySelector('.ol-attribution ul');
 
         const { w, h } = this._pdf.doc.getTextDimensions(
             attributionsUl.textContent
@@ -595,7 +597,7 @@ export default class Pdf {
 
         this._addRoundedBox(
             x - w - 2,
-            y - 3,
+            y - h,
             w + paddingBack,
             h + paddingBack,
             '#ffffff',

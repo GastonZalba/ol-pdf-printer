@@ -2251,6 +2251,8 @@
 
 
       this._addAttributions = function () {
+        var attributionsUl = document.querySelector('.ol-attribution ul');
+        if (!attributionsUl) return;
         var position = 'bottomright';
         var offset = {
           x: 1,
@@ -2267,7 +2269,6 @@
             y = _this$_calculateOffse4.y;
 
         var xPos = x;
-        var attributionsUl = document.querySelector('.ol-attribution ul');
 
         var _this$_pdf$doc$getTex5 = _this._pdf.doc.getTextDimensions(attributionsUl.textContent),
             w = _this$_pdf$doc$getTex5.w,
@@ -2275,7 +2276,7 @@
 
         var paddingBack = 4;
 
-        _this._addRoundedBox(x - w - 2, y - 3, w + paddingBack, h + paddingBack, '#ffffff', '#ffffff');
+        _this._addRoundedBox(x - w - 2, y - h, w + paddingBack, h + paddingBack, '#ffffff', '#ffffff');
 
         var attributions = document.querySelectorAll('.ol-attribution li');
         Array.from(attributions).reverse().forEach(function (attribution) {

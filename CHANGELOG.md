@@ -6,3 +6,6 @@
 ## v1.0.1
 * Fixed README details
 * Removed folder "dist" and "lib" from .gitignore.
+
+## v1.0.2
+* Url links added to layer attributions
