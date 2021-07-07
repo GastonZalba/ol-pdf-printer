@@ -158,15 +158,7 @@ export default class PdfPrinter extends Control {
         controlElement.className = `ol-print-btn-menu ${this._options.ctrlBtnClass}`;
         controlElement.innerHTML = `<img src="${pdfIcon}"/>`;
         controlElement.title = this._i18n.printPdf;
-        controlElement.onclick = () => this._show();
-    }
-
-    /**
-     * @protected
-     */
-    _show(): void {
-        if (!this._initialized) this._init();
-        this._settingsModal.show();
+        controlElement.onclick = () => this.showPrintSettingsModal();
     }
 
     /**
@@ -384,8 +376,10 @@ export default class PdfPrinter extends Control {
      * @public
      */
     showPrintSettingsModal(): void {
+        if (!this._initialized) this._init();
         this._settingsModal.show();
     }
+
     /**
      * Hide the Settings Modal
      * @public

@@ -23,10 +23,6 @@ export default class PdfPrinter extends Control {
     /**
      * @protected
      */
-    _show(): void;
-    /**
-     * @protected
-     */
     _init(): void;
     /**
      * @protected

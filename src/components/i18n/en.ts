@@ -9,7 +9,7 @@ export const en: I18n = {
     printing: 'Printing',
     cancel: 'Cancel',
     close: 'Close',
-    print: 'Print',
+    print: 'Export',
     mapElements: 'Map elements',
     compass: 'Compass',
     scale: 'Scale',

@@ -9,3 +9,9 @@
 
 ## v1.0.2
 * Url links added to layer attributions
+
+## v1.0.3
+* Fixed bug on `showPrintSettingsModal` method
+
+## v1.0.4
+* Changed print button text

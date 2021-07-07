@@ -2246,6 +2246,7 @@
         _this._addTextByOffset(position, offset, w, fontSize, txcolor, align, str);
       };
       /**
+       * The attributions are obtained from the Control in the DOM.
        * @protected
        */
 
@@ -3985,7 +3986,7 @@
     printing: 'Imprimiendo',
     cancel: 'Cancelar',
     close: 'Cerrar',
-    print: 'Imprimir',
+    print: 'Exportar',
     mapElements: 'Elementos en el mapa',
     compass: 'Brújula',
     scale: 'Escala',
@@ -4009,7 +4010,7 @@
     printing: 'Printing',
     cancel: 'Cancel',
     close: 'Close',
-    print: 'Print',
+    print: 'Export',
     mapElements: 'Map elements',
     compass: 'Compass',
     scale: 'Scale',
@@ -4197,7 +4198,7 @@
       controlElement.title = _this._i18n.printPdf;
 
       controlElement.onclick = function () {
-        return _this._show();
+        return _this.showPrintSettingsModal();
       };
 
       return _this;
@@ -4208,17 +4209,6 @@
 
 
     _createClass(PdfPrinter, [{
-      key: "_show",
-      value: function _show() {
-        if (!this._initialized) this._init();
-
-        this._settingsModal.show();
-      }
-      /**
-       * @protected
-       */
-
-    }, {
       key: "_init",
       value: function _init() {
         this._map = this.getMap();
@@ -4452,6 +4442,8 @@
     }, {
       key: "showPrintSettingsModal",
       value: function showPrintSettingsModal() {
+        if (!this._initialized) this._init();
+
         this._settingsModal.show();
       }
       /**

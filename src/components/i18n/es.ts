@@ -9,7 +9,7 @@ export const es: I18n = {
     printing: 'Imprimiendo',
     cancel: 'Cancelar',
     close: 'Cerrar',
-    print: 'Imprimir',
+    print: 'Exportar',
     mapElements: 'Elementos en el mapa',
     compass: 'Brújula',
     scale: 'Escala',
