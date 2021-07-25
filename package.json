@@ -1,6 +1,6 @@
 {
   "name": "ol-pdf-printer",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "PDF Printer for Open Layers",
   "browser": "dist/ol-pdf-printer.min.js",
   "main": "dist/ol-pdf-printer.js",
@@ -56,7 +56,6 @@
     "clean-css": "^4.2.3",
     "del-cli": "^3.0.1",
     "documentation": "^13.1.0",
-    "dom-to-image-improved": "^2.8.0",
     "eslint-config-openlayers": "^14.0.0",
     "eslint-config-prettier": "^6.15.0",
     "eslint-plugin-prettier": "^3.1.4",
@@ -70,6 +69,7 @@
     "typescript": "^4.1.2"
   },
   "dependencies": {
+    "dom-to-image-improved": "^2.8.0",
     "jspdf": "^2.3.1",
     "modal-vanilla": "^0.8.0"
   }
