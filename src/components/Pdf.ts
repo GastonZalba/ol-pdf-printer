@@ -1,8 +1,7 @@
-import { TextOptionsLight } from 'jspdf';
-import { View } from 'ol';
+import View from 'ol/View.js';
 import { getPointResolution } from 'ol/proj';
 import { I18n, Options, IPrintOptions, IWatermark } from 'src/ol-pdf-printer';
-import { jsPDF } from 'jspdf';
+import { jsPDF, TextOptionsLight } from 'jspdf';
 
 /**
  * @private
@@ -134,6 +133,60 @@ export default class Pdf {
     savePdf(): void {
         this._pdf.doc.save(this._config.filename + '.pdf');
     }
+
+    /**
+     * Convert an SVGElement to an PNG string
+     * @param svg
+     * @returns
+     */
+    _processSvgImage = (svg: SVGElement): Promise<string> => {
+        // https://stackoverflow.com/questions/3975499/convert-svg-to-image-jpeg-png-etc-in-the-browser#answer-58142441
+        return new Promise((resolve, reject) => {
+            const svgToPng = (svg: SVGElement, callback) => {
+                const url = getSvgUrl(svg);
+                svgUrlToPng(url, (imgData: string) => {
+                    callback(imgData);
+                    URL.revokeObjectURL(url);
+                });
+            };
+
+            const getSvgUrl = (svg: SVGElement) => {
+                return URL.createObjectURL(
+                    new Blob([svg.outerHTML], { type: 'image/svg+xml' })
+                );
+            };
+
+            const svgUrlToPng = (svgUrl: string, callback) => {
+                const svgImage = document.createElement('img');
+                document.body.appendChild(svgImage);
+
+                svgImage.onerror = (err) => {
+                    console.error(err);
+                    return reject(this._i18n.errorImage);
+                };
+
+                svgImage.onload = () => {
+                    try {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = svgImage.clientWidth;
+                        canvas.height = svgImage.clientHeight;
+                        const canvasCtx = canvas.getContext('2d');
+                        canvasCtx.drawImage(svgImage, 0, 0);
+                        const imgData = canvas.toDataURL('image/png');
+                        callback(imgData);
+                        document.body.removeChild(svgImage);
+                    } catch (err) {
+                        return reject(err);
+                    }
+                };
+                svgImage.src = svgUrl;
+            };
+
+            svgToPng(svg, (imgData: string) => {
+                resolve(imgData);
+            });
+        });
+    };
 
     /**
      *   Adapted from http://hg.intevation.de/gemma/file/tip/client/src/components/Pdftool.vue#l252
@@ -340,7 +393,7 @@ export default class Pdf {
      * @protected
      */
     _addWatermark = (watermark: IWatermark): Promise<void> => {
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             const position = 'topright';
             const offset = { x: 0, y: 0 };
             const fontSize = 14;
@@ -435,7 +488,7 @@ export default class Pdf {
 
             if (!watermark.logo) return resolve();
 
-            const addImage = (image) => {
+            const addImage = (image: HTMLImageElement): void => {
                 this._pdf.doc.addImage(
                     image,
                     'PNG',
@@ -462,6 +515,20 @@ export default class Pdf {
                 addImage(watermark.logo);
                 resolve();
             } else {
+                let imgData: string;
+
+                if (typeof watermark.logo === 'string') {
+                    imgData = watermark.logo;
+                } else if (watermark.logo instanceof SVGElement) {
+                    try {
+                        imgData = await this._processSvgImage(watermark.logo);
+                    } catch (err) {
+                        return reject(err);
+                    }
+                } else {
+                    throw this._i18n.errorImage;
+                }
+
                 const image = new Image(imageSize, imageSize);
                 image.onload = () => {
                     try {
@@ -474,7 +541,7 @@ export default class Pdf {
                 image.onerror = () => {
                     return reject(this._i18n.errorImage);
                 };
-                image.src = watermark.logo;
+                image.src = imgData;
             }
         });
     };
@@ -767,8 +834,10 @@ export default class Pdf {
      * @returns
      * @protected
      */
-    _addCompass = (imgSrc: HTMLImageElement | string): Promise<void> => {
-        return new Promise((resolve, reject) => {
+    _addCompass = (
+        imgSrc: HTMLImageElement | string | SVGElement
+    ): Promise<void> => {
+        return new Promise(async (resolve, reject) => {
             const position = 'bottomright';
             const offset = { x: 2, y: 6 };
             const size = 6;
@@ -827,11 +896,28 @@ export default class Pdf {
                 );
             };
 
+            let image: HTMLImageElement;
+
             if (imgSrc instanceof Image) {
-                addImage(imgSrc);
+                addImage(image);
                 resolve();
-            } else if (typeof imgSrc === 'string') {
+            } else {
+                let imgData: string;
+
+                if (typeof imgSrc === 'string') {
+                    imgData = imgSrc;
+                } else if (imgSrc instanceof SVGElement) {
+                    try {
+                        imgData = await this._processSvgImage(imgSrc);
+                    } catch (err) {
+                        return reject(err);
+                    }
+                } else {
+                    throw this._i18n.errorImage;
+                }
+
                 const image = new Image(imageSize, imageSize);
+
                 image.onload = () => {
                     try {
                         addImage(image);
@@ -840,11 +926,12 @@ export default class Pdf {
                         return reject(err);
                     }
                 };
+
                 image.onerror = () => {
                     return reject(this._i18n.errorImage);
                 };
 
-                image.src = imgSrc;
+                image.src = imgData;
             }
         });
     };

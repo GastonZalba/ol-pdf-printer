@@ -1899,6 +1899,62 @@
         }));
       };
       /**
+       * Convert an SVGElement to an PNG string
+       * @param svg
+       * @returns
+       */
+
+
+      this._processSvgImage = function (svg) {
+        // https://stackoverflow.com/questions/3975499/convert-svg-to-image-jpeg-png-etc-in-the-browser#answer-58142441
+        return new Promise(function (resolve, reject) {
+          var svgToPng = function svgToPng(svg, callback) {
+            var url = getSvgUrl(svg);
+            svgUrlToPng(url, function (imgData) {
+              callback(imgData);
+              URL.revokeObjectURL(url);
+            });
+          };
+
+          var getSvgUrl = function getSvgUrl(svg) {
+            return URL.createObjectURL(new Blob([svg.outerHTML], {
+              type: 'image/svg+xml'
+            }));
+          };
+
+          var svgUrlToPng = function svgUrlToPng(svgUrl, callback) {
+            var svgImage = document.createElement('img');
+            document.body.appendChild(svgImage);
+
+            svgImage.onerror = function (err) {
+              console.error(err);
+              return reject(_this._i18n.errorImage);
+            };
+
+            svgImage.onload = function () {
+              try {
+                var canvas = document.createElement('canvas');
+                canvas.width = svgImage.clientWidth;
+                canvas.height = svgImage.clientHeight;
+                var canvasCtx = canvas.getContext('2d');
+                canvasCtx.drawImage(svgImage, 0, 0);
+                var imgData = canvas.toDataURL('image/png');
+                callback(imgData);
+                document.body.removeChild(svgImage);
+              } catch (err) {
+                return reject(err);
+              }
+            };
+
+            svgImage.src = svgUrl;
+          };
+
+          svgToPng(svg, function (imgData) {
+            resolve(imgData);
+          });
+        });
+      };
+      /**
        *
        * @param position
        * @param offset
@@ -2055,120 +2111,178 @@
 
       this._addWatermark = function (watermark) {
         return new Promise(function (resolve, reject) {
-          var position = 'topright';
-          var offset = {
-            x: 0,
-            y: 0
-          };
-          var fontSize = 14;
-          var imageSize = 12;
-          var fontSizeSubtitle = fontSize / 1.8;
-          var back = false;
+          return __awaiter$1(_this, void 0, void 0, /*#__PURE__*/regenerator.mark(function _callee2() {
+            var _this2 = this;
 
-          var _this$_calculateOffse3 = _this._calculateOffsetByPosition(position, offset),
-              x = _this$_calculateOffse3.x,
-              y = _this$_calculateOffse3.y;
+            var position, offset, fontSize, imageSize, fontSizeSubtitle, back, _this$_calculateOffse3, x, y, paddingBack, acumulativeWidth, _this$_pdf$doc$getTex2, w, wSub, _height, widthBack, _this$_pdf$doc$getTex3, _w, _widthBack, marginTop, addImage, _widthBack2, imgData, image;
 
-          var paddingBack = 2;
-          var acumulativeWidth = watermark.logo ? imageSize + 0.5 : 0;
+            return regenerator.wrap(function _callee2$(_context2) {
+              while (1) {
+                switch (_context2.prev = _context2.next) {
+                  case 0:
+                    position = 'topright';
+                    offset = {
+                      x: 0,
+                      y: 0
+                    };
+                    fontSize = 14;
+                    imageSize = 12;
+                    fontSizeSubtitle = fontSize / 1.8;
+                    back = false;
+                    _this$_calculateOffse3 = this._calculateOffsetByPosition(position, offset), x = _this$_calculateOffse3.x, y = _this$_calculateOffse3.y;
+                    paddingBack = 2;
+                    acumulativeWidth = watermark.logo ? imageSize + 0.5 : 0;
 
-          if (watermark.title) {
-            _this._pdf.doc.setTextColor(watermark.titleColor);
+                    if (watermark.title) {
+                      this._pdf.doc.setTextColor(watermark.titleColor);
 
-            _this._pdf.doc.setFontSize(fontSize);
+                      this._pdf.doc.setFontSize(fontSize);
 
-            _this._pdf.doc.setFont('helvetica', 'bold'); // This function works bad
-
-
-            var _this$_pdf$doc$getTex2 = _this._pdf.doc.getTextDimensions(watermark.title),
-                w = _this$_pdf$doc$getTex2.w;
-
-            if (watermark.subtitle) {
-              _this._pdf.doc.setFontSize(fontSizeSubtitle);
-
-              var wSub = _this._pdf.doc.getTextDimensions(watermark.subtitle).w;
-
-              w = wSub - 4 > w ? wSub : w + 4; // weird fix needed
-
-              _this._pdf.doc.setFontSize(fontSize);
-            } else {
-              w += 4;
-            } // Adaptable width, fixed height
+                      this._pdf.doc.setFont('helvetica', 'bold'); // This function works bad
 
 
-            var _height = 16;
-            var widthBack = w + paddingBack;
+                      _this$_pdf$doc$getTex2 = this._pdf.doc.getTextDimensions(watermark.title), w = _this$_pdf$doc$getTex2.w;
 
-            _this._addRoundedBox(x - widthBack + 4 - acumulativeWidth, y - 4, widthBack + acumulativeWidth, _height, '#ffffff', '#ffffff');
+                      if (watermark.subtitle) {
+                        this._pdf.doc.setFontSize(fontSizeSubtitle);
 
-            back = true;
+                        wSub = this._pdf.doc.getTextDimensions(watermark.subtitle).w;
+                        w = wSub - 4 > w ? wSub : w + 4; // weird fix needed
 
-            _this._pdf.doc.text(watermark.title, x, y + paddingBack + 3 + (!watermark.subtitle ? 2 : 0), {
-              align: 'right'
-            });
+                        this._pdf.doc.setFontSize(fontSize);
+                      } else {
+                        w += 4;
+                      } // Adaptable width, fixed height
 
-            acumulativeWidth += w;
-          }
 
-          if (watermark.subtitle) {
-            _this._pdf.doc.setTextColor(watermark.subtitleColor);
+                      _height = 16;
+                      widthBack = w + paddingBack;
 
-            _this._pdf.doc.setFontSize(fontSizeSubtitle);
+                      this._addRoundedBox(x - widthBack + 4 - acumulativeWidth, y - 4, widthBack + acumulativeWidth, _height, '#ffffff', '#ffffff');
 
-            _this._pdf.doc.setFont('helvetica', 'normal');
+                      back = true;
 
-            if (!back) {
-              var _this$_pdf$doc$getTex3 = _this._pdf.doc.getTextDimensions(watermark.subtitle),
-                  _w = _this$_pdf$doc$getTex3.w;
+                      this._pdf.doc.text(watermark.title, x, y + paddingBack + 3 + (!watermark.subtitle ? 2 : 0), {
+                        align: 'right'
+                      });
 
-              var _widthBack = paddingBack * 2 + _w;
+                      acumulativeWidth += w;
+                    }
 
-              _this._addRoundedBox(x - _widthBack + 3 - acumulativeWidth, y - 4, _widthBack + acumulativeWidth, 16, '#ffffff', '#ffffff');
+                    if (watermark.subtitle) {
+                      this._pdf.doc.setTextColor(watermark.subtitleColor);
 
-              acumulativeWidth += _widthBack;
-              back = true;
-            }
+                      this._pdf.doc.setFontSize(fontSizeSubtitle);
 
-            var marginTop = watermark.title ? fontSize / 2 : 4;
+                      this._pdf.doc.setFont('helvetica', 'normal');
 
-            _this._pdf.doc.text(watermark.subtitle, x, y + paddingBack + marginTop, {
-              align: 'right'
-            });
-          }
+                      if (!back) {
+                        _this$_pdf$doc$getTex3 = this._pdf.doc.getTextDimensions(watermark.subtitle), _w = _this$_pdf$doc$getTex3.w;
+                        _widthBack = paddingBack * 2 + _w;
 
-          if (!watermark.logo) return resolve();
+                        this._addRoundedBox(x - _widthBack + 3 - acumulativeWidth, y - 4, _widthBack + acumulativeWidth, 16, '#ffffff', '#ffffff');
 
-          var addImage = function addImage(image) {
-            _this._pdf.doc.addImage(image, 'PNG', x - acumulativeWidth + paddingBack * 2 - 1, y - 1, imageSize, imageSize);
-          };
+                        acumulativeWidth += _widthBack;
+                        back = true;
+                      }
 
-          if (!back) {
-            var _widthBack2 = acumulativeWidth + paddingBack;
+                      marginTop = watermark.title ? fontSize / 2 : 4;
 
-            _this._addRoundedBox(x - _widthBack2 + 4, y - 4, _widthBack2, 16, '#ffffff', '#ffffff');
-          }
+                      this._pdf.doc.text(watermark.subtitle, x, y + paddingBack + marginTop, {
+                        align: 'right'
+                      });
+                    }
 
-          if (watermark.logo instanceof Image) {
-            addImage(watermark.logo);
-            resolve();
-          } else {
-            var image = new Image(imageSize, imageSize);
+                    if (watermark.logo) {
+                      _context2.next = 13;
+                      break;
+                    }
 
-            image.onload = function () {
-              try {
-                addImage(image);
-                resolve();
-              } catch (err) {
-                return reject(err);
+                    return _context2.abrupt("return", resolve());
+
+                  case 13:
+                    addImage = function addImage(image) {
+                      _this2._pdf.doc.addImage(image, 'PNG', x - acumulativeWidth + paddingBack * 2 - 1, y - 1, imageSize, imageSize);
+                    };
+
+                    if (!back) {
+                      _widthBack2 = acumulativeWidth + paddingBack;
+
+                      this._addRoundedBox(x - _widthBack2 + 4, y - 4, _widthBack2, 16, '#ffffff', '#ffffff');
+                    }
+
+                    if (!(watermark.logo instanceof Image)) {
+                      _context2.next = 20;
+                      break;
+                    }
+
+                    addImage(watermark.logo);
+                    resolve();
+                    _context2.next = 41;
+                    break;
+
+                  case 20:
+                    if (!(typeof watermark.logo === 'string')) {
+                      _context2.next = 24;
+                      break;
+                    }
+
+                    imgData = watermark.logo;
+                    _context2.next = 37;
+                    break;
+
+                  case 24:
+                    if (!(watermark.logo instanceof SVGElement)) {
+                      _context2.next = 36;
+                      break;
+                    }
+
+                    _context2.prev = 25;
+                    _context2.next = 28;
+                    return this._processSvgImage(watermark.logo);
+
+                  case 28:
+                    imgData = _context2.sent;
+                    _context2.next = 34;
+                    break;
+
+                  case 31:
+                    _context2.prev = 31;
+                    _context2.t0 = _context2["catch"](25);
+                    return _context2.abrupt("return", reject(_context2.t0));
+
+                  case 34:
+                    _context2.next = 37;
+                    break;
+
+                  case 36:
+                    throw this._i18n.errorImage;
+
+                  case 37:
+                    image = new Image(imageSize, imageSize);
+
+                    image.onload = function () {
+                      try {
+                        addImage(image);
+                        resolve();
+                      } catch (err) {
+                        return reject(err);
+                      }
+                    };
+
+                    image.onerror = function () {
+                      return reject(_this2._i18n.errorImage);
+                    };
+
+                    image.src = imgData;
+
+                  case 41:
+                  case "end":
+                    return _context2.stop();
+                }
               }
-            };
-
-            image.onerror = function () {
-              return reject(_this._i18n.errorImage);
-            };
-
-            image.src = watermark.logo;
-          }
+            }, _callee2, this, [[25, 31]]);
+          }));
         });
       };
       /**
@@ -2428,74 +2542,129 @@
 
       this._addCompass = function (imgSrc) {
         return new Promise(function (resolve, reject) {
-          var position = 'bottomright';
-          var offset = {
-            x: 2,
-            y: 6
-          };
-          var size = 6;
+          return __awaiter$1(_this, void 0, void 0, /*#__PURE__*/regenerator.mark(function _callee3() {
+            var _this3 = this;
 
-          var rotationRadians = _this._view.getRotation();
+            var position, offset, size, rotationRadians, imageSize, _this$_calculateOffse5, x, y, addRotation, addImage, image, imgData, _image;
 
-          var imageSize = 100;
+            return regenerator.wrap(function _callee3$(_context3) {
+              while (1) {
+                switch (_context3.prev = _context3.next) {
+                  case 0:
+                    position = 'bottomright';
+                    offset = {
+                      x: 2,
+                      y: 6
+                    };
+                    size = 6;
+                    rotationRadians = this._view.getRotation();
+                    imageSize = 100;
+                    _this$_calculateOffse5 = this._calculateOffsetByPosition(position, offset, size), x = _this$_calculateOffse5.x, y = _this$_calculateOffse5.y;
 
-          var _this$_calculateOffse5 = _this._calculateOffsetByPosition(position, offset, size),
-              x = _this$_calculateOffse5.x,
-              y = _this$_calculateOffse5.y;
+                    addRotation = function addRotation(image) {
+                      var canvas = document.createElement('canvas'); // Must be bigger than the image to prevent clipping
 
-          var addRotation = function addRotation(image) {
-            var canvas = document.createElement('canvas'); // Must be bigger than the image to prevent clipping
+                      canvas.height = 120;
+                      canvas.width = 120;
+                      var context = canvas.getContext('2d');
+                      context.translate(canvas.width * 0.5, canvas.height * 0.5);
+                      context.rotate(rotationRadians);
+                      context.translate(-canvas.width * 0.5, -canvas.height * 0.5);
+                      context.drawImage(image, (canvas.height - imageSize) / 2, (canvas.width - imageSize) / 2, imageSize, imageSize); // Add back circle
 
-            canvas.height = 120;
-            canvas.width = 120;
-            var context = canvas.getContext('2d');
-            context.translate(canvas.width * 0.5, canvas.height * 0.5);
-            context.rotate(rotationRadians);
-            context.translate(-canvas.width * 0.5, -canvas.height * 0.5);
-            context.drawImage(image, (canvas.height - imageSize) / 2, (canvas.width - imageSize) / 2, imageSize, imageSize); // Add back circle
+                      var xCircle = x - size;
+                      var yCircle = y;
 
-            var xCircle = x - size;
-            var yCircle = y;
+                      _this3._pdf.doc.setDrawColor(_this3._style.brcolor);
 
-            _this._pdf.doc.setDrawColor(_this._style.brcolor);
+                      _this3._pdf.doc.setFillColor(_this3._style.bkcolor);
 
-            _this._pdf.doc.setFillColor(_this._style.bkcolor);
+                      _this3._pdf.doc.circle(xCircle, yCircle, size, 'FD');
 
-            _this._pdf.doc.circle(xCircle, yCircle, size, 'FD');
+                      return canvas;
+                    };
 
-            return canvas;
-          };
+                    addImage = function addImage(image) {
+                      var rotatedCanvas = addRotation(image);
+                      var sizeImage = size * 1.5;
+                      var xImage = x - sizeImage - size / 4.3;
+                      var yImage = y - sizeImage / 2;
 
-          var addImage = function addImage(image) {
-            var rotatedCanvas = addRotation(image);
-            var sizeImage = size * 1.5;
-            var xImage = x - sizeImage - size / 4.3;
-            var yImage = y - sizeImage / 2;
+                      _this3._pdf.doc.addImage(rotatedCanvas, 'PNG', xImage, yImage, sizeImage, sizeImage);
+                    };
 
-            _this._pdf.doc.addImage(rotatedCanvas, 'PNG', xImage, yImage, sizeImage, sizeImage);
-          };
+                    if (!(imgSrc instanceof Image)) {
+                      _context3.next = 13;
+                      break;
+                    }
 
-          if (imgSrc instanceof Image) {
-            addImage(imgSrc);
-            resolve();
-          } else if (typeof imgSrc === 'string') {
-            var image = new Image(imageSize, imageSize);
+                    addImage(image);
+                    resolve();
+                    _context3.next = 34;
+                    break;
 
-            image.onload = function () {
-              try {
-                addImage(image);
-                resolve();
-              } catch (err) {
-                return reject(err);
+                  case 13:
+                    if (!(typeof imgSrc === 'string')) {
+                      _context3.next = 17;
+                      break;
+                    }
+
+                    imgData = imgSrc;
+                    _context3.next = 30;
+                    break;
+
+                  case 17:
+                    if (!(imgSrc instanceof SVGElement)) {
+                      _context3.next = 29;
+                      break;
+                    }
+
+                    _context3.prev = 18;
+                    _context3.next = 21;
+                    return this._processSvgImage(imgSrc);
+
+                  case 21:
+                    imgData = _context3.sent;
+                    _context3.next = 27;
+                    break;
+
+                  case 24:
+                    _context3.prev = 24;
+                    _context3.t0 = _context3["catch"](18);
+                    return _context3.abrupt("return", reject(_context3.t0));
+
+                  case 27:
+                    _context3.next = 30;
+                    break;
+
+                  case 29:
+                    throw this._i18n.errorImage;
+
+                  case 30:
+                    _image = new Image(imageSize, imageSize);
+
+                    _image.onload = function () {
+                      try {
+                        addImage(_image);
+                        resolve();
+                      } catch (err) {
+                        return reject(err);
+                      }
+                    };
+
+                    _image.onerror = function () {
+                      return reject(_this3._i18n.errorImage);
+                    };
+
+                    _image.src = imgData;
+
+                  case 34:
+                  case "end":
+                    return _context3.stop();
+                }
               }
-            };
-
-            image.onerror = function () {
-              return reject(_this._i18n.errorImage);
-            };
-
-            image.src = imgSrc;
-          }
+            }, _callee3, this, [[18, 24]]);
+          }));
         });
       };
 
@@ -4031,9 +4200,13 @@
     en: en
   });
 
-  var img$1 = "data:image/svg+xml,%3c%3fxml version='1.0' encoding='utf-8'%3f%3e%3csvg version='1.1' id='Capa_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 300 300' style='enable-background:new 0 0 300 300%3b' xml:space='preserve'%3e%3cstyle type='text/css'%3e .st0%7bfill:%23EA6868%3b%7d%3c/style%3e%3cg%3e %3cg%3e %3cg%3e %3cg%3e %3cg%3e %3cpath class='st0' d='M146.3%2c9.1L75.5%2c287.2c-0.5%2c1.8%2c0.5%2c3.7%2c2.1%2c4.4c1.8%2c0.8%2c3.7%2c0.2%2c4.7-1.5l68.4-106.7l66.8%2c106.7 c0.6%2c1.1%2c1.9%2c1.8%2c3.2%2c1.8c0.5%2c0%2c1-0.2%2c1.5-0.3c1.8-0.8%2c2.6-2.6%2c2.3-4.4L153.7%2c9.1C152.9%2c5.7%2c147.2%2c5.7%2c146.3%2c9.1z M154.2%2c174.2 c-0.6-1.1-1.9-1.8-3.2-1.8l0%2c0c-1.3%2c0-2.6%2c0.6-3.2%2c1.8l-59%2c92L150%2c25.5l61.1%2c239.9L154.2%2c174.2z'/%3e %3c/g%3e %3c/g%3e %3cg%3e %3cg%3e %3cpath class='st0' d='M220.8%2c293.1c-1.8%2c0-3.4-1-4.2-2.3l-65.8-105.1L83.4%2c290.8c-1.3%2c1.9-4%2c2.9-6.1%2c1.9c-2.3-1-3.4-3.4-2.9-5.8 L145.1%2c8.8c0.5-2.1%2c2.4-3.4%2c4.9-3.4s4.4%2c1.3%2c4.9%2c3.4l70.8%2c278.1c0.6%2c2.4-0.6%2c4.9-2.9%2c5.8C222.1%2c292.9%2c221.5%2c293.1%2c220.8%2c293.1z M150.8%2c181.2l1%2c1.6l66.8%2c106.7c0.6%2c1%2c1.9%2c1.5%2c3.2%2c1c1.1-0.5%2c1.8-1.8%2c1.5-3.1L152.4%2c9.3c-0.3-1.1-1.6-1.6-2.6-1.6 s-2.3%2c0.5-2.6%2c1.6L76.4%2c287.4c-0.3%2c1.3%2c0.3%2c2.6%2c1.5%2c3.1c1.1%2c0.5%2c2.6%2c0%2c3.2-1L150.8%2c181.2z M85.6%2c273.2L150%2c20.6l64.2%2c251.9 l-61.1-97.7c-1-1.6-3.4-1.5-4.4%2c0L85.6%2c273.2z'/%3e %3c/g%3e %3c/g%3e %3c/g%3e %3c/g%3e%3c/g%3e%3c/svg%3e";
+  function compassIcon() {
+    return (new DOMParser().parseFromString("<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<svg version=\"1.1\" id=\"compass\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"\r\n\t viewBox=\"0 0 300 300\" style=\"enable-background:new 0 0 300 300;\" xml:space=\"preserve\">\r\n<style type=\"text/css\">\r\n\t.st0{fill:#EA6868;}\r\n</style>\r\n<g>\r\n\t<g>\r\n\t\t<g>\r\n\t\t\t<g>\r\n\t\t\t\t<g>\r\n\t\t\t\t\t<path class=\"st0\" d=\"M146.3,9.1L75.5,287.2c-0.5,1.8,0.5,3.7,2.1,4.4c1.8,0.8,3.7,0.2,4.7-1.5l68.4-106.7l66.8,106.7\r\n\t\t\t\t\t\tc0.6,1.1,1.9,1.8,3.2,1.8c0.5,0,1-0.2,1.5-0.3c1.8-0.8,2.6-2.6,2.3-4.4L153.7,9.1C152.9,5.7,147.2,5.7,146.3,9.1z M154.2,174.2\r\n\t\t\t\t\t\tc-0.6-1.1-1.9-1.8-3.2-1.8l0,0c-1.3,0-2.6,0.6-3.2,1.8l-59,92L150,25.5l61.1,239.9L154.2,174.2z\"/>\r\n\t\t\t\t</g>\r\n\t\t\t</g>\r\n\t\t\t<g>\r\n\t\t\t\t<g>\r\n\t\t\t\t\t<path class=\"st0\" d=\"M220.8,293.1c-1.8,0-3.4-1-4.2-2.3l-65.8-105.1L83.4,290.8c-1.3,1.9-4,2.9-6.1,1.9c-2.3-1-3.4-3.4-2.9-5.8\r\n\t\t\t\t\t\tL145.1,8.8c0.5-2.1,2.4-3.4,4.9-3.4s4.4,1.3,4.9,3.4l70.8,278.1c0.6,2.4-0.6,4.9-2.9,5.8C222.1,292.9,221.5,293.1,220.8,293.1z\r\n\t\t\t\t\t\t M150.8,181.2l1,1.6l66.8,106.7c0.6,1,1.9,1.5,3.2,1c1.1-0.5,1.8-1.8,1.5-3.1L152.4,9.3c-0.3-1.1-1.6-1.6-2.6-1.6\r\n\t\t\t\t\t\ts-2.3,0.5-2.6,1.6L76.4,287.4c-0.3,1.3,0.3,2.6,1.5,3.1c1.1,0.5,2.6,0,3.2-1L150.8,181.2z M85.6,273.2L150,20.6l64.2,251.9\r\n\t\t\t\t\t\tl-61.1-97.7c-1-1.6-3.4-1.5-4.4,0L85.6,273.2z\"/>\r\n\t\t\t\t</g>\r\n\t\t\t</g>\r\n\t\t</g>\r\n\t</g>\r\n</g>\r\n</svg>\r\n", 'image/svg+xml')).firstChild;
+  }
 
-  var img = "data:image/svg+xml,%3c%3fxml version='1.0' encoding='utf-8'%3f%3e%3csvg version='1.1' id='Capa_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 490 490' style='enable-background:new 0 0 490 490%3b' xml:space='preserve'%3e%3cstyle type='text/css'%3e .st0%7bfill:white%3b%7d%3c/style%3e%3cg%3e %3cpath class='st0' d='M65.4%2c6v157.1c0%2c3.3-2.9%2c6-6.5%2c6H33.6c-3.6%2c0-6.5%2c2.7-6.5%2c6v189.6h0l36.3%2c33.8c1.2%2c1.1%2c1.9%2c2.7%2c1.9%2c4.3l0%2c81.2 c0%2c3.3%2c2.9%2c6%2c6.5%2c6h383.8c3.6%2c0%2c6.5-2.7%2c6.5-6V104.9c0-1.6-0.7-3.1-1.9-4.3l-106-98.9c-1.2-1.1-2.9-1.8-4.6-1.8H71.8 C68.2%2c0%2c65.4%2c2.7%2c65.4%2c6z M431.3%2c357.4h-374c-3.8%2c0-6.9-4-6.9-9V203.2c0-5%2c3.1-9%2c6.9-9h374c3.8%2c0%2c6.9%2c4%2c6.9%2c9v145.2 C438.2%2c353.4%2c435.1%2c357.4%2c431.3%2c357.4z M340.2%2c27.6l70.8%2c66c7.2%2c6.7%2c2.1%2c18.2-8.1%2c18.2h-70.8c-6.3%2c0-11.4-4.8-11.4-10.7v-66 C320.7%2c25.6%2c333%2c20.9%2c340.2%2c27.6z'/%3e %3cpath class='st0' d='M136.9%2c207.4h-6.5H87.9c-5.8%2c0-10.5%2c4.9-10.5%2c11v115.5c0%2c6.1%2c4.7%2c11%2c10.5%2c11h4c5.8%2c0%2c10.5-4.9%2c10.5-11v-22.4 c0-6.1%2c4.7-11%2c10.5-11h18.9l5.8-0.1c18%2c0%2c29.9-3%2c35.8-9.1c5.9-6.1%2c8.9-18.3%2c8.9-36.7c0-18.5-3.1-31-9.3-37.5 C166.6%2c210.6%2c154.7%2c207.4%2c136.9%2c207.4z M152.2%2c274.4c-3.1%2c2.7-10.2%2c4.1-21.5%2c4.1h-17.9c-5.8%2c0-10.5-4.9-10.5-11v-27.2 c0-6.1%2c4.7-11%2c10.5-11h20.4c10.6%2c0%2c17.2%2c1.4%2c19.8%2c4.2c2.5%2c2.8%2c3.8%2c10%2c3.8%2c21.6C156.8%2c265.2%2c155.3%2c271.6%2c152.2%2c274.4z'/%3e %3cpath class='st0' d='M262.6%2c207.4h-54.1c-5.8%2c0-10.5%2c4.9-10.5%2c11v115.5c0%2c6.1%2c4.7%2c11%2c10.5%2c11h54.9c20.7%2c0%2c34.1-4.9%2c39.9-14.6 c5.9-9.8%2c8.9-31.8%2c8.9-66.1c0-21-3.7-35.7-11-44.1C293.8%2c211.5%2c281%2c207.4%2c262.6%2c207.4z M281.6%2c314.2c-3.5%2c5.8-11.2%2c8.6-23.1%2c8.6 h-25c-5.8%2c0-10.5-4.9-10.5-11v-71.6c0-6.1%2c4.7-11%2c10.5-11H260c11.6%2c0%2c19%2c2.7%2c22.1%2c8.2c3.1%2c5.5%2c4.7%2c18.4%2c4.7%2c38.7 C286.9%2c295.8%2c285.1%2c308.5%2c281.6%2c314.2z'/%3e %3cpath class='st0' d='M340.9%2c344.8h3.9c5.8%2c0%2c10.5-4.9%2c10.5-11v-34.5c0-6.1%2c4.7-11%2c10.5-11h37.9c5.8%2c0%2c10.5-4.9%2c10.5-11v0 c0-6.1-4.7-11-10.5-11h-37.9c-5.8%2c0-10.5-4.9-10.5-11v-15.1c0-6.1%2c4.7-11%2c10.5-11h41.1c5.8%2c0%2c10.5-4.9%2c10.5-11v0 c0-6.1-4.7-11-10.5-11h-66c-5.8%2c0-10.5%2c4.9-10.5%2c11v115.5C330.4%2c339.9%2c335.1%2c344.8%2c340.9%2c344.8z'/%3e%3c/g%3e%3c/svg%3e";
+  function pdfIcon() {
+    return (new DOMParser().parseFromString("<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"\r\n\t viewBox=\"0 0 490 490\" style=\"enable-background:new 0 0 490 490;\" xml:space=\"preserve\">\r\n<g>\r\n\t<path d=\"M65.4,6v157.1c0,3.3-2.9,6-6.5,6H33.6c-3.6,0-6.5,2.7-6.5,6v189.6h0l36.3,33.8c1.2,1.1,1.9,2.7,1.9,4.3l0,81.2\r\n\t\tc0,3.3,2.9,6,6.5,6h383.8c3.6,0,6.5-2.7,6.5-6V104.9c0-1.6-0.7-3.1-1.9-4.3l-106-98.9c-1.2-1.1-2.9-1.8-4.6-1.8H71.8\r\n\t\tC68.2,0,65.4,2.7,65.4,6z M431.3,357.4h-374c-3.8,0-6.9-4-6.9-9V203.2c0-5,3.1-9,6.9-9h374c3.8,0,6.9,4,6.9,9v145.2\r\n\t\tC438.2,353.4,435.1,357.4,431.3,357.4z M340.2,27.6l70.8,66c7.2,6.7,2.1,18.2-8.1,18.2h-70.8c-6.3,0-11.4-4.8-11.4-10.7v-66\r\n\t\tC320.7,25.6,333,20.9,340.2,27.6z\"/>\r\n\t<path d=\"M136.9,207.4h-6.5H87.9c-5.8,0-10.5,4.9-10.5,11v115.5c0,6.1,4.7,11,10.5,11h4c5.8,0,10.5-4.9,10.5-11v-22.4\r\n\t\tc0-6.1,4.7-11,10.5-11h18.9l5.8-0.1c18,0,29.9-3,35.8-9.1c5.9-6.1,8.9-18.3,8.9-36.7c0-18.5-3.1-31-9.3-37.5\r\n\t\tC166.6,210.6,154.7,207.4,136.9,207.4z M152.2,274.4c-3.1,2.7-10.2,4.1-21.5,4.1h-17.9c-5.8,0-10.5-4.9-10.5-11v-27.2\r\n\t\tc0-6.1,4.7-11,10.5-11h20.4c10.6,0,17.2,1.4,19.8,4.2c2.5,2.8,3.8,10,3.8,21.6C156.8,265.2,155.3,271.6,152.2,274.4z\"/>\r\n\t<path d=\"M262.6,207.4h-54.1c-5.8,0-10.5,4.9-10.5,11v115.5c0,6.1,4.7,11,10.5,11h54.9c20.7,0,34.1-4.9,39.9-14.6\r\n\t\tc5.9-9.8,8.9-31.8,8.9-66.1c0-21-3.7-35.7-11-44.1C293.8,211.5,281,207.4,262.6,207.4z M281.6,314.2c-3.5,5.8-11.2,8.6-23.1,8.6\r\n\t\th-25c-5.8,0-10.5-4.9-10.5-11v-71.6c0-6.1,4.7-11,10.5-11H260c11.6,0,19,2.7,22.1,8.2c3.1,5.5,4.7,18.4,4.7,38.7\r\n\t\tC286.9,295.8,285.1,308.5,281.6,314.2z\"/>\r\n\t<path d=\"M340.9,344.8h3.9c5.8,0,10.5-4.9,10.5-11v-34.5c0-6.1,4.7-11,10.5-11h37.9c5.8,0,10.5-4.9,10.5-11v0\r\n\t\tc0-6.1-4.7-11-10.5-11h-37.9c-5.8,0-10.5-4.9-10.5-11v-15.1c0-6.1,4.7-11,10.5-11h41.1c5.8,0,10.5-4.9,10.5-11v0\r\n\t\tc0-6.1-4.7-11-10.5-11h-66c-5.8,0-10.5,4.9-10.5,11v115.5C330.4,339.9,335.1,344.8,340.9,344.8z\"/>\r\n</g>\r\n</svg>\r\n", 'image/svg+xml')).firstChild;
+  }
 
   function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
@@ -4141,7 +4314,7 @@
           description: true,
           attributions: true,
           scalebar: true,
-          compass: img$1
+          compass: compassIcon()
         },
         watermark: {
           title: 'Ol Pdf Printer',
@@ -4194,13 +4367,13 @@
 
       _this._options = deepObjectAssign(_this._options, opt_options);
       controlElement.className = "ol-print-btn-menu ".concat(_this._options.ctrlBtnClass);
-      controlElement.innerHTML = "<img src=\"".concat(img, "\"/>");
       controlElement.title = _this._i18n.printPdf;
 
       controlElement.onclick = function () {
         return _this.showPrintSettingsModal();
       };
 
+      controlElement.append(pdfIcon());
       return _this;
     }
     /**

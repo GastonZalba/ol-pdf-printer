@@ -1,6 +1,6 @@
 {
   "name": "ol-pdf-printer",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "PDF Printer for Open Layers",
   "browser": "dist/ol-pdf-printer.min.js",
   "main": "dist/ol-pdf-printer.js",
@@ -8,7 +8,6 @@
   "types": "lib/ol-pdf-printer.d.ts",
   "style": "lib/ol-pdf-printer.css",
   "scripts": {
-    "watch": "chokidar 'src/**' --initial --command 'WATCH=1 rollup --config rollup.config.dist.js'",
     "precleanstart": "del-cli dist lib tmp-dist tmp-lib",
     "doc": "documentation readme src/ol-pdf-printer.ts --shallow --quiet=true --access=public --access=undefined --section=API --parse-extension ts && node scripts/external-links.js README.md && prettier --write README.md",
     "format": "eslint --fix src/*.ts && prettier --write src",
@@ -46,13 +45,11 @@
     "@babel/preset-env": "^7.12.1",
     "@rollup/plugin-babel": "^5.2.1",
     "@rollup/plugin-commonjs": "^17.0.0",
-    "@rollup/plugin-image": "^2.0.6",
     "@rollup/plugin-node-resolve": "^11.0.1",
     "@types/node": "^14.14.10",
     "@types/ol": "^6.4.2",
     "@typescript-eslint/eslint-plugin": "^4.8.2",
     "@typescript-eslint/parser": "^4.8.2",
-    "chokidar-cli": "^2.1.0",
     "clean-css": "^4.2.3",
     "del-cli": "^3.0.1",
     "documentation": "^13.1.0",
@@ -65,6 +62,7 @@
     "rollup": "^2.33.3",
     "rollup-plugin-css-only": "^3.1.0",
     "rollup-plugin-node-builtins": "^2.1.2",
+    "rollup-plugin-svg-import": "^1.5.1",
     "rollup-plugin-terser": "^7.0.2",
     "typescript": "^4.1.2"
   },

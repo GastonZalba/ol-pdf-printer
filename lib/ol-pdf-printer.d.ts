@@ -244,7 +244,7 @@ export interface IWatermark {
     /**
      *
      */
-    logo?: false | string | HTMLImageElement;
+    logo?: false | string | HTMLImageElement | SVGElement;
 }
 /**
  * **_[interface]_** - Print information at the bottom of the PDF
@@ -283,7 +283,7 @@ export interface IMapElements {
     /**
      * Compass image. North must be pointing to the top
      */
-    compass?: false | string | HTMLImageElement;
+    compass?: false | string | HTMLImageElement | SVGElement;
 }
 /**
  * **_[interface]_** - Options specified when creating an instance

@@ -1,6 +1,6 @@
 import pkg from './package.json';
 import babel from '@rollup/plugin-babel';
-import image from '@rollup/plugin-image';
+import svg from 'rollup-plugin-svg-import';
 import { mkdirSync, writeFileSync } from 'fs';
 import css from 'rollup-plugin-css-only';
 
@@ -30,7 +30,7 @@ module.exports = {
         }
     ],
     plugins: [
-        image(),
+        svg(),
         babel({
             presets: [
                 [
@@ -53,7 +53,7 @@ module.exports = {
                     }
                 ]
             ]
-        }),
+        }),       
         css({
             output: function (styles, styleNodes) {
                 mkdirSync('lib/css', { recursive: true });

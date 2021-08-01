@@ -93,14 +93,14 @@ See [CHANGELOG](./CHANGELOG.md) for details of changes in each release.
 Load `ol-pdf-printer.js` after [OpenLayers](https://www.npmjs.com/package/ol) and [jspdf](https://www.npmjs.com/package/jspdf). Ol Pdf Printer is available as `PdfPrinter`.
 
 ```HTML
-<script src="https://unpkg.com/ol-pdf-printer@1.0.6"></script>
+<script src="https://unpkg.com/ol-pdf-printer@1.0.7"></script>
 ```
 
 #### CSS
 
 ```HTML
-<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.0.6/dist/css/ol-pdf-printer.css" />
-<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.0.6/dist/css/bootstrap.min.css" /> <!-- Bootstrap bundle -->
+<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.0.7/dist/css/ol-pdf-printer.css" />
+<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.0.7/dist/css/bootstrap.min.css" /> <!-- Bootstrap bundle -->
 ```
 
 ### Parcel, Webpack, etc.
@@ -408,7 +408,7 @@ Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Glob
 
 Compass image. North must be pointing to the top
 
-Type: (`false` | [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [HTMLImageElement](https://developer.mozilla.org/docs/Web/API/HTMLImageElement))
+Type: (`false` | [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [HTMLImageElement](https://developer.mozilla.org/docs/Web/API/HTMLImageElement) | [SVGElement](https://developer.mozilla.org/docs/Web/SVG/Element/animate))
 
 ### Options
 
@@ -496,4 +496,5 @@ Type: [I18n](#i18n)
 -   Interface comments
 -   Legends support
 -   Imperial units option for scalebar
+-   Customizable date format
 -   Tests!

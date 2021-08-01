@@ -18,3 +18,6 @@
 
 ## v1.0.5-6
 * Moved two devDependenceis to dependencies
+
+## v1.0.7
+* Added SVG support

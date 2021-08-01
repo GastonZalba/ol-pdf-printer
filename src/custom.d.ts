@@ -1,9 +1,5 @@
-declare module '*.png' {
-    const value: unknown;
-    export = value;
-}
-
 declare module '*.svg' {
-    const value: unknown;
-    export = value;
+    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+    const content: any;
+    export default content;
 }

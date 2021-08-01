@@ -114,7 +114,7 @@ export default class PdfPrinter extends Control {
                 description: true,
                 attributions: true,
                 scalebar: true,
-                compass: compassIcon as string
+                compass: compassIcon() as SVGElement
             },
             watermark: {
                 title: 'Ol Pdf Printer',
@@ -156,9 +156,9 @@ export default class PdfPrinter extends Control {
         this._options = deepObjectAssign(this._options, opt_options);
 
         controlElement.className = `ol-print-btn-menu ${this._options.ctrlBtnClass}`;
-        controlElement.innerHTML = `<img src="${pdfIcon}"/>`;
         controlElement.title = this._i18n.printPdf;
         controlElement.onclick = () => this.showPrintSettingsModal();
+        controlElement.append(pdfIcon());
     }
 
     /**
@@ -589,7 +589,7 @@ export interface IWatermark {
     /**
      *
      */
-    logo?: false | string | HTMLImageElement;
+    logo?: false | string | HTMLImageElement | SVGElement;
 }
 
 /**
@@ -630,7 +630,7 @@ export interface IMapElements {
     /**
      * Compass image. North must be pointing to the top
      */
-    compass?: false | string | HTMLImageElement;
+    compass?: false | string | HTMLImageElement | SVGElement;
 }
 
 /**

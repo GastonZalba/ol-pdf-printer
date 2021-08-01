@@ -2,7 +2,7 @@ import pkg from './package.json';
 import babel from '@rollup/plugin-babel';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
-import image from '@rollup/plugin-image';
+import svg from 'rollup-plugin-svg-import';
 import builtins from 'rollup-plugin-node-builtins';
 import { terser } from "rollup-plugin-terser";
 import CleanCss from 'clean-css';
@@ -76,7 +76,7 @@ module.exports = {
                 ]
             ]
         }),
-        image(),
+        svg(),
         css({
             output: function (styles, styleNodes) {
                 mkdirSync('dist/css', { recursive: true });
