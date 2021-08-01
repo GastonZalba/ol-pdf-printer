@@ -21,3 +21,7 @@
 
 ## v1.0.7
 * Added SVG support
+
+## v1.0.8
+* Added customizable `imperial` and `metric` units system
+* Added customizable date format

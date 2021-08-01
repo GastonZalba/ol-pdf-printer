@@ -24,6 +24,7 @@ var opt_options = {
     language: 'en',
     i18n: {...}, // Custom translations. Default is according to selected language
     filename: 'Ol Pdf Printer',
+    units: 'metric',
     style: {
         paperMargin: 10,
         brcolor: '#000000',
@@ -62,6 +63,7 @@ var opt_options = {
         { value: 300 }
     ],
     scales: [10000, 5000, 1000, 500, 250, 100, 50, 25, 10],
+    dateFormat: undefined, // Use browser
     ctrlBtnClass: '',
     modal: {
         animateClass: 'fade',
@@ -93,14 +95,14 @@ See [CHANGELOG](./CHANGELOG.md) for details of changes in each release.
 Load `ol-pdf-printer.js` after [OpenLayers](https://www.npmjs.com/package/ol) and [jspdf](https://www.npmjs.com/package/jspdf). Ol Pdf Printer is available as `PdfPrinter`.
 
 ```HTML
-<script src="https://unpkg.com/ol-pdf-printer@1.0.7"></script>
+<script src="https://unpkg.com/ol-pdf-printer@1.0.8"></script>
 ```
 
 #### CSS
 
 ```HTML
-<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.0.7/dist/css/ol-pdf-printer.css" />
-<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.0.7/dist/css/bootstrap.min.css" /> <!-- Bootstrap bundle -->
+<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.0.8/dist/css/ol-pdf-printer.css" />
+<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.0.8/dist/css/bootstrap.min.css" /> <!-- Bootstrap bundle -->
 ```
 
 ### Parcel, Webpack, etc.
@@ -183,6 +185,7 @@ TypeScript types are shipped with the project in the dist directory and should b
     -   [compass](#compass-1)
 -   [Options](#options)
     -   [filename](#filename)
+    -   [units](#units)
     -   [style](#style)
     -   [extraInfo](#extrainfo)
     -   [mapElements](#mapelements)
@@ -190,6 +193,7 @@ TypeScript types are shipped with the project in the dist directory and should b
     -   [paperSizes](#papersizes)
     -   [dpi](#dpi)
     -   [scales](#scales)
+    -   [dateFormat](#dateformat)
     -   [ctrlBtnClass](#ctrlbtnclass)
     -   [modal](#modal)
     -   [language](#language)
@@ -358,7 +362,7 @@ Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Globa
 
 #### logo
 
-Type: (`false` | [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [HTMLImageElement](https://developer.mozilla.org/docs/Web/API/HTMLImageElement))
+Type: (`false` | [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [HTMLImageElement](https://developer.mozilla.org/docs/Web/API/HTMLImageElement) | [SVGElement](https://developer.mozilla.org/docs/Web/SVG/Element/animate))
 
 ### IExtraInfo
 
@@ -422,6 +426,12 @@ Export filename
 
 Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
 
+#### units
+
+Map unit mode
+
+Type: (`"metric"` | `"imperial"`)
+
 #### style
 
 Some basic PDF style configuration
@@ -467,6 +477,13 @@ Map scales options to be shown in the settings modal
 
 Type: [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[IScale](#iscale)>
 
+#### dateFormat
+
+Locale time zone. Default varies according to browser locale
+<https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString#using_locales>
+
+Type: Locale
+
 #### ctrlBtnClass
 
 ClassName to add to the Btn Control
@@ -495,6 +512,6 @@ Type: [I18n](#i18n)
 
 -   Interface comments
 -   Legends support
--   Imperial units option for scalebar
--   Customizable date format
+-   \~~Imperial units option for scalebar~~
+-   \~~Customizable date format~~
 -   Tests!

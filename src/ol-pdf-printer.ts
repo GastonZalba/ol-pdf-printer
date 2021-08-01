@@ -17,6 +17,8 @@ import * as i18n from './components/i18n/index.js';
 import compassIcon from './assets/images/compass.svg';
 import pdfIcon from './assets/images/pdf.svg';
 
+import { Locale } from 'locale-enum';
+
 import './assets/css/ol-pdf-printer.css';
 
 /**
@@ -139,6 +141,8 @@ export default class PdfPrinter extends Control {
                 { value: 300 }
             ],
             scales: [10000, 5000, 1000, 500, 250, 100, 50, 25, 10],
+            units: 'metric',
+            dateFormat: undefined,
             ctrlBtnClass: '',
             modal: {
                 animateClass: 'fade',
@@ -643,6 +647,11 @@ export interface Options extends ControlOptions {
     filename?: string;
 
     /**
+     * Map unit mode
+     */
+    units?: 'metric' | 'imperial';
+
+    /**
      * Some basic PDF style configuration
      */
     style?: IStyle;
@@ -679,6 +688,12 @@ export interface Options extends ControlOptions {
      * Map scales options to be shown in the settings modal
      */
     scales?: IScale[];
+
+    /**
+     * Locale time zone. Default varies according to browser locale
+     * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString#using_locales
+     */
+    dateFormat?: Locale;
 
     /**
      * ClassName to add to the Btn Control

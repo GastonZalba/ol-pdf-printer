@@ -189,7 +189,7 @@ export default class Pdf {
     };
 
     /**
-     *   Adapted from http://hg.intevation.de/gemma/file/tip/client/src/components/Pdftool.vue#l252
+     * Adapted from http://hg.intevation.de/gemma/file/tip/client/src/components/Pdftool.vue#l252
      * @protected
      */
     _calculateScaleDenominator(
@@ -561,7 +561,9 @@ export default class Pdf {
         const align = 'right';
 
         this._pdf.doc.setFont('helvetica', 'normal');
-        const str = new Date(Date.now()).toLocaleDateString();
+        const str = new Date(Date.now()).toLocaleDateString(
+            this._config.dateFormat
+        );
         this._addTextByOffset(
             position,
             offset,
@@ -725,16 +727,40 @@ export default class Pdf {
 
         let maxLength = maxWidth * this._scaleDenominator;
 
-        let unit = 'mm';
-        let unitConversionFactor = 1;
-        if (maxLength >= 1e7) {
-            // >= 10 km
-            unit = 'km';
-            unitConversionFactor = 1e6;
-        } else if (maxLength >= 1e4) {
-            // >= 10 m
-            unit = 'm';
-            unitConversionFactor = 1e3;
+        let unit: string;
+        let unitConversionFactor: number;
+
+        if (this._config.units === 'metric') {
+            unit = 'mm';
+
+            let millimetre = 1;
+            let metre = 1000;
+            let kilometre = metre * 1000;
+
+            unitConversionFactor = millimetre;
+
+            if (maxLength >= kilometre * 10) {
+                unit = 'km';
+                unitConversionFactor = 1e6;
+            } else if (maxLength >= metre * 10) {
+                unit = 'm';
+                unitConversionFactor = metre;
+            }
+        } else if (this._config.units === 'imperial') {
+            let inch = 25.4; // Millimetre to inch
+            let mile = inch * 63360;
+            let yard = inch * 36;
+
+            unit = 'in';
+            unitConversionFactor = inch;
+
+            if (maxLength >= mile * 10) {
+                unit = 'mi';
+                unitConversionFactor = mile;
+            } else if (maxLength >= yard * 10) {
+                unit = 'yd';
+                unitConversionFactor = yard;
+            }
         }
 
         maxLength /= unitConversionFactor;

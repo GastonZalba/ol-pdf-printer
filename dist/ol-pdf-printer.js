@@ -2303,7 +2303,7 @@
 
         _this._pdf.doc.setFont('helvetica', 'normal');
 
-        var str = new Date(Date.now()).toLocaleDateString();
+        var str = new Date(Date.now()).toLocaleDateString(_this._config.dateFormat);
 
         _this._addTextByOffset(position, offset, width, fontSize, txcolor, align, str);
       };
@@ -2449,17 +2449,38 @@
         };
 
         var maxLength = maxWidth * _this._scaleDenominator;
-        var unit = 'mm';
-        var unitConversionFactor = 1;
+        var unit;
+        var unitConversionFactor;
 
-        if (maxLength >= 1e7) {
-          // >= 10 km
-          unit = 'km';
-          unitConversionFactor = 1e6;
-        } else if (maxLength >= 1e4) {
-          // >= 10 m
-          unit = 'm';
-          unitConversionFactor = 1e3;
+        if (_this._config.units === 'metric') {
+          unit = 'mm';
+          var millimetre = 1;
+          var metre = 1000;
+          var kilometre = metre * 1000;
+          unitConversionFactor = millimetre;
+
+          if (maxLength >= kilometre * 10) {
+            unit = 'km';
+            unitConversionFactor = 1e6;
+          } else if (maxLength >= metre * 10) {
+            unit = 'm';
+            unitConversionFactor = metre;
+          }
+        } else if (_this._config.units === 'imperial') {
+          var inch = 25.4; // Millimetre to inch
+
+          var mile = inch * 63360;
+          var yard = inch * 36;
+          unit = 'in';
+          unitConversionFactor = inch;
+
+          if (maxLength >= mile * 10) {
+            unit = 'mi';
+            unitConversionFactor = mile;
+          } else if (maxLength >= yard * 10) {
+            unit = 'yd';
+            unitConversionFactor = yard;
+          }
         }
 
         maxLength /= unitConversionFactor;
@@ -2732,7 +2753,7 @@
         this._pdf.doc.save(this._config.filename + '.pdf');
       }
       /**
-       *   Adapted from http://hg.intevation.de/gemma/file/tip/client/src/components/Pdftool.vue#l252
+       * Adapted from http://hg.intevation.de/gemma/file/tip/client/src/components/Pdftool.vue#l252
        * @protected
        */
 
@@ -4352,6 +4373,8 @@
           value: 300
         }],
         scales: [10000, 5000, 1000, 500, 250, 100, 50, 25, 10],
+        units: 'metric',
+        dateFormat: undefined,
         ctrlBtnClass: '',
         modal: {
           animateClass: 'fade',

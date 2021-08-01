@@ -1,6 +1,6 @@
 {
   "name": "ol-pdf-printer",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "PDF Printer for Open Layers",
   "browser": "dist/ol-pdf-printer.min.js",
   "main": "dist/ol-pdf-printer.js",
@@ -69,6 +69,7 @@
   "dependencies": {
     "dom-to-image-improved": "^2.8.0",
     "jspdf": "^2.3.1",
+    "locale-enum": "^1.1.1",
     "modal-vanilla": "^0.8.0"
   }
 }

@@ -4,6 +4,7 @@ import { EventsKey } from 'ol/events';
 import Pdf from './components/Pdf';
 import SettingsModal from './components/SettingsModal';
 import ProcessingModal from './components/ProcessingModal';
+import { Locale } from 'locale-enum';
 import './assets/css/ol-pdf-printer.css';
 export default class PdfPrinter extends Control {
     protected _i18n: I18n;
@@ -294,6 +295,10 @@ export interface Options extends ControlOptions {
      */
     filename?: string;
     /**
+     * Map unit mode
+     */
+    units?: 'metric' | 'imperial';
+    /**
      * Some basic PDF style configuration
      */
     style?: IStyle;
@@ -324,6 +329,11 @@ export interface Options extends ControlOptions {
      * Map scales options to be shown in the settings modal
      */
     scales?: IScale[];
+    /**
+     * Locale time zone. Default varies according to browser locale
+     * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString#using_locales
+     */
+    dateFormat?: Locale;
     /**
      * ClassName to add to the Btn Control
      */

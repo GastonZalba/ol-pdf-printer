@@ -86,6 +86,7 @@
   var opt_options = {
     filename: 'Example export',
     language: 'en',
+    units: 'imperial',
     style: {
       paperMargin: 10
     },
