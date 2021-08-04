@@ -43,7 +43,8 @@ function deepObjectAssign(target, ...sources) {
                 t_val &&
                 s_val &&
                 typeof t_val === 'object' &&
-                typeof s_val === 'object'
+                typeof s_val === 'object' &&
+                !Array.isArray(t_val) // Don't merge arrays
                     ? deepObjectAssign(t_val, s_val)
                     : s_val;
         });
@@ -141,6 +142,12 @@ export default class PdfPrinter extends Control {
                 { value: 300 }
             ],
             scales: [10000, 5000, 1000, 500, 250, 100, 50, 25, 10],
+            mimeTypeExports: [
+                { value: 'pdf', selected: true },
+                { value: 'png' },
+                { value: 'jpeg' },
+                { value: 'webp' }
+            ],
             units: 'metric',
             dateFormat: undefined,
             ctrlBtnClass: '',
@@ -341,7 +348,7 @@ export default class PdfPrinter extends Control {
 
                         if (this._isCanceled) return;
 
-                        this._pdf.savePdf();
+                        await this._pdf.savePdf();
 
                         // Reset original map size
                         this._onEndPrint();
@@ -453,6 +460,10 @@ export interface IPrintOptions {
      *
      */
     scalebar?: boolean;
+    /**
+     *
+     */
+    typeExport?: IMimeTypeExport['value'];
 }
 
 /**
@@ -539,6 +550,14 @@ interface IStyle {
      *
      */
     txcolor?: string;
+}
+
+/**
+ * **_[interface]_**
+ */
+interface IMimeTypeExport {
+    value: 'pdf' | 'png' | 'jpeg' | 'webp';
+    selected?: boolean;
 }
 
 /**
@@ -688,6 +707,11 @@ export interface Options extends ControlOptions {
      * Map scales options to be shown in the settings modal
      */
     scales?: IScale[];
+
+    /**
+     * Export format
+     */
+    mimeTypeExports?: IMimeTypeExport[];
 
     /**
      * Locale time zone. Default varies according to browser locale

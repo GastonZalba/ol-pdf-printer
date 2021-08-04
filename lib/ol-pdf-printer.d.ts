@@ -112,6 +112,10 @@ export interface IPrintOptions {
      *
      */
     scalebar?: boolean;
+    /**
+     *
+     */
+    typeExport?: IMimeTypeExport['value'];
 }
 /**
  * **_[interface]_** - Custom translations specified when creating an instance
@@ -193,6 +197,13 @@ interface IStyle {
      *
      */
     txcolor?: string;
+}
+/**
+ * **_[interface]_**
+ */
+interface IMimeTypeExport {
+    value: 'pdf' | 'png' | 'jpeg' | 'webp';
+    selected?: boolean;
 }
 /**
  * **_[interface]_**
@@ -329,6 +340,10 @@ export interface Options extends ControlOptions {
      * Map scales options to be shown in the settings modal
      */
     scales?: IScale[];
+    /**
+     * Export format
+     */
+    mimeTypeExports?: IMimeTypeExport[];
     /**
      * Locale time zone. Default varies according to browser locale
      * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString#using_locales

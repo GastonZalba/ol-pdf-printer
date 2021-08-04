@@ -8,6 +8,7 @@ import { terser } from "rollup-plugin-terser";
 import CleanCss from 'clean-css';
 import css from 'rollup-plugin-css-only';
 import { mkdirSync, writeFileSync } from 'fs';
+import nodeGlobals from 'rollup-plugin-node-globals';
 
 let globals = {
     'ol/Map': 'ol.Map',
@@ -22,7 +23,8 @@ let globals = {
     'dom-to-image-improved': 'domtoimage',
     'modal-vanilla': 'Modal',
     'events': 'EventEmitter',
-    'myPragma': 'myPragma'
+    'myPragma': 'myPragma',
+    'pdfjs-dist': 'pdfjsLib'
 };
 
 module.exports = {
@@ -32,9 +34,11 @@ module.exports = {
             file: pkg.main,
             format: 'umd',
             name: 'PdfPrinter',
-            globals: globals
+            globals: globals,
+            intro: 'var global = window;'
         },
         {
+            intro: 'var global = window;',
             file: pkg.browser,
             format: 'umd',
             plugins: [terser()],
@@ -43,6 +47,7 @@ module.exports = {
         }
     ],
     plugins: [
+        nodeGlobals(),
         builtins(), // Events
         resolve(),
         commonjs(),
@@ -96,6 +101,7 @@ module.exports = {
         'ol/Observable',
         'ol/source/TileWMS',
         'ol/layer/Tile',
-        'jspdf'
+        'jspdf',
+        'pdfjs-dist'
     ]
 };

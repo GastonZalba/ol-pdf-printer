@@ -1,8 +1,10 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('ol/proj'), require('ol/control/Control'), require('ol/source/TileWMS'), require('ol/layer/Tile'), require('ol/Observable'), require('jspdf'), require('ol/proj/Units')) :
-  typeof define === 'function' && define.amd ? define(['ol/proj', 'ol/control/Control', 'ol/source/TileWMS', 'ol/layer/Tile', 'ol/Observable', 'jspdf', 'ol/proj/Units'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.PdfPrinter = factory(global.ol.proj, global.ol.control.Control, global.ol.source.TileWMS, global.ol.layer.Tile, global.ol.Observable, global.jsPDF, global.ol.proj.Units));
-}(this, (function (proj, Control, TileWMS, Tile, Observable, jspdf, Units) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('ol/proj'), require('ol/control/Control'), require('ol/source/TileWMS'), require('ol/layer/Tile'), require('ol/Observable'), require('jspdf'), require('pdfjs-dist'), require('ol/proj/Units')) :
+  typeof define === 'function' && define.amd ? define(['ol/proj', 'ol/control/Control', 'ol/source/TileWMS', 'ol/layer/Tile', 'ol/Observable', 'jspdf', 'pdfjs-dist', 'ol/proj/Units'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.PdfPrinter = factory(global.ol.proj, global.ol.control.Control, global.ol.source.TileWMS, global.ol.layer.Tile, global.ol.Observable, global.jsPDF, global.pdfjsLib, global.ol.proj.Units));
+}(this, (function (proj, Control, TileWMS, Tile, Observable, jspdf, pdfjsDist, Units) { 'use strict';
+
+  var global = window;
 
   function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -1783,6 +1785,53 @@
   })();
   });
 
+  function _arrayWithoutHoles(arr) {
+    if (Array.isArray(arr)) return _arrayLikeToArray(arr);
+  }
+
+  function _iterableToArray(iter) {
+    if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter);
+  }
+
+  function _nonIterableSpread() {
+    throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+  }
+
+  function _toConsumableArray(arr) {
+    return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread();
+  }
+
+  function createElement(tagName) {
+    var attrs = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    for (var _len = arguments.length, children = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+      children[_key - 2] = arguments[_key];
+    }
+
+    if (tagName === 'fragment') return children;
+    if (typeof tagName === 'function') return tagName(attrs, children);
+    var elem = document.createElement(tagName);
+    Object.entries(attrs || {}).forEach(function (_ref) {
+      var _ref2 = _slicedToArray(_ref, 2),
+          name = _ref2[0],
+          value = _ref2[1];
+
+      if (name.startsWith('on') && name.toLowerCase() in window) elem.addEventListener(name.toLowerCase().substr(2), value);else {
+        if (name === 'className') elem.setAttribute('class', value.toString());else if (name === 'htmlFor') elem.setAttribute('for', value.toString());else elem.setAttribute(name, value.toString());
+      }
+    });
+
+    for (var _i = 0, _children = children; _i < _children.length; _i++) {
+      var child = _children[_i];
+      if (!child) continue;
+      if (Array.isArray(child)) elem.append.apply(elem, _toConsumableArray(child));else {
+        elem.appendChild(child.nodeType === undefined ? document.createTextNode(child.toString()) : child);
+      }
+    }
+
+    return elem;
+  }
+
   var __awaiter$1 = undefined && undefined.__awaiter || function (thisArg, _arguments, P, generator) {
     function adopt(value) {
       return value instanceof P ? value : new P(function (resolve) {
@@ -2700,7 +2749,7 @@
       this._form = form;
       this._i18n = i18n;
       this._config = config;
-      this._pdf = this.createPdf(this._form.orientation, this._form.format, height, width);
+      this._pdf = this.create(this._form.orientation, this._form.format, height, width);
       this._scaleDenominator = this._calculateScaleDenominator(this._form.resolution, scaleResolution);
     }
     /**
@@ -2715,8 +2764,8 @@
 
 
     _createClass(Pdf, [{
-      key: "createPdf",
-      value: function createPdf(orientation, format, height, width) {
+      key: "create",
+      value: function create(orientation, format, height, width) {
         var _a; // UMD support
 
 
@@ -2750,7 +2799,56 @@
     }, {
       key: "savePdf",
       value: function savePdf() {
-        this._pdf.doc.save(this._config.filename + '.pdf');
+        var _this4 = this;
+
+        var downloadURI = function downloadURI(uri, name) {
+          var link = createElement("a", {
+            download: name,
+            href: uri
+          });
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        };
+
+        return new Promise(function (resolve, reject) {
+          if (_this4._form.typeExport === 'pdf') {
+            _this4._pdf.doc.save(_this4._config.filename + '.pdf');
+
+            resolve();
+          } else {
+            var pdf = _this4._pdf.doc.output('dataurlstring');
+
+            pdfjsDist.getDocument(pdf).promise.then(function (pdf) {
+              pdf.getPage(1).then(function (page) {
+                var scale = 2;
+                var viewport = page.getViewport({
+                  scale: scale
+                }); // Prepare canvas
+
+                var canvas = createElement("canvas", null);
+                canvas.style.display = 'none';
+                document.body.appendChild(canvas);
+                var context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width; // Render PDF page into canvas context
+
+                var task = page.render({
+                  canvasContext: context,
+                  viewport: viewport
+                });
+                task.promise.then(function () {
+                  downloadURI(canvas.toDataURL("image/".concat(_this4._form.typeExport)), _this4._config.filename + ".".concat(_this4._form.typeExport));
+                  canvas.remove();
+                  resolve();
+                });
+              });
+            }, function (error) {
+              reject(error);
+              console.log(error);
+            });
+          }
+        });
       }
       /**
        * Adapted from http://hg.intevation.de/gemma/file/tip/client/src/components/Pdftool.vue#l252
@@ -3842,53 +3940,6 @@
 
   var modalVanilla = require$$0.default;
 
-  function _arrayWithoutHoles(arr) {
-    if (Array.isArray(arr)) return _arrayLikeToArray(arr);
-  }
-
-  function _iterableToArray(iter) {
-    if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter);
-  }
-
-  function _nonIterableSpread() {
-    throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-  }
-
-  function _toConsumableArray(arr) {
-    return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread();
-  }
-
-  function createElement(tagName) {
-    var attrs = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-    for (var _len = arguments.length, children = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
-      children[_key - 2] = arguments[_key];
-    }
-
-    if (tagName === 'fragment') return children;
-    if (typeof tagName === 'function') return tagName(attrs, children);
-    var elem = document.createElement(tagName);
-    Object.entries(attrs || {}).forEach(function (_ref) {
-      var _ref2 = _slicedToArray(_ref, 2),
-          name = _ref2[0],
-          value = _ref2[1];
-
-      if (name.startsWith('on') && name.toLowerCase() in window) elem.addEventListener(name.toLowerCase().substr(2), value);else {
-        if (name === 'className') elem.setAttribute('class', value.toString());else if (name === 'htmlFor') elem.setAttribute('for', value.toString());else elem.setAttribute(name, value.toString());
-      }
-    });
-
-    for (var _i = 0, _children = children; _i < _children.length; _i++) {
-      var child = _children[_i];
-      if (!child) continue;
-      if (Array.isArray(child)) elem.append.apply(elem, _toConsumableArray(child));else {
-        elem.appendChild(child.nodeType === undefined ? document.createTextNode(child.toString()) : child);
-      }
-    }
-
-    return elem;
-  }
-
   /**
    *
    * @param map
@@ -3919,6 +3970,8 @@
 
   var SettingsModal = /*#__PURE__*/function () {
     function SettingsModal(map, options, i18n, printMap) {
+      var _this = this;
+
       _classCallCheck(this, SettingsModal);
 
       this._modal = new modalVanilla(Object.assign({
@@ -3927,7 +3980,7 @@
         animate: true,
         title: i18n.printPdf,
         content: this.Content(i18n, options),
-        footer: this.Footer(i18n)
+        footer: this.Footer(i18n, options)
       }, options.modal));
 
       this._modal.on('dismiss', function (modal, event) {
@@ -3943,7 +3996,8 @@
           description: formData.get('printDescription'),
           compass: formData.get('printCompass'),
           attributions: formData.get('printAttributions'),
-          scalebar: formData.get('printScalebar')
+          scalebar: formData.get('printScalebar'),
+          typeExport: _this._modal.el.querySelector('select[name="printTypeExport"]').value
         };
         printMap(values,
         /* showLaoding */
@@ -3954,7 +4008,9 @@
 
       this._modal.on('shown', function () {
         var actualScaleVal = getMapScale(map);
-        var actualScale = document.querySelector('.actualScale');
+
+        var actualScale = _this._modal.el.querySelector('.actualScale');
+
         actualScale.value = String(actualScaleVal / 1000);
         actualScale.innerHTML = "".concat(i18n.current, " (1:").concat(actualScaleVal.toLocaleString('de'), ")");
       });
@@ -4070,8 +4126,30 @@
 
     }, {
       key: "Footer",
-      value: function Footer(i18n) {
-        return "\n        <div>\n            <button\n                type=\"button\"\n                class=\"btn-sm btn btn-secondary\"\n                data-dismiss=\"modal\"\n            >\n                ".concat(i18n.cancel, "\n            </button>\n            <button\n                type=\"button\"\n                class=\"btn-sm btn btn-primary\"\n                data-print=\"true\"\n                data-dismiss=\"modal\"\n            >\n                ").concat(i18n.print, "\n            </button>\n        </div>\n    ");
+      value: function Footer(i18n, params) {
+        var mimeTypeExports = params.mimeTypeExports;
+        return createElement("div", null, createElement("button", {
+          type: "button",
+          className: "btn-sm btn btn-secondary",
+          "data-dismiss": "modal"
+        }, i18n.cancel), createElement("div", {
+          class: "typeExportContainer"
+        }, createElement("button", {
+          type: "button",
+          className: "btn-sm btn btn-primary",
+          "data-print": "true",
+          "data-dismiss": "modal"
+        }, i18n.print), createElement("select", {
+          className: "typeExport",
+          name: "printTypeExport",
+          id: "printTypeExport"
+        }, mimeTypeExports.map(function (type) {
+          return createElement("option", Object.assign({
+            value: type.value
+          }, type.selected ? {
+            selected: 'selected'
+          } : {}), type.value);
+        })))).outerHTML;
       }
     }, {
       key: "hide",
@@ -4168,12 +4246,12 @@
   }();
 
   var es = {
-    printPdf: 'Imprimir PDF',
+    printPdf: 'Exportar PDF',
     pleaseWait: 'Por favor espere...',
     almostThere: 'Ya casi...',
     error: 'Error al generar pdf',
     errorImage: 'Ocurrió un error al tratar de cargar una imagen',
-    printing: 'Imprimiendo',
+    printing: 'Exportando',
     cancel: 'Cancelar',
     close: 'Cerrar',
     print: 'Exportar',
@@ -4197,7 +4275,7 @@
     almostThere: 'Almost there...',
     error: 'An error occurred while printing',
     errorImage: 'An error ocurred while loading an image',
-    printing: 'Printing',
+    printing: 'Exporting',
     cancel: 'Cancel',
     close: 'Close',
     print: 'Export',
@@ -4287,7 +4365,8 @@
       Object.keys(source).forEach(function (key) {
         var s_val = source[key];
         var t_val = target[key];
-        target[key] = t_val && s_val && _typeof(t_val) === 'object' && _typeof(s_val) === 'object' ? deepObjectAssign(t_val, s_val) : s_val;
+        target[key] = t_val && s_val && _typeof(t_val) === 'object' && _typeof(s_val) === 'object' && !Array.isArray(t_val) // Don't merge arrays
+        ? deepObjectAssign(t_val, s_val) : s_val;
       });
     });
     return target;
@@ -4373,6 +4452,16 @@
           value: 300
         }],
         scales: [10000, 5000, 1000, 500, 250, 100, 50, 25, 10],
+        mimeTypeExports: [{
+          value: 'pdf',
+          selected: true
+        }, {
+          value: 'png'
+        }, {
+          value: 'jpeg'
+        }, {
+          value: 'webp'
+        }],
         units: 'metric',
         dateFormat: undefined,
         ctrlBtnClass: '',
@@ -4585,14 +4674,16 @@
                         return _context.abrupt("return");
 
                       case 8:
-                        this._pdf.savePdf(); // Reset original map size
+                        _context.next = 10;
+                        return this._pdf.savePdf();
 
-
+                      case 10:
+                        // Reset original map size
                         this._onEndPrint();
 
                         if (showLoading) this._disableLoading();
 
-                      case 11:
+                      case 12:
                       case "end":
                         return _context.stop();
                     }

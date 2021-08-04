@@ -16,7 +16,8 @@ let globals = {
     'modal-vanilla': 'Modal',
     'jsPDF': 'jspdf',
     'dom-to-image-improved': 'domtoimage',
-    'events': 'EventEmitter'
+    'events': 'EventEmitter',
+    'pdfjs-dist': 'pdfjsLib'
 };
 
 module.exports = {
@@ -43,7 +44,7 @@ module.exports = {
                 ]
             ],
             babelHelpers: 'bundled',
-            exclude: ["node_modules/**", "src/assets/**"],
+            exclude: "node_modules/**",
             plugins: [
                 [
                     '@babel/plugin-transform-react-jsx',
@@ -74,6 +75,7 @@ module.exports = {
         'modal-vanilla',
         'events',
         'jspdf',
-        'dom-to-image-improved'
+        'dom-to-image-improved',
+        'pdfjs-dist'
     ]
 };

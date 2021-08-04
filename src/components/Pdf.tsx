@@ -1,7 +1,9 @@
-import View from 'ol/View.js';
+import View from 'ol/View';
 import { getPointResolution } from 'ol/proj';
 import { I18n, Options, IPrintOptions, IWatermark } from 'src/ol-pdf-printer';
 import { jsPDF, TextOptionsLight } from 'jspdf';
+import { getDocument } from 'pdfjs-dist';
+import myPragma from '../myPragma';
 
 /**
  * @private
@@ -25,7 +27,7 @@ export default class Pdf {
         this._i18n = i18n;
         this._config = config;
 
-        this._pdf = this.createPdf(
+        this._pdf = this.create(
             this._form.orientation,
             this._form.format,
             height,
@@ -47,7 +49,7 @@ export default class Pdf {
      * @returns
      * @protected
      */
-    createPdf(
+    create(
         orientation: IPrintOptions['orientation'],
         format: IPrintOptions['format'],
         height: number,
@@ -130,8 +132,61 @@ export default class Pdf {
     /**
      * @protected
      */
-    savePdf(): void {
-        this._pdf.doc.save(this._config.filename + '.pdf');
+    savePdf(): Promise<void> {
+        const downloadURI = (uri: String, name: string): void => {
+            const link = <a download={name} href={uri}></a>;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+
+        return new Promise((resolve, reject) => {
+            if (this._form.typeExport === 'pdf') {
+                this._pdf.doc.save(this._config.filename + '.pdf');
+                resolve();
+            } else {
+                const pdf = this._pdf.doc.output('dataurlstring');
+
+                getDocument(pdf).promise.then(
+                    (pdf) => {
+                        pdf.getPage(1).then((page) => {
+                            const scale = 2;
+
+                            const viewport = page.getViewport({ scale });
+
+                            // Prepare canvas
+                            const canvas = <canvas />;
+                            canvas.style.display = 'none';
+                            document.body.appendChild(canvas);
+                            const context = canvas.getContext('2d');
+                            canvas.height = viewport.height;
+                            canvas.width = viewport.width;
+
+                            // Render PDF page into canvas context
+                            const task = page.render({
+                                canvasContext: context,
+                                viewport: viewport
+                            });
+                            task.promise.then(() => {
+                                downloadURI(
+                                    canvas.toDataURL(
+                                        `image/${this._form.typeExport}`
+                                    ),
+                                    this._config.filename +
+                                        `.${this._form.typeExport}`
+                                );
+                                canvas.remove();
+                                resolve();
+                            });
+                        });
+                    },
+                    (error: Error) => {
+                        reject(error);
+                        console.log(error);
+                    }
+                );
+            }
+        });
     }
 
     /**

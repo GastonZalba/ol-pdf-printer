@@ -6,7 +6,7 @@ export const en: I18n = {
     almostThere: 'Almost there...',
     error: 'An error occurred while printing',
     errorImage: 'An error ocurred while loading an image',
-    printing: 'Printing',
+    printing: 'Exporting',
     cancel: 'Cancel',
     close: 'Close',
     print: 'Export',

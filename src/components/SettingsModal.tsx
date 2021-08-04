@@ -22,7 +22,7 @@ export default class SettingsModal {
             animate: true,
             title: i18n.printPdf,
             content: this.Content(i18n, options),
-            footer: this.Footer(i18n),
+            footer: this.Footer(i18n, options),
             ...options.modal
         });
 
@@ -42,7 +42,10 @@ export default class SettingsModal {
                 description: formData.get('printDescription'),
                 compass: formData.get('printCompass'),
                 attributions: formData.get('printAttributions'),
-                scalebar: formData.get('printScalebar')
+                scalebar: formData.get('printScalebar'),
+                typeExport: this._modal.el.querySelector(
+                    'select[name="printTypeExport"]'
+                ).value
             };
 
             printMap(
@@ -54,7 +57,7 @@ export default class SettingsModal {
 
         this._modal.on('shown', (): void => {
             const actualScaleVal = getMapScale(map);
-            const actualScale = document.querySelector('.actualScale');
+            const actualScale = this._modal.el.querySelector('.actualScale');
             (actualScale as HTMLInputElement).value = String(
                 actualScaleVal / 1000
             );
@@ -200,26 +203,46 @@ export default class SettingsModal {
      * @returns
      * @protected
      */
-    Footer(i18n: I18n) {
-        return `
-        <div>
-            <button
-                type="button"
-                class="btn-sm btn btn-secondary"
-                data-dismiss="modal"
-            >
-                ${i18n.cancel}
-            </button>
-            <button
-                type="button"
-                class="btn-sm btn btn-primary"
-                data-print="true"
-                data-dismiss="modal"
-            >
-                ${i18n.print}
-            </button>
-        </div>
-    `;
+    Footer(i18n: I18n, params) {
+        const { mimeTypeExports } = params;
+
+        return (
+            <div>
+                <button
+                    type="button"
+                    className="btn-sm btn btn-secondary"
+                    data-dismiss="modal"
+                >
+                    {i18n.cancel}
+                </button>
+                <div class="typeExportContainer">
+                    <button
+                        type="button"
+                        className="btn-sm btn btn-primary"
+                        data-print="true"
+                        data-dismiss="modal"
+                    >
+                        {i18n.print}
+                    </button>
+                    <select
+                        className="typeExport"
+                        name="printTypeExport"
+                        id="printTypeExport"
+                    >
+                        {mimeTypeExports.map((type) => (
+                            <option
+                                value={type.value}
+                                {...(type.selected
+                                    ? { selected: 'selected' }
+                                    : {})}
+                            >
+                                {type.value}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            </div>
+        ).outerHTML;
     }
 
     hide() {

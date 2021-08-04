@@ -63,7 +63,13 @@ var opt_options = {
         { value: 300 }
     ],
     scales: [10000, 5000, 1000, 500, 250, 100, 50, 25, 10],
-    dateFormat: undefined, // Use browser
+    mimeTypeExport: [
+        { value: 'pdf', selected: true},
+        { value: 'png' },
+        { value: 'jpeg' },
+        { value: 'webp' }
+    ],
+    dateFormat: undefined, // Use browser default
     ctrlBtnClass: '',
     modal: {
         animateClass: 'fade',
@@ -92,17 +98,17 @@ See [CHANGELOG](./CHANGELOG.md) for details of changes in each release.
 
 #### JS
 
-Load `ol-pdf-printer.js` after [OpenLayers](https://www.npmjs.com/package/ol) and [jspdf](https://www.npmjs.com/package/jspdf). Ol Pdf Printer is available as `PdfPrinter`.
+Load `ol-pdf-printer.js` after [OpenLayers](https://www.npmjs.com/package/ol), [jspdf](https://www.npmjs.com/package/jspdf) and PDF.js\[https://www.npmjs.com/package/pdfjs-dist]. Ol Pdf Printer is available as `PdfPrinter`.
 
 ```HTML
-<script src="https://unpkg.com/ol-pdf-printer@1.0.8"></script>
+<script src="https://unpkg.com/ol-pdf-printer@1.0.9"></script>
 ```
 
 #### CSS
 
 ```HTML
-<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.0.8/dist/css/ol-pdf-printer.css" />
-<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.0.8/dist/css/bootstrap.min.css" /> <!-- Bootstrap bundle -->
+<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.0.9/dist/css/ol-pdf-printer.css" />
+<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.0.9/dist/css/bootstrap.min.css" /> <!-- Bootstrap bundle -->
 ```
 
 ### Parcel, Webpack, etc.
@@ -148,6 +154,7 @@ TypeScript types are shipped with the project in the dist directory and should b
     -   [compass](#compass)
     -   [attributions](#attributions)
     -   [scalebar](#scalebar)
+    -   [typeExport](#typeexport)
 -   [I18n](#i18n)
 -   [IPaperSize](#ipapersize)
     -   [size](#size)
@@ -162,6 +169,7 @@ TypeScript types are shipped with the project in the dist directory and should b
     -   [brcolor](#brcolor)
     -   [bkcolor](#bkcolor)
     -   [txcolor](#txcolor)
+-   [IMimeTypeExport](#imimetypeexport)
 -   [IModal](#imodal)
     -   [animateClass](#animateclass)
     -   [animateInClass](#animateinclass)
@@ -193,6 +201,7 @@ TypeScript types are shipped with the project in the dist directory and should b
     -   [paperSizes](#papersizes)
     -   [dpi](#dpi)
     -   [scales](#scales)
+    -   [mimeTypeExports](#mimetypeexports)
     -   [dateFormat](#dateformat)
     -   [ctrlBtnClass](#ctrlbtnclass)
     -   [modal](#modal)
@@ -258,6 +267,10 @@ Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Glob
 
 Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)
 
+#### typeExport
+
+Type: any
+
 ### I18n
 
 **_\[interface]_** - Custom translations specified when creating an instance
@@ -315,6 +328,10 @@ Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Globa
 #### txcolor
 
 Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+### IMimeTypeExport
+
+**_\[interface]_**
 
 ### IModal
 
@@ -476,6 +493,12 @@ Type: [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global
 Map scales options to be shown in the settings modal
 
 Type: [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[IScale](#iscale)>
+
+#### mimeTypeExports
+
+Export format
+
+Type: [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[IMimeTypeExport](#imimetypeexport)>
 
 #### dateFormat
 

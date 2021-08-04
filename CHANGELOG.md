@@ -25,3 +25,7 @@
 ## v1.0.8
 * Added customizable `imperial` and `metric` units system
 * Added customizable date format
+
+## v1.0.9
+* Added image MIME types to export
+* Fixed deepObjectAssign helper (bug on merging configuration arrays)

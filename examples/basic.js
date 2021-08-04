@@ -103,7 +103,13 @@
       { value: 200 },
       { value: 300 }
     ],
-    scales: [10000, 5000, 1000, 500, 250, 100, 50, 25, 10]
+    scales: [10000, 5000, 1000, 500, 250, 100, 50, 25, 10],
+    mimeTypeExports: [
+      { value: 'pdf' },
+      { value: 'png', selected: true },
+      { value: 'jpeg' },
+      { value: 'webp' }
+    ],
   }
 
   var pdfPrinter = new PdfPrinter(opt_options);
