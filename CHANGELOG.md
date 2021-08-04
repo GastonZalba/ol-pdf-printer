@@ -29,3 +29,6 @@
 ## v1.0.9
 * Added image MIME types to export
 * Fixed deepObjectAssign helper (bug on merging configuration arrays)
+
+## v1.0.10
+* Updated example screenshot
