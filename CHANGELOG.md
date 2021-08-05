@@ -32,3 +32,6 @@
 
 ## v1.0.10
 * Updated example screenshot
+
+## v1.0.11
+* Fixed worker error on compiling lib module with webpack

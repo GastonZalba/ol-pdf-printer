@@ -2819,6 +2819,7 @@
           } else {
             var pdf = _this4._pdf.doc.output('dataurlstring');
 
+            pdfjsDist.GlobalWorkerOptions.workerSrc = 'https://mozilla.github.io/pdf.js/build/pdf.worker.js';
             pdfjsDist.getDocument(pdf).promise.then(function (pdf) {
               pdf.getPage(1).then(function (page) {
                 var scale = 2;
