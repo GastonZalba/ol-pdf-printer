@@ -2,7 +2,7 @@ import View from 'ol/View';
 import { getPointResolution } from 'ol/proj';
 import { I18n, Options, IPrintOptions, IWatermark } from 'src/ol-pdf-printer';
 import { jsPDF, TextOptionsLight } from 'jspdf';
-import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist';
+import { getDocument, GlobalWorkerOptions, version } from 'pdfjs-dist';
 import myPragma from '../myPragma';
 
 /**
@@ -147,8 +147,12 @@ export default class Pdf {
             } else {
                 const pdf = this._pdf.doc.output('dataurlstring');
 
-                GlobalWorkerOptions.workerSrc =
-                    'https://mozilla.github.io/pdf.js/build/pdf.worker.js';
+                // UMD support
+                const versionPdfJS =
+                    (window as IWindow & typeof globalThis)?.pdfjsLib
+                        ?.version || version;
+
+                GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${versionPdfJS}/pdf.worker.js`;
 
                 getDocument(pdf).promise.then(
                     (pdf) => {
@@ -1027,6 +1031,7 @@ export default class Pdf {
  */
 interface IWindow extends Window {
     jspdf: any;
+    pdfjsLib: any;
 }
 
 /**

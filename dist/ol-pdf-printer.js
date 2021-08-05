@@ -2812,14 +2812,18 @@
         };
 
         return new Promise(function (resolve, reject) {
+          var _a, _b;
+
           if (_this4._form.typeExport === 'pdf') {
             _this4._pdf.doc.save(_this4._config.filename + '.pdf');
 
             resolve();
           } else {
-            var pdf = _this4._pdf.doc.output('dataurlstring');
+            var pdf = _this4._pdf.doc.output('dataurlstring'); // UMD support
 
-            pdfjsDist.GlobalWorkerOptions.workerSrc = 'https://mozilla.github.io/pdf.js/build/pdf.worker.js';
+
+            var versionPdfJS = ((_b = (_a = window) === null || _a === void 0 ? void 0 : _a.pdfjsLib) === null || _b === void 0 ? void 0 : _b.version) || pdfjsDist.version;
+            pdfjsDist.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/".concat(versionPdfJS, "/pdf.worker.js");
             pdfjsDist.getDocument(pdf).promise.then(function (pdf) {
               pdf.getPage(1).then(function (page) {
                 var scale = 2;

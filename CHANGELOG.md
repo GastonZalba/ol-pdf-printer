@@ -35,3 +35,6 @@
 
 ## v1.0.11
 * Fixed worker error on compiling lib module with webpack
+
+## v1.0.12
+* Improved worker version management and PDF.js version on example
