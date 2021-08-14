@@ -1,36 +1,39 @@
-import pkg from './package.json';
 import babel from '@rollup/plugin-babel';
 import svg from 'rollup-plugin-svg-import';
 import { mkdirSync, writeFileSync } from 'fs';
 import css from 'rollup-plugin-css-only';
-
-let globals = {
-    'ol/Map': 'ol.Map',
-    'ol/control/Control': 'ol.control.Control',
-    'ol/proj': 'ol.proj',
-    'ol/proj/Units': 'ol.proj.Units',
-    'ol/events': 'ol.events',
-    'ol/Observable' : 'ol.Observable',
-    'ol/source/TileWMS': 'ol.source.TileWMS',
-    'ol/layer/Tile': 'ol.layer.Tile',
-    'modal-vanilla': 'Modal',
-    'jsPDF': 'jspdf',
-    'dom-to-image-improved': 'domtoimage',
-    'events': 'EventEmitter',
-    'pdfjs-dist': 'pdfjsLib'
-};
+import typescript from '@rollup/plugin-typescript';
+import del from 'rollup-plugin-delete';
+import copy from 'rollup-plugin-copy';
+import jsx from 'acorn-jsx';
+import resolve from '@rollup/plugin-node-resolve';
+import path from 'path';
 
 module.exports = {
-    input: 'tmp-lib/ol-pdf-printer.js',
+    input: 'src/ol-pdf-printer.ts',
     output: [
         {
-            file: pkg.module,
+            dir: 'lib',
             format: 'es',
-            name: 'PdfPrinter',
-            globals: globals
+            sourcemap: true
         }
     ],
+    acornInjectPlugins: [ jsx() ],
     plugins: [
+        del({ targets: 'lib/*' }),
+        typescript({
+            outDir: './lib',
+            declarationDir: './lib',
+            outputToFilesystem: true
+        }),
+        copy({
+            targets: [
+                { src: 'src/assets/css/bootstrap.min.css', dest: 'lib/css' },
+            ]
+        }),
+        resolve({
+            extensions: ['.mjs', '.js', '.ts', '.json', '.node', '.tsx ', '.jsx']
+        }),
         svg(),
         babel({
             presets: [
@@ -52,6 +55,13 @@ module.exports = {
                         pragma: 'myPragma',
                         pragmaFrag: "'fragment'"
                     }
+                ],
+                [
+                    'babel-plugin-jsx-pragmatic',
+                    {
+                        module: 'myPragma',
+                        import: 'myPragma'
+                    }
                 ]
             ]
         }),       
@@ -62,20 +72,5 @@ module.exports = {
             }
         })
     ],
-    external: [
-        'ol',
-        'ol/Map',
-        'ol/control/Control',
-        'ol/proj',
-        'ol/proj/Units',
-        'ol/events',
-        'ol/Observable',
-        'ol/source/TileWMS',
-        'ol/layer/Tile',
-        'modal-vanilla',
-        'events',
-        'jspdf',
-        'dom-to-image-improved',
-        'pdfjs-dist'
-    ]
+    external: id => !(path.isAbsolute(id) || id.startsWith("."))
 };

@@ -30,6 +30,7 @@
 
 .ol-print-btn-menu svg {
     height: 1.3em;
+    width: auto;
     fill: #ffffff;
 }
 

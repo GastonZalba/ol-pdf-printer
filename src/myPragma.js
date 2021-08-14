@@ -1,5 +1,5 @@
 export default function createElement(tagName, attrs = {}, ...children) {
-    if (tagName === 'fragment') return children;
+    if (tagName === 'null') return children;
     if (typeof tagName === 'function') return tagName(attrs, children);
 
     const elem = document.createElement(tagName);

@@ -38,3 +38,11 @@
 
 ## v1.0.12
 * Improved worker version management and PDF.js version on example
+
+## v1.0.13
+* Improved typescript and rollup configuration
+* Added "watch" script
+* Updated dependencies
+* Fixed minor css issues
+* Excluded some folders from npm
+* Added Source Maps

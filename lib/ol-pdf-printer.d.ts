@@ -18,7 +18,7 @@ export default class PdfPrinter extends Control {
     protected _timeoutProcessing: ReturnType<typeof setTimeout>;
     protected _initialViewResolution: number;
     protected _options: Options;
-    protected _renderCompleteKey: EventsKey;
+    protected _renderCompleteKey: EventsKey | EventsKey[];
     protected _isCanceled: boolean;
     constructor(opt_options?: Options);
     /**
@@ -367,3 +367,4 @@ export interface Options extends ControlOptions {
     i18n?: I18n;
 }
 export {};
+//# sourceMappingURL=ol-pdf-printer.d.ts.map
