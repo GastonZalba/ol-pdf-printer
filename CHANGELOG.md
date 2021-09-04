@@ -39,10 +39,18 @@
 ## v1.0.12
 * Improved worker version management and PDF.js version on example
 
-## v1.0.13
+## v1.0.13/14
 * Improved typescript and rollup configuration
 * Added "watch" script
 * Updated dependencies
 * Fixed minor css issues
 * Excluded some folders from npm
 * Added Source Maps
+
+## v1.0.15
+* Fixed overlapping elements on small paper prints with long urls
+* Beter css builds
+* Better watch mode
+* Added .gitattributes
+* Typescript improvements
+* Changed separator on attributions

@@ -5,8 +5,9 @@ import commonjs from '@rollup/plugin-commonjs';
 import svg from 'rollup-plugin-svg-import';
 import builtins from 'rollup-plugin-node-builtins';
 import { terser } from "rollup-plugin-terser";
-import CleanCss from 'clean-css';
+import postcss from 'rollup-plugin-postcss';
 import css from 'rollup-plugin-css-only';
+import CleanCss from 'clean-css';
 import { mkdirSync, writeFileSync } from 'fs';
 import nodeGlobals from 'rollup-plugin-node-globals';
 import typescript from '@rollup/plugin-typescript';
@@ -114,14 +115,17 @@ export default function (commandOptions) {
             }),
             commonjs(),
             svg(),
-            css({
+            commandOptions.dev && postcss({
+                extensions: ['.css', '.sass', '.scss'],
+                inject: true,
+                extract: false
+            }),
+            !commandOptions.dev && css({
                 output: function (styles) {
                     mkdirSync('dist/css', { recursive: true });
                     writeFileSync('dist/css/ol-pdf-printer.css', styles);
-                    if (!commandOptions.dev) {
-                        const compressed = new CleanCss().minify(styles).styles;
-                        writeFileSync('dist/css/ol-pdf-printer.min.css', compressed);
-                    }
+                    const compressed = new CleanCss().minify(styles).styles;
+                    writeFileSync('dist/css/ol-pdf-printer.min.css', compressed);
                 }
             }),
             commandOptions.dev && serve({
@@ -140,7 +144,7 @@ export default function (commandOptions) {
                 }
             }),
             commandOptions.dev && livereload({
-                watch: ['src'],
+                watch: ['dist'],
                 delay: 500
             })
         ],

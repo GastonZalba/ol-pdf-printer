@@ -1252,9 +1252,9 @@
              * @protected
              */
             this._addTextByOffset = (position, offset, width, fontSize, color, align, str) => {
-                let { x, y } = this._calculateOffsetByPosition(position, offset);
-                x = align === 'center' ? x - width / 2 : x;
-                this._addText(x, y, width, fontSize, color, align, str);
+                const { x, y } = this._calculateOffsetByPosition(position, offset);
+                const fixX = align === 'center' ? x - width / 2 : x;
+                this._addText(fixX, y, width, fontSize, color, align, str);
             };
             /**
              * @protected
@@ -1283,87 +1283,82 @@
              * @returns
              * @protected
              */
-            this._addWatermark = (watermark) => {
-                return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
-                    const position = 'topright';
-                    const offset = { x: 0, y: 0 };
-                    const fontSize = 14;
-                    const imageSize = 12;
-                    const fontSizeSubtitle = fontSize / 1.8;
-                    let back = false;
-                    const { x, y } = this._calculateOffsetByPosition(position, offset);
-                    const paddingBack = 2;
-                    let acumulativeWidth = watermark.logo ? imageSize + 0.5 : 0;
-                    if (watermark.title) {
-                        this._pdf.doc.setTextColor(watermark.titleColor);
-                        this._pdf.doc.setFontSize(fontSize);
-                        this._pdf.doc.setFont('helvetica', 'bold');
-                        // This function works bad
-                        let { w } = this._pdf.doc.getTextDimensions(watermark.title);
-                        if (watermark.subtitle) {
-                            this._pdf.doc.setFontSize(fontSizeSubtitle);
-                            const wSub = this._pdf.doc.getTextDimensions(watermark.subtitle).w;
-                            w = wSub - 4 > w ? wSub : w + 4; // weird fix needed
-                            this._pdf.doc.setFontSize(fontSize);
-                        }
-                        else {
-                            w += 4;
-                        }
-                        // Adaptable width, fixed height
-                        const height = 16;
-                        const widthBack = w + paddingBack;
-                        this._addRoundedBox(x - widthBack + 4 - acumulativeWidth, y - 4, widthBack + acumulativeWidth, height, '#ffffff', '#ffffff');
-                        back = true;
-                        this._pdf.doc.text(watermark.title, x, y + paddingBack + 3 + (!watermark.subtitle ? 2 : 0), {
-                            align: 'right'
-                        });
-                        acumulativeWidth += w;
-                    }
+            this._addWatermark = (watermark) => __awaiter(this, void 0, void 0, function* () {
+                const position = 'topright';
+                const offset = { x: 0, y: 0 };
+                const fontSize = 14;
+                const imageSize = 12;
+                const fontSizeSubtitle = fontSize / 1.8;
+                let back = false;
+                const { x, y } = this._calculateOffsetByPosition(position, offset);
+                const paddingBack = 2;
+                let acumulativeWidth = watermark.logo ? imageSize + 0.5 : 0;
+                if (watermark.title) {
+                    this._pdf.doc.setTextColor(watermark.titleColor);
+                    this._pdf.doc.setFontSize(fontSize);
+                    this._pdf.doc.setFont('helvetica', 'bold');
+                    // This function works bad
+                    let { w } = this._pdf.doc.getTextDimensions(watermark.title);
                     if (watermark.subtitle) {
-                        this._pdf.doc.setTextColor(watermark.subtitleColor);
                         this._pdf.doc.setFontSize(fontSizeSubtitle);
-                        this._pdf.doc.setFont('helvetica', 'normal');
-                        if (!back) {
-                            const { w } = this._pdf.doc.getTextDimensions(watermark.subtitle);
-                            const widthBack = paddingBack * 2 + w;
-                            this._addRoundedBox(x - widthBack + 3 - acumulativeWidth, y - 4, widthBack + acumulativeWidth, 16, '#ffffff', '#ffffff');
-                            acumulativeWidth += widthBack;
-                            back = true;
-                        }
-                        const marginTop = watermark.title ? fontSize / 2 : 4;
-                        this._pdf.doc.text(watermark.subtitle, x, y + paddingBack + marginTop, {
-                            align: 'right'
-                        });
-                    }
-                    if (!watermark.logo)
-                        return resolve();
-                    const addImage = (image) => {
-                        this._pdf.doc.addImage(image, 'PNG', x - acumulativeWidth + paddingBack * 2 - 1, y - 1, imageSize, imageSize);
-                    };
-                    if (!back) {
-                        const widthBack = acumulativeWidth + paddingBack;
-                        this._addRoundedBox(x - widthBack + 4, y - 4, widthBack, 16, '#ffffff', '#ffffff');
-                    }
-                    if (watermark.logo instanceof Image) {
-                        addImage(watermark.logo);
-                        resolve();
+                        const wSub = this._pdf.doc.getTextDimensions(watermark.subtitle).w;
+                        w = wSub - 4 > w ? wSub : w + 4; // weird fix needed
+                        this._pdf.doc.setFontSize(fontSize);
                     }
                     else {
-                        let imgData;
-                        if (typeof watermark.logo === 'string') {
-                            imgData = watermark.logo;
-                        }
-                        else if (watermark.logo instanceof SVGElement) {
-                            try {
-                                imgData = yield this._processSvgImage(watermark.logo);
-                            }
-                            catch (err) {
-                                return reject(err);
-                            }
-                        }
-                        else {
-                            throw this._i18n.errorImage;
-                        }
+                        w += 4;
+                    }
+                    // Adaptable width, fixed height
+                    const height = 16;
+                    const widthBack = w + paddingBack;
+                    this._addRoundedBox(x - widthBack + 4 - acumulativeWidth, y - 4, widthBack + acumulativeWidth, height, '#ffffff', '#ffffff');
+                    back = true;
+                    this._pdf.doc.text(watermark.title, x, y + paddingBack + 3 + (!watermark.subtitle ? 2 : 0), {
+                        align: 'right'
+                    });
+                    acumulativeWidth += w;
+                }
+                if (watermark.subtitle) {
+                    this._pdf.doc.setTextColor(watermark.subtitleColor);
+                    this._pdf.doc.setFontSize(fontSizeSubtitle);
+                    this._pdf.doc.setFont('helvetica', 'normal');
+                    if (!back) {
+                        const { w } = this._pdf.doc.getTextDimensions(watermark.subtitle);
+                        const widthBack = paddingBack * 2 + w;
+                        this._addRoundedBox(x - widthBack + 3 - acumulativeWidth, y - 4, widthBack + acumulativeWidth, 16, '#ffffff', '#ffffff');
+                        acumulativeWidth += widthBack;
+                        back = true;
+                    }
+                    const marginTop = watermark.title ? fontSize / 2 : 4;
+                    this._pdf.doc.text(watermark.subtitle, x, y + paddingBack + marginTop, {
+                        align: 'right'
+                    });
+                }
+                if (!watermark.logo)
+                    return;
+                const addImage = (image) => {
+                    this._pdf.doc.addImage(image, 'PNG', x - acumulativeWidth + paddingBack * 2 - 1, y - 1, imageSize, imageSize);
+                };
+                if (!back) {
+                    const widthBack = acumulativeWidth + paddingBack;
+                    this._addRoundedBox(x - widthBack + 4, y - 4, widthBack, 16, '#ffffff', '#ffffff');
+                }
+                if (watermark.logo instanceof Image) {
+                    addImage(watermark.logo);
+                    return;
+                }
+                else {
+                    let imgData;
+                    if (typeof watermark.logo === 'string') {
+                        imgData = watermark.logo;
+                    }
+                    else if (watermark.logo instanceof SVGElement) {
+                        imgData = yield this._processSvgImage(watermark.logo);
+                    }
+                    else {
+                        throw this._i18n.errorImage;
+                    }
+                    return new Promise((resolve, reject) => {
                         const image = new Image(imageSize, imageSize);
                         image.onload = () => {
                             try {
@@ -1378,9 +1373,9 @@
                             return reject(this._i18n.errorImage);
                         };
                         image.src = imgData;
-                    }
-                }));
-            };
+                    });
+                }
+            });
             /**
              * @protected
              */
@@ -1406,9 +1401,9 @@
                 const width = 250;
                 const offset = {
                     x: 0,
-                    y: -5
+                    y: -6.5
                 };
-                const fontSize = 7;
+                const fontSize = 6;
                 const txcolor = '#000000';
                 const align = 'left';
                 this._pdf.doc.setFont('helvetica', 'italic');
@@ -1421,12 +1416,12 @@
             this._addSpecs = () => {
                 const position = 'bottomleft';
                 const offset = {
-                    x: this._pdf.width / 2 + this._style.paperMargin,
-                    y: -5
+                    x: 0,
+                    y: -3.5
                 };
-                const fontSize = 7;
+                const fontSize = 6;
                 const txcolor = '#000000';
-                const align = 'center';
+                const align = 'left';
                 this._pdf.doc.setFont('helvetica', 'bold');
                 this._pdf.doc.setFontSize(fontSize);
                 const scale = `${this._i18n.scale} 1:${this._scaleDenominator.toLocaleString('de')}`;
@@ -1445,6 +1440,7 @@
                 const attributionsUl = document.querySelector('.ol-attribution ul');
                 if (!attributionsUl)
                     return;
+                const ATTRI_SEPATATOR = ' · ';
                 const position = 'bottomright';
                 const offset = { x: 1, y: 1 };
                 const fontSize = 7;
@@ -1454,16 +1450,18 @@
                 let xPos = x;
                 const { w, h } = this._pdf.doc.getTextDimensions(attributionsUl.textContent);
                 const paddingBack = 4;
-                this._addRoundedBox(x - w - 2, y - h, w + paddingBack, h + paddingBack, '#ffffff', '#ffffff');
+                const whiteSpaceWidth = this._pdf.doc.getTextDimensions(ATTRI_SEPATATOR).w;
                 const attributions = document.querySelectorAll('.ol-attribution li');
+                const sumWhiteSpaceWidth = whiteSpaceWidth * (attributions.length - 1);
+                this._addRoundedBox(x - w - sumWhiteSpaceWidth - 2, y - h, w + paddingBack + sumWhiteSpaceWidth + 2, h + paddingBack, '#ffffff', '#ffffff');
                 Array.from(attributions)
                     .reverse()
-                    .forEach((attribution) => {
+                    .forEach((attribution, index) => {
                     Array.from(attribution.childNodes)
                         .reverse()
                         .forEach((node) => {
-                        let content = node.textContent;
-                        if (('href' in node)) {
+                        const content = node.textContent;
+                        if ('href' in node) {
                             this._pdf.doc.setTextColor('#0077cc');
                             this._pdf.doc.textWithLink(content, xPos, y, {
                                 align: 'right',
@@ -1479,12 +1477,14 @@
                         const { w } = this._pdf.doc.getTextDimensions(content);
                         xPos -= w;
                     });
-                    // To add separation between diferents attributtions
-                    this._pdf.doc.text(' ', xPos, y, {
-                        align: 'right'
-                    });
-                    const { w } = this._pdf.doc.getTextDimensions(' ');
-                    xPos -= w;
+                    // Excldue last element
+                    if (index !== attributions.length - 1) {
+                        // To add separation between diferents attributtions
+                        this._pdf.doc.text(ATTRI_SEPATATOR, xPos, y, {
+                            align: 'right'
+                        });
+                        xPos -= whiteSpaceWidth;
+                    }
                 });
             };
             /**
@@ -1504,9 +1504,9 @@
                 let unitConversionFactor;
                 if (this._config.units === 'metric') {
                     unit = 'mm';
-                    let millimetre = 1;
-                    let metre = 1000;
-                    let kilometre = metre * 1000;
+                    const millimetre = 1;
+                    const metre = 1000;
+                    const kilometre = metre * 1000;
                     unitConversionFactor = millimetre;
                     if (maxLength >= kilometre * 10) {
                         unit = 'km';
@@ -1518,9 +1518,9 @@
                     }
                 }
                 else if (this._config.units === 'imperial') {
-                    let inch = 25.4; // Millimetre to inch
-                    let mile = inch * 63360;
-                    let yard = inch * 36;
+                    const inch = 25.4; // Millimetre to inch
+                    const mile = inch * 63360;
+                    const yard = inch * 36;
                     unit = 'in';
                     unitConversionFactor = inch;
                     if (maxLength >= mile * 10) {
@@ -1562,7 +1562,7 @@
                     : size;
                 const fullSize = size * 4;
                 // x/y defaults to offset for topleft corner (normal x/y coordinates)
-                let x = offset.x + this._style.paperMargin;
+                const x = offset.x + this._style.paperMargin;
                 let y = offset.y + this._style.paperMargin;
                 y = this._pdf.height - offset.y - 10 - this._style.paperMargin;
                 // to give the outer white box 4mm padding
@@ -1597,77 +1597,67 @@
              * @returns
              * @protected
              */
-            this._addCompass = (imgSrc) => {
-                return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
-                    const position = 'bottomright';
-                    const offset = { x: 2, y: 6 };
-                    const size = 6;
-                    const rotationRadians = this._view.getRotation();
-                    const imageSize = 100;
-                    const { x, y } = this._calculateOffsetByPosition(position, offset, size);
-                    const addRotation = (image) => {
-                        const canvas = document.createElement('canvas');
-                        // Must be bigger than the image to prevent clipping
-                        canvas.height = 120;
-                        canvas.width = 120;
-                        const context = canvas.getContext('2d');
-                        context.translate(canvas.width * 0.5, canvas.height * 0.5);
-                        context.rotate(rotationRadians);
-                        context.translate(-canvas.width * 0.5, -canvas.height * 0.5);
-                        context.drawImage(image, (canvas.height - imageSize) / 2, (canvas.width - imageSize) / 2, imageSize, imageSize);
-                        // Add back circle
-                        const xCircle = x - size;
-                        const yCircle = y;
-                        this._pdf.doc.setDrawColor(this._style.brcolor);
-                        this._pdf.doc.setFillColor(this._style.bkcolor);
-                        this._pdf.doc.circle(xCircle, yCircle, size, 'FD');
-                        return canvas;
-                    };
-                    const addImage = (image) => {
-                        const rotatedCanvas = addRotation(image);
-                        const sizeImage = size * 1.5;
-                        const xImage = x - sizeImage - size / 4.3;
-                        const yImage = y - sizeImage / 2;
-                        this._pdf.doc.addImage(rotatedCanvas, 'PNG', xImage, yImage, sizeImage, sizeImage);
-                    };
-                    let image;
-                    if (imgSrc instanceof Image) {
-                        addImage(image);
-                        resolve();
+            this._addCompass = (imgSrc) => __awaiter(this, void 0, void 0, function* () {
+                const position = 'bottomright';
+                const offset = { x: 2, y: 6 };
+                const size = 6;
+                const rotationRadians = this._view.getRotation();
+                const imageSize = 100;
+                const { x, y } = this._calculateOffsetByPosition(position, offset, size);
+                const addRotation = (image) => {
+                    const canvas = document.createElement('canvas');
+                    // Must be bigger than the image to prevent clipping
+                    canvas.height = 120;
+                    canvas.width = 120;
+                    const context = canvas.getContext('2d');
+                    context.translate(canvas.width * 0.5, canvas.height * 0.5);
+                    context.rotate(rotationRadians);
+                    context.translate(-canvas.width * 0.5, -canvas.height * 0.5);
+                    context.drawImage(image, (canvas.height - imageSize) / 2, (canvas.width - imageSize) / 2, imageSize, imageSize);
+                    // Add back circle
+                    const xCircle = x - size;
+                    const yCircle = y;
+                    this._pdf.doc.setDrawColor(this._style.brcolor);
+                    this._pdf.doc.setFillColor(this._style.bkcolor);
+                    this._pdf.doc.circle(xCircle, yCircle, size, 'FD');
+                    return canvas;
+                };
+                const addImage = (image) => {
+                    const rotatedCanvas = addRotation(image);
+                    const sizeImage = size * 1.5;
+                    const xImage = x - sizeImage - size / 4.3;
+                    const yImage = y - sizeImage / 2;
+                    this._pdf.doc.addImage(rotatedCanvas, 'PNG', xImage, yImage, sizeImage, sizeImage);
+                };
+                let image;
+                if (imgSrc instanceof Image) {
+                    addImage(image);
+                    return;
+                }
+                else {
+                    let imgData;
+                    if (typeof imgSrc === 'string') {
+                        imgData = imgSrc;
+                    }
+                    else if (imgSrc instanceof SVGElement) {
+                        imgData = yield this._processSvgImage(imgSrc);
                     }
                     else {
-                        let imgData;
-                        if (typeof imgSrc === 'string') {
-                            imgData = imgSrc;
-                        }
-                        else if (imgSrc instanceof SVGElement) {
-                            try {
-                                imgData = yield this._processSvgImage(imgSrc);
-                            }
-                            catch (err) {
-                                return reject(err);
-                            }
-                        }
-                        else {
-                            throw this._i18n.errorImage;
-                        }
+                        throw this._i18n.errorImage;
+                    }
+                    return new Promise((resolve, reject) => {
                         const image = new Image(imageSize, imageSize);
                         image.onload = () => {
-                            try {
-                                addImage(image);
-                                resolve();
-                            }
-                            catch (err) {
-                                return reject(err);
-                            }
+                            addImage(image);
+                            resolve();
                         };
                         image.onerror = () => {
-                            return reject(this._i18n.errorImage);
+                            reject(this._i18n.errorImage);
                         };
                         image.src = imgData;
-                    }
-                }));
-            };
+                    });
+                }
+            });
             const { view, form, i18n, config, height, width, scaleResolution } = params;
             this._view = view;
             this._form = form;
@@ -2882,7 +2872,7 @@
                     typeExport: this._modal.el.querySelector('select[name="printTypeExport"]').value
                 };
                 printMap(values, 
-                /* showLaoding */ true, 
+                /* showLoading */ true, 
                 /* delay */ options.modal.transition);
             });
             this._modal.on('shown', () => {
@@ -2895,12 +2885,12 @@
         /**
          *
          * @param i18n
-         * @param params
+         * @param options
          * @returns
          * @protected
          */
-        Content(i18n, params) {
-            const { scales, dpi, mapElements, paperSizes } = params;
+        Content(i18n, options) {
+            const { scales, dpi, mapElements, paperSizes } = options;
             return (createElement("form", { id: "printMap" },
                 createElement("div", null,
                     createElement("div", { className: "printFieldHalf" },
@@ -2950,8 +2940,8 @@
          * @returns
          * @protected
          */
-        Footer(i18n, params) {
-            const { mimeTypeExports } = params;
+        Footer(i18n, options) {
+            const { mimeTypeExports } = options;
             return (createElement("div", null,
                 createElement("button", { type: "button", className: "btn-sm btn btn-secondary", "data-dismiss": "modal" }, i18n.cancel),
                 createElement("div", { class: "typeExportContainer" },
@@ -3089,7 +3079,7 @@
     }
 
     function pdfIcon() {
-      return (new DOMParser().parseFromString("<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"\r\n\t viewBox=\"0 0 490 490\" style=\"enable-background:new 0 0 490 490;\" xml:space=\"preserve\">\r\n<g>\r\n\t<path d=\"M65.4,6v157.1c0,3.3-2.9,6-6.5,6H33.6c-3.6,0-6.5,2.7-6.5,6v189.6h0l36.3,33.8c1.2,1.1,1.9,2.7,1.9,4.3l0,81.2\r\n\t\tc0,3.3,2.9,6,6.5,6h383.8c3.6,0,6.5-2.7,6.5-6V104.9c0-1.6-0.7-3.1-1.9-4.3l-106-98.9c-1.2-1.1-2.9-1.8-4.6-1.8H71.8\r\n\t\tC68.2,0,65.4,2.7,65.4,6z M431.3,357.4h-374c-3.8,0-6.9-4-6.9-9V203.2c0-5,3.1-9,6.9-9h374c3.8,0,6.9,4,6.9,9v145.2\r\n\t\tC438.2,353.4,435.1,357.4,431.3,357.4z M340.2,27.6l70.8,66c7.2,6.7,2.1,18.2-8.1,18.2h-70.8c-6.3,0-11.4-4.8-11.4-10.7v-66\r\n\t\tC320.7,25.6,333,20.9,340.2,27.6z\"/>\r\n\t<path d=\"M136.9,207.4h-6.5H87.9c-5.8,0-10.5,4.9-10.5,11v115.5c0,6.1,4.7,11,10.5,11h4c5.8,0,10.5-4.9,10.5-11v-22.4\r\n\t\tc0-6.1,4.7-11,10.5-11h18.9l5.8-0.1c18,0,29.9-3,35.8-9.1c5.9-6.1,8.9-18.3,8.9-36.7c0-18.5-3.1-31-9.3-37.5\r\n\t\tC166.6,210.6,154.7,207.4,136.9,207.4z M152.2,274.4c-3.1,2.7-10.2,4.1-21.5,4.1h-17.9c-5.8,0-10.5-4.9-10.5-11v-27.2\r\n\t\tc0-6.1,4.7-11,10.5-11h20.4c10.6,0,17.2,1.4,19.8,4.2c2.5,2.8,3.8,10,3.8,21.6C156.8,265.2,155.3,271.6,152.2,274.4z\"/>\r\n\t<path d=\"M262.6,207.4h-54.1c-5.8,0-10.5,4.9-10.5,11v115.5c0,6.1,4.7,11,10.5,11h54.9c20.7,0,34.1-4.9,39.9-14.6\r\n\t\tc5.9-9.8,8.9-31.8,8.9-66.1c0-21-3.7-35.7-11-44.1C293.8,211.5,281,207.4,262.6,207.4z M281.6,314.2c-3.5,5.8-11.2,8.6-23.1,8.6\r\n\t\th-25c-5.8,0-10.5-4.9-10.5-11v-71.6c0-6.1,4.7-11,10.5-11H260c11.6,0,19,2.7,22.1,8.2c3.1,5.5,4.7,18.4,4.7,38.7\r\n\t\tC286.9,295.8,285.1,308.5,281.6,314.2z\"/>\r\n\t<path d=\"M340.9,344.8h3.9c5.8,0,10.5-4.9,10.5-11v-34.5c0-6.1,4.7-11,10.5-11h37.9c5.8,0,10.5-4.9,10.5-11v0\r\n\t\tc0-6.1-4.7-11-10.5-11h-37.9c-5.8,0-10.5-4.9-10.5-11v-15.1c0-6.1,4.7-11,10.5-11h41.1c5.8,0,10.5-4.9,10.5-11v0\r\n\t\tc0-6.1-4.7-11-10.5-11h-66c-5.8,0-10.5,4.9-10.5,11v115.5C330.4,339.9,335.1,344.8,340.9,344.8z\"/>\r\n</g>\r\n</svg>\r\n", 'image/svg+xml')).firstChild;
+      return (new DOMParser().parseFromString("<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"\r\n\t viewBox=\"0 0 490 490\" xml:space=\"preserve\">\r\n<g>\r\n\t<path d=\"M65.4,6v157.1c0,3.3-2.9,6-6.5,6H33.6c-3.6,0-6.5,2.7-6.5,6v189.6h0l36.3,33.8c1.2,1.1,1.9,2.7,1.9,4.3l0,81.2\r\n\t\tc0,3.3,2.9,6,6.5,6h383.8c3.6,0,6.5-2.7,6.5-6V104.9c0-1.6-0.7-3.1-1.9-4.3l-106-98.9c-1.2-1.1-2.9-1.8-4.6-1.8H71.8\r\n\t\tC68.2,0,65.4,2.7,65.4,6z M431.3,357.4h-374c-3.8,0-6.9-4-6.9-9V203.2c0-5,3.1-9,6.9-9h374c3.8,0,6.9,4,6.9,9v145.2\r\n\t\tC438.2,353.4,435.1,357.4,431.3,357.4z M340.2,27.6l70.8,66c7.2,6.7,2.1,18.2-8.1,18.2h-70.8c-6.3,0-11.4-4.8-11.4-10.7v-66\r\n\t\tC320.7,25.6,333,20.9,340.2,27.6z\"/>\r\n\t<path d=\"M136.9,207.4h-6.5H87.9c-5.8,0-10.5,4.9-10.5,11v115.5c0,6.1,4.7,11,10.5,11h4c5.8,0,10.5-4.9,10.5-11v-22.4\r\n\t\tc0-6.1,4.7-11,10.5-11h18.9l5.8-0.1c18,0,29.9-3,35.8-9.1c5.9-6.1,8.9-18.3,8.9-36.7c0-18.5-3.1-31-9.3-37.5\r\n\t\tC166.6,210.6,154.7,207.4,136.9,207.4z M152.2,274.4c-3.1,2.7-10.2,4.1-21.5,4.1h-17.9c-5.8,0-10.5-4.9-10.5-11v-27.2\r\n\t\tc0-6.1,4.7-11,10.5-11h20.4c10.6,0,17.2,1.4,19.8,4.2c2.5,2.8,3.8,10,3.8,21.6C156.8,265.2,155.3,271.6,152.2,274.4z\"/>\r\n\t<path d=\"M262.6,207.4h-54.1c-5.8,0-10.5,4.9-10.5,11v115.5c0,6.1,4.7,11,10.5,11h54.9c20.7,0,34.1-4.9,39.9-14.6\r\n\t\tc5.9-9.8,8.9-31.8,8.9-66.1c0-21-3.7-35.7-11-44.1C293.8,211.5,281,207.4,262.6,207.4z M281.6,314.2c-3.5,5.8-11.2,8.6-23.1,8.6\r\n\t\th-25c-5.8,0-10.5-4.9-10.5-11v-71.6c0-6.1,4.7-11,10.5-11H260c11.6,0,19,2.7,22.1,8.2c3.1,5.5,4.7,18.4,4.7,38.7\r\n\t\tC286.9,295.8,285.1,308.5,281.6,314.2z\"/>\r\n\t<path d=\"M340.9,344.8h3.9c5.8,0,10.5-4.9,10.5-11v-34.5c0-6.1,4.7-11,10.5-11h37.9c5.8,0,10.5-4.9,10.5-11v0\r\n\t\tc0-6.1-4.7-11-10.5-11h-37.9c-5.8,0-10.5-4.9-10.5-11v-15.1c0-6.1,4.7-11,10.5-11h41.1c5.8,0,10.5-4.9,10.5-11v0\r\n\t\tc0-6.1-4.7-11-10.5-11h-66c-5.8,0-10.5,4.9-10.5,11v115.5C330.4,339.9,335.1,344.8,340.9,344.8z\"/>\r\n</g>\r\n</svg>\r\n", 'image/svg+xml')).firstChild;
     }
 
     /**

@@ -1,19 +1,19 @@
 import Modal from 'modal-vanilla';
 import { PluggableMap } from 'ol';
-import { I18n, Options } from 'src/ol-pdf-printer';
+import { I18n, IValues, Options } from '../ol-pdf-printer';
 import { getMapScale } from './Helpers';
 import myPragma from '../myPragma';
 /**
  * @private
  */
 export default class SettingsModal {
-    _modal: typeof Modal;
+    _modal: Modal;
 
     constructor(
         map: PluggableMap,
         options: Options,
         i18n: I18n,
-        printMap: Function
+        printMap: (values: IValues, showLoading: boolean, delay: number) => void
     ) {
         this._modal = new Modal({
             headerClose: true,
@@ -25,8 +25,8 @@ export default class SettingsModal {
             ...options.modal
         });
 
-        this._modal.on('dismiss', (modal, event): void => {
-            const print = event.target.dataset.print;
+        this._modal.on('dismiss', (modal: Modal, event: Event): void => {
+            const print = (event.target as HTMLElement).dataset.print;
             if (!print) return;
 
             const form = document.getElementById('printMap') as HTMLFormElement;
@@ -49,7 +49,7 @@ export default class SettingsModal {
 
             printMap(
                 values,
-                /* showLaoding */ true,
+                /* showLoading */ true,
                 /* delay */ options.modal.transition
             );
         });
@@ -69,12 +69,12 @@ export default class SettingsModal {
     /**
      *
      * @param i18n
-     * @param params
+     * @param options
      * @returns
      * @protected
      */
-    Content(i18n: I18n, params): void {
-        const { scales, dpi, mapElements, paperSizes } = params;
+    Content(i18n: I18n, options: Options): HTMLElement {
+        const { scales, dpi, mapElements, paperSizes } = options;
 
         return (
             <form id="printMap">
@@ -202,8 +202,8 @@ export default class SettingsModal {
      * @returns
      * @protected
      */
-    Footer(i18n: I18n, params) {
-        const { mimeTypeExports } = params;
+    Footer(i18n: I18n, options: Options): string {
+        const { mimeTypeExports } = options;
 
         return (
             <div>
@@ -244,11 +244,11 @@ export default class SettingsModal {
         ).outerHTML;
     }
 
-    hide() {
+    hide(): void {
         this._modal.hide();
     }
 
-    show() {
+    show(): void {
         if (!this._modal._visible) this._modal.show();
     }
 }

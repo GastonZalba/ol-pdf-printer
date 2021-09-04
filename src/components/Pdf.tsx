@@ -133,7 +133,7 @@ export default class Pdf {
      * @protected
      */
     savePdf(): Promise<void> {
-        const downloadURI = (uri: String, name: string): void => {
+        const downloadURI = (uri: string, name: string): void => {
             const link = <a download={name} href={uri}></a>;
             document.body.appendChild(link);
             link.click();
@@ -287,7 +287,7 @@ export default class Pdf {
      */
     _calculateOffsetByPosition = (
         position: string,
-        offset,
+        offset: { x: number; y: number },
         size = 0
     ): { x: number; y: number } => {
         let x: number, y: number;
@@ -378,7 +378,7 @@ export default class Pdf {
         color: string,
         align: TextOptionsLight['align'] = 'left',
         str: string
-    ) => {
+    ): void => {
         this._pdf.doc.setTextColor(color);
         this._pdf.doc.setFontSize(fontSize);
 
@@ -401,16 +401,16 @@ export default class Pdf {
      */
     _addTextByOffset = (
         position: string,
-        offset,
+        offset: { x: number; y: number },
         width: number,
         fontSize: number,
         color: string,
         align: TextOptionsLight['align'],
         str: string
-    ) => {
-        let { x, y } = this._calculateOffsetByPosition(position, offset);
-        x = align === 'center' ? x - width / 2 : x;
-        this._addText(x, y, width, fontSize, color, align, str);
+    ): void => {
+        const { x, y } = this._calculateOffsetByPosition(position, offset);
+        const fixX = align === 'center' ? x - width / 2 : x;
+        this._addText(fixX, y, width, fontSize, color, align, str);
     };
 
     /**
@@ -454,143 +454,139 @@ export default class Pdf {
      * @returns
      * @protected
      */
-    _addWatermark = (watermark: IWatermark): Promise<void> => {
-        return new Promise(async (resolve, reject) => {
-            const position = 'topright';
-            const offset = { x: 0, y: 0 };
-            const fontSize = 14;
-            const imageSize = 12;
-            const fontSizeSubtitle = fontSize / 1.8;
-            let back = false;
+    _addWatermark = async (watermark: IWatermark): Promise<void> => {
+        const position = 'topright';
+        const offset = { x: 0, y: 0 };
+        const fontSize = 14;
+        const imageSize = 12;
+        const fontSizeSubtitle = fontSize / 1.8;
+        let back = false;
 
-            const { x, y } = this._calculateOffsetByPosition(position, offset);
+        const { x, y } = this._calculateOffsetByPosition(position, offset);
 
-            const paddingBack = 2;
+        const paddingBack = 2;
 
-            let acumulativeWidth = watermark.logo ? imageSize + 0.5 : 0;
+        let acumulativeWidth = watermark.logo ? imageSize + 0.5 : 0;
 
-            if (watermark.title) {
-                this._pdf.doc.setTextColor(watermark.titleColor);
-                this._pdf.doc.setFontSize(fontSize);
-                this._pdf.doc.setFont('helvetica', 'bold');
+        if (watermark.title) {
+            this._pdf.doc.setTextColor(watermark.titleColor);
+            this._pdf.doc.setFontSize(fontSize);
+            this._pdf.doc.setFont('helvetica', 'bold');
 
-                // This function works bad
-                let { w } = this._pdf.doc.getTextDimensions(watermark.title);
-
-                if (watermark.subtitle) {
-                    this._pdf.doc.setFontSize(fontSizeSubtitle);
-                    const wSub = this._pdf.doc.getTextDimensions(
-                        watermark.subtitle
-                    ).w;
-                    w = wSub - 4 > w ? wSub : w + 4; // weird fix needed
-                    this._pdf.doc.setFontSize(fontSize);
-                } else {
-                    w += 4;
-                }
-
-                // Adaptable width, fixed height
-                const height = 16;
-                const widthBack = w + paddingBack;
-
-                this._addRoundedBox(
-                    x - widthBack + 4 - acumulativeWidth,
-                    y - 4,
-                    widthBack + acumulativeWidth,
-                    height,
-                    '#ffffff',
-                    '#ffffff'
-                );
-                back = true;
-
-                this._pdf.doc.text(
-                    watermark.title,
-                    x,
-                    y + paddingBack + 3 + (!watermark.subtitle ? 2 : 0),
-                    {
-                        align: 'right'
-                    }
-                );
-
-                acumulativeWidth += w;
-            }
+            // This function works bad
+            let { w } = this._pdf.doc.getTextDimensions(watermark.title);
 
             if (watermark.subtitle) {
-                this._pdf.doc.setTextColor(watermark.subtitleColor);
                 this._pdf.doc.setFontSize(fontSizeSubtitle);
-                this._pdf.doc.setFont('helvetica', 'normal');
-
-                if (!back) {
-                    const { w } = this._pdf.doc.getTextDimensions(
-                        watermark.subtitle
-                    );
-                    const widthBack = paddingBack * 2 + w;
-                    this._addRoundedBox(
-                        x - widthBack + 3 - acumulativeWidth,
-                        y - 4,
-                        widthBack + acumulativeWidth,
-                        16,
-                        '#ffffff',
-                        '#ffffff'
-                    );
-                    acumulativeWidth += widthBack;
-                    back = true;
-                }
-
-                const marginTop = watermark.title ? fontSize / 2 : 4;
-
-                this._pdf.doc.text(
-                    watermark.subtitle,
-                    x,
-                    y + paddingBack + marginTop,
-                    {
-                        align: 'right'
-                    }
-                );
+                const wSub = this._pdf.doc.getTextDimensions(
+                    watermark.subtitle
+                ).w;
+                w = wSub - 4 > w ? wSub : w + 4; // weird fix needed
+                this._pdf.doc.setFontSize(fontSize);
+            } else {
+                w += 4;
             }
 
-            if (!watermark.logo) return resolve();
+            // Adaptable width, fixed height
+            const height = 16;
+            const widthBack = w + paddingBack;
 
-            const addImage = (image: HTMLImageElement): void => {
-                this._pdf.doc.addImage(
-                    image,
-                    'PNG',
-                    x - acumulativeWidth + paddingBack * 2 - 1,
-                    y - 1,
-                    imageSize,
-                    imageSize
-                );
-            };
+            this._addRoundedBox(
+                x - widthBack + 4 - acumulativeWidth,
+                y - 4,
+                widthBack + acumulativeWidth,
+                height,
+                '#ffffff',
+                '#ffffff'
+            );
+            back = true;
+
+            this._pdf.doc.text(
+                watermark.title,
+                x,
+                y + paddingBack + 3 + (!watermark.subtitle ? 2 : 0),
+                {
+                    align: 'right'
+                }
+            );
+
+            acumulativeWidth += w;
+        }
+
+        if (watermark.subtitle) {
+            this._pdf.doc.setTextColor(watermark.subtitleColor);
+            this._pdf.doc.setFontSize(fontSizeSubtitle);
+            this._pdf.doc.setFont('helvetica', 'normal');
 
             if (!back) {
-                const widthBack = acumulativeWidth + paddingBack;
+                const { w } = this._pdf.doc.getTextDimensions(
+                    watermark.subtitle
+                );
+                const widthBack = paddingBack * 2 + w;
                 this._addRoundedBox(
-                    x - widthBack + 4,
+                    x - widthBack + 3 - acumulativeWidth,
                     y - 4,
-                    widthBack,
+                    widthBack + acumulativeWidth,
                     16,
                     '#ffffff',
                     '#ffffff'
                 );
+                acumulativeWidth += widthBack;
+                back = true;
             }
 
-            if (watermark.logo instanceof Image) {
-                addImage(watermark.logo);
-                resolve();
-            } else {
-                let imgData: string;
+            const marginTop = watermark.title ? fontSize / 2 : 4;
 
-                if (typeof watermark.logo === 'string') {
-                    imgData = watermark.logo;
-                } else if (watermark.logo instanceof SVGElement) {
-                    try {
-                        imgData = await this._processSvgImage(watermark.logo);
-                    } catch (err) {
-                        return reject(err);
-                    }
-                } else {
-                    throw this._i18n.errorImage;
+            this._pdf.doc.text(
+                watermark.subtitle,
+                x,
+                y + paddingBack + marginTop,
+                {
+                    align: 'right'
                 }
+            );
+        }
 
+        if (!watermark.logo) return;
+
+        const addImage = (image: HTMLImageElement): void => {
+            this._pdf.doc.addImage(
+                image,
+                'PNG',
+                x - acumulativeWidth + paddingBack * 2 - 1,
+                y - 1,
+                imageSize,
+                imageSize
+            );
+        };
+
+        if (!back) {
+            const widthBack = acumulativeWidth + paddingBack;
+            this._addRoundedBox(
+                x - widthBack + 4,
+                y - 4,
+                widthBack,
+                16,
+                '#ffffff',
+                '#ffffff'
+            );
+        }
+
+        if (watermark.logo instanceof Image) {
+            addImage(watermark.logo);
+            return;
+        } else {
+            let imgData: string;
+
+            if (typeof watermark.logo === 'string') {
+                imgData = watermark.logo;
+            } else if (watermark.logo instanceof SVGElement) {
+                imgData = await this._processSvgImage(watermark.logo);
+            } else {
+                throw this._i18n.errorImage;
+            }
+
+            return new Promise((resolve, reject) => {
                 const image = new Image(imageSize, imageSize);
                 image.onload = () => {
                     try {
@@ -604,14 +600,14 @@ export default class Pdf {
                     return reject(this._i18n.errorImage);
                 };
                 image.src = imgData;
-            }
-        });
+            });
+        }
     };
 
     /**
      * @protected
      */
-    _addDate = () => {
+    _addDate = (): void => {
         const position = 'bottomright';
         const width = 250;
         const offset = {
@@ -645,9 +641,9 @@ export default class Pdf {
         const width = 250;
         const offset = {
             x: 0,
-            y: -5
+            y: -6.5
         };
-        const fontSize = 7;
+        const fontSize = 6;
         const txcolor = '#000000';
         const align = 'left';
 
@@ -669,12 +665,12 @@ export default class Pdf {
     _addSpecs = (): void => {
         const position = 'bottomleft';
         const offset = {
-            x: this._pdf.width / 2 + this._style.paperMargin,
-            y: -5
+            x: 0,
+            y: -3.5
         };
-        const fontSize = 7;
+        const fontSize = 6;
         const txcolor = '#000000';
-        const align = 'center';
+        const align = 'left';
 
         this._pdf.doc.setFont('helvetica', 'bold');
         this._pdf.doc.setFontSize(fontSize);
@@ -710,6 +706,8 @@ export default class Pdf {
 
         if (!attributionsUl) return;
 
+        const ATTRI_SEPATATOR = ' · ';
+
         const position = 'bottomright';
         const offset = { x: 1, y: 1 };
         const fontSize = 7;
@@ -726,30 +724,35 @@ export default class Pdf {
 
         const paddingBack = 4;
 
+        const whiteSpaceWidth =
+            this._pdf.doc.getTextDimensions(ATTRI_SEPATATOR).w;
+
+        const attributions = document.querySelectorAll('.ol-attribution li');
+
+        const sumWhiteSpaceWidth = whiteSpaceWidth * (attributions.length - 1);
+
         this._addRoundedBox(
-            x - w - 2,
+            x - w - sumWhiteSpaceWidth - 2,
             y - h,
-            w + paddingBack,
+            w + paddingBack + sumWhiteSpaceWidth + 2,
             h + paddingBack,
             '#ffffff',
             '#ffffff'
         );
 
-        const attributions = document.querySelectorAll('.ol-attribution li');
-
         Array.from(attributions)
             .reverse()
-            .forEach((attribution) => {
+            .forEach((attribution, index) => {
                 Array.from(attribution.childNodes)
                     .reverse()
                     .forEach((node) => {
-                        let content = node.textContent;
+                        const content = node.textContent;
 
-                        if (('href' in node) as any) {
+                        if ('href' in node) {
                             this._pdf.doc.setTextColor('#0077cc');
                             this._pdf.doc.textWithLink(content, xPos, y, {
                                 align: 'right',
-                                url: (node as any).href
+                                url: (node as HTMLAnchorElement).href
                             });
                         } else {
                             this._pdf.doc.setTextColor('#666666');
@@ -762,12 +765,15 @@ export default class Pdf {
                         xPos -= w;
                     });
 
-                // To add separation between diferents attributtions
-                this._pdf.doc.text(' ', xPos, y, {
-                    align: 'right'
-                });
-                const { w } = this._pdf.doc.getTextDimensions(' ');
-                xPos -= w;
+                // Excldue last element
+                if (index !== attributions.length - 1) {
+                    // To add separation between diferents attributtions
+                    this._pdf.doc.text(ATTRI_SEPATATOR, xPos, y, {
+                        align: 'right'
+                    });
+
+                    xPos -= whiteSpaceWidth;
+                }
             });
     };
 
@@ -795,9 +801,9 @@ export default class Pdf {
         if (this._config.units === 'metric') {
             unit = 'mm';
 
-            let millimetre = 1;
-            let metre = 1000;
-            let kilometre = metre * 1000;
+            const millimetre = 1;
+            const metre = 1000;
+            const kilometre = metre * 1000;
 
             unitConversionFactor = millimetre;
 
@@ -809,9 +815,9 @@ export default class Pdf {
                 unitConversionFactor = metre;
             }
         } else if (this._config.units === 'imperial') {
-            let inch = 25.4; // Millimetre to inch
-            let mile = inch * 63360;
-            let yard = inch * 36;
+            const inch = 25.4; // Millimetre to inch
+            const mile = inch * 63360;
+            const yard = inch * 36;
 
             unit = 'in';
             unitConversionFactor = inch;
@@ -860,7 +866,7 @@ export default class Pdf {
         const fullSize = size * 4;
 
         // x/y defaults to offset for topleft corner (normal x/y coordinates)
-        let x = offset.x + this._style.paperMargin;
+        const x = offset.x + this._style.paperMargin;
         let y = offset.y + this._style.paperMargin;
 
         y = this._pdf.height - offset.y - 10 - this._style.paperMargin;
@@ -922,106 +928,98 @@ export default class Pdf {
      * @returns
      * @protected
      */
-    _addCompass = (
+    _addCompass = async (
         imgSrc: HTMLImageElement | string | SVGElement
     ): Promise<void> => {
-        return new Promise(async (resolve, reject) => {
-            const position = 'bottomright';
-            const offset = { x: 2, y: 6 };
-            const size = 6;
-            const rotationRadians = this._view.getRotation();
-            const imageSize = 100;
+        const position = 'bottomright';
+        const offset = { x: 2, y: 6 };
+        const size = 6;
+        const rotationRadians = this._view.getRotation();
+        const imageSize = 100;
 
-            const { x, y } = this._calculateOffsetByPosition(
-                position,
-                offset,
-                size
+        const { x, y } = this._calculateOffsetByPosition(
+            position,
+            offset,
+            size
+        );
+
+        const addRotation = (image: CanvasImageSource) => {
+            const canvas = document.createElement('canvas');
+
+            // Must be bigger than the image to prevent clipping
+            canvas.height = 120;
+            canvas.width = 120;
+            const context = canvas.getContext('2d');
+
+            context.translate(canvas.width * 0.5, canvas.height * 0.5);
+            context.rotate(rotationRadians);
+            context.translate(-canvas.width * 0.5, -canvas.height * 0.5);
+            context.drawImage(
+                image,
+                (canvas.height - imageSize) / 2,
+                (canvas.width - imageSize) / 2,
+                imageSize,
+                imageSize
             );
 
-            const addRotation = (image: CanvasImageSource) => {
-                const canvas = document.createElement('canvas');
+            // Add back circle
+            const xCircle = x - size;
+            const yCircle = y;
+            this._pdf.doc.setDrawColor(this._style.brcolor);
+            this._pdf.doc.setFillColor(this._style.bkcolor);
+            this._pdf.doc.circle(xCircle, yCircle, size, 'FD');
 
-                // Must be bigger than the image to prevent clipping
-                canvas.height = 120;
-                canvas.width = 120;
-                const context = canvas.getContext('2d');
+            return canvas;
+        };
 
-                context.translate(canvas.width * 0.5, canvas.height * 0.5);
-                context.rotate(rotationRadians);
-                context.translate(-canvas.width * 0.5, -canvas.height * 0.5);
-                context.drawImage(
-                    image,
-                    (canvas.height - imageSize) / 2,
-                    (canvas.width - imageSize) / 2,
-                    imageSize,
-                    imageSize
-                );
+        const addImage = (image: CanvasImageSource): void => {
+            const rotatedCanvas = addRotation(image);
 
-                // Add back circle
-                const xCircle = x - size;
-                const yCircle = y;
-                this._pdf.doc.setDrawColor(this._style.brcolor);
-                this._pdf.doc.setFillColor(this._style.bkcolor);
-                this._pdf.doc.circle(xCircle, yCircle, size, 'FD');
+            const sizeImage = size * 1.5;
+            const xImage = x - sizeImage - size / 4.3;
+            const yImage = y - sizeImage / 2;
 
-                return canvas;
-            };
+            this._pdf.doc.addImage(
+                rotatedCanvas,
+                'PNG',
+                xImage,
+                yImage,
+                sizeImage,
+                sizeImage
+            );
+        };
 
-            const addImage = (image: CanvasImageSource): void => {
-                const rotatedCanvas = addRotation(image);
+        let image: HTMLImageElement;
 
-                const sizeImage = size * 1.5;
-                const xImage = x - sizeImage - size / 4.3;
-                const yImage = y - sizeImage / 2;
+        if (imgSrc instanceof Image) {
+            addImage(image);
+            return;
+        } else {
+            let imgData: string;
 
-                this._pdf.doc.addImage(
-                    rotatedCanvas,
-                    'PNG',
-                    xImage,
-                    yImage,
-                    sizeImage,
-                    sizeImage
-                );
-            };
-
-            let image: HTMLImageElement;
-
-            if (imgSrc instanceof Image) {
-                addImage(image);
-                resolve();
+            if (typeof imgSrc === 'string') {
+                imgData = imgSrc;
+            } else if (imgSrc instanceof SVGElement) {
+                imgData = await this._processSvgImage(imgSrc);
             } else {
-                let imgData: string;
+                throw this._i18n.errorImage;
+            }
 
-                if (typeof imgSrc === 'string') {
-                    imgData = imgSrc;
-                } else if (imgSrc instanceof SVGElement) {
-                    try {
-                        imgData = await this._processSvgImage(imgSrc);
-                    } catch (err) {
-                        return reject(err);
-                    }
-                } else {
-                    throw this._i18n.errorImage;
-                }
-
+            return new Promise((resolve, reject) => {
                 const image = new Image(imageSize, imageSize);
 
                 image.onload = () => {
-                    try {
-                        addImage(image);
-                        resolve();
-                    } catch (err) {
-                        return reject(err);
-                    }
+                    addImage(image);
+                    resolve();
                 };
 
                 image.onerror = () => {
-                    return reject(this._i18n.errorImage);
+                    reject(this._i18n.errorImage);
                 };
 
                 image.src = imgData;
-            }
-        });
+            });
+        }
     };
 }
 

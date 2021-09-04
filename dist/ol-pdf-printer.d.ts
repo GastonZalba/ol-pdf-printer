@@ -120,6 +120,20 @@ export interface IPrintOptions {
 /**
  * **_[interface]_** - Custom translations specified when creating an instance
  */
+export interface IValues {
+    format: FormDataEntryValue;
+    orientation: FormDataEntryValue;
+    resolution: FormDataEntryValue;
+    scale: FormDataEntryValue;
+    description: FormDataEntryValue;
+    compass: FormDataEntryValue;
+    attributions: FormDataEntryValue;
+    scalebar: FormDataEntryValue;
+    typeExport: FormDataEntryValue;
+}
+/**
+ * **_[interface]_** - Custom translations specified when creating an instance
+ */
 export interface I18n {
     printPdf: string;
     pleaseWait: string;

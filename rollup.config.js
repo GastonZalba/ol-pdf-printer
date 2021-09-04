@@ -1,7 +1,6 @@
 import babel from '@rollup/plugin-babel';
 import svg from 'rollup-plugin-svg-import';
-import { mkdirSync, writeFileSync } from 'fs';
-import css from 'rollup-plugin-css-only';
+import postcss from 'rollup-plugin-postcss';
 import typescript from '@rollup/plugin-typescript';
 import del from 'rollup-plugin-delete';
 import copy from 'rollup-plugin-copy';
@@ -18,7 +17,7 @@ module.exports = {
             sourcemap: true
         }
     ],
-    acornInjectPlugins: [ jsx() ],
+    acornInjectPlugins: [jsx()],
     plugins: [
         del({ targets: 'lib/*' }),
         typescript({
@@ -64,13 +63,12 @@ module.exports = {
                     }
                 ]
             ]
-        }),       
-        css({
-            output: function (styles, styleNodes) {
-                mkdirSync('lib/css', { recursive: true });
-                writeFileSync('lib/css/ol-pdf-printer.css', styles)
-            }
-        })
+        }),
+        postcss({
+            extensions: ['.css', '.sass', '.scss'], 
+            inject: false,
+            extract: path.resolve('lib/css/ol-pdf-printer.css')
+        }),
     ],
     external: id => !(path.isAbsolute(id) || id.startsWith("."))
 };

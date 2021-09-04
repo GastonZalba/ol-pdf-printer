@@ -5,7 +5,7 @@ import { I18n, Options } from 'src/ol-pdf-printer';
  * @private
  */
 export default class ProcessingModal {
-    protected _modal: typeof Modal;
+    protected _modal: Modal;
     protected _footer: string;
     protected _i18n: I18n;
 
@@ -16,7 +16,7 @@ export default class ProcessingModal {
      * @param onEndPrint
      * @protected
      */
-    constructor(i18n: I18n, options: Options, onEndPrint: Function) {
+    constructor(i18n: I18n, options: Options, onEndPrint: () => void) {
         this._i18n = i18n;
 
         this._modal = new Modal({
