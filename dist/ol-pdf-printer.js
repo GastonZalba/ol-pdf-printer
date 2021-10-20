@@ -1236,8 +1236,7 @@
                 this._pdf.doc.setTextColor(color);
                 this._pdf.doc.setFontSize(fontSize);
                 this._pdf.doc.text(str, x, y, {
-                    align: align,
-                    maxWidth: width
+                    align: align
                 });
             };
             /**

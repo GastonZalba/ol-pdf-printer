@@ -54,3 +54,6 @@
 * Added .gitattributes
 * Typescript improvements
 * Changed separator on attributions
+
+## v1.0.16
+* Remove unnecessary max-width on texts
