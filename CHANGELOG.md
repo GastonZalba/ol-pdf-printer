@@ -57,3 +57,6 @@
 
 ## v1.0.16
 * Remove unnecessary max-width on texts
+
+## v1.0.17
+* Fix bug when printing multiples times on protrait mode

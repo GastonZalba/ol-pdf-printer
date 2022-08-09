@@ -2,7 +2,7 @@
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('ol/proj'), require('ol/control/Control'), require('ol/source/TileWMS'), require('ol/layer/Tile'), require('ol/Observable'), require('jspdf'), require('pdfjs-dist'), require('ol/proj/Units')) :
     typeof define === 'function' && define.amd ? define(['ol/proj', 'ol/control/Control', 'ol/source/TileWMS', 'ol/layer/Tile', 'ol/Observable', 'jspdf', 'pdfjs-dist', 'ol/proj/Units'], factory) :
     (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.PdfPrinter = factory(global.ol.proj, global.ol.control.Control, global.ol.source.TileWMS, global.ol.layer.Tile, global.ol.Observable, global.jsPDF, global.pdfjsLib, global.ol.proj.Units));
-}(this, (function (proj, Control, TileWMS, Tile, Observable, jspdf, pdfjsDist, Units) { 'use strict';
+})(this, (function (proj, Control, TileWMS, Tile, Observable, jspdf, pdfjsDist, Units) { 'use strict';
 
     var global = window;
 
@@ -927,8 +927,7 @@
       return arr2;
     }
 
-    module.exports = _arrayLikeToArray;
-    module.exports["default"] = module.exports, module.exports.__esModule = true;
+    module.exports = _arrayLikeToArray, module.exports.__esModule = true, module.exports["default"] = module.exports;
     });
 
     var arrayWithoutHoles = createCommonjsModule(function (module) {
@@ -936,8 +935,7 @@
       if (Array.isArray(arr)) return arrayLikeToArray(arr);
     }
 
-    module.exports = _arrayWithoutHoles;
-    module.exports["default"] = module.exports, module.exports.__esModule = true;
+    module.exports = _arrayWithoutHoles, module.exports.__esModule = true, module.exports["default"] = module.exports;
     });
 
     var iterableToArray = createCommonjsModule(function (module) {
@@ -945,8 +943,7 @@
       if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter);
     }
 
-    module.exports = _iterableToArray;
-    module.exports["default"] = module.exports, module.exports.__esModule = true;
+    module.exports = _iterableToArray, module.exports.__esModule = true, module.exports["default"] = module.exports;
     });
 
     var unsupportedIterableToArray = createCommonjsModule(function (module) {
@@ -959,8 +956,7 @@
       if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return arrayLikeToArray(o, minLen);
     }
 
-    module.exports = _unsupportedIterableToArray;
-    module.exports["default"] = module.exports, module.exports.__esModule = true;
+    module.exports = _unsupportedIterableToArray, module.exports.__esModule = true, module.exports["default"] = module.exports;
     });
 
     var nonIterableSpread = createCommonjsModule(function (module) {
@@ -968,8 +964,7 @@
       throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
     }
 
-    module.exports = _nonIterableSpread;
-    module.exports["default"] = module.exports, module.exports.__esModule = true;
+    module.exports = _nonIterableSpread, module.exports.__esModule = true, module.exports["default"] = module.exports;
     });
 
     var toConsumableArray = createCommonjsModule(function (module) {
@@ -977,8 +972,7 @@
       return arrayWithoutHoles(arr) || iterableToArray(arr) || unsupportedIterableToArray(arr) || nonIterableSpread();
     }
 
-    module.exports = _toConsumableArray;
-    module.exports["default"] = module.exports, module.exports.__esModule = true;
+    module.exports = _toConsumableArray, module.exports.__esModule = true, module.exports["default"] = module.exports;
     });
 
     var _toConsumableArray = /*@__PURE__*/getDefaultExportFromCjs(toConsumableArray);
@@ -988,13 +982,12 @@
       if (Array.isArray(arr)) return arr;
     }
 
-    module.exports = _arrayWithHoles;
-    module.exports["default"] = module.exports, module.exports.__esModule = true;
+    module.exports = _arrayWithHoles, module.exports.__esModule = true, module.exports["default"] = module.exports;
     });
 
     var iterableToArrayLimit = createCommonjsModule(function (module) {
     function _iterableToArrayLimit(arr, i) {
-      var _i = arr && (typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]);
+      var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"];
 
       if (_i == null) return;
       var _arr = [];
@@ -1023,8 +1016,7 @@
       return _arr;
     }
 
-    module.exports = _iterableToArrayLimit;
-    module.exports["default"] = module.exports, module.exports.__esModule = true;
+    module.exports = _iterableToArrayLimit, module.exports.__esModule = true, module.exports["default"] = module.exports;
     });
 
     var nonIterableRest = createCommonjsModule(function (module) {
@@ -1032,8 +1024,7 @@
       throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
     }
 
-    module.exports = _nonIterableRest;
-    module.exports["default"] = module.exports, module.exports.__esModule = true;
+    module.exports = _nonIterableRest, module.exports.__esModule = true, module.exports["default"] = module.exports;
     });
 
     var slicedToArray = createCommonjsModule(function (module) {
@@ -1041,8 +1032,7 @@
       return arrayWithHoles(arr) || iterableToArrayLimit(arr, i) || unsupportedIterableToArray(arr, i) || nonIterableRest();
     }
 
-    module.exports = _slicedToArray;
-    module.exports["default"] = module.exports, module.exports.__esModule = true;
+    module.exports = _slicedToArray, module.exports.__esModule = true, module.exports["default"] = module.exports;
     });
 
     var _slicedToArray = /*@__PURE__*/getDefaultExportFromCjs(slicedToArray);
@@ -1704,7 +1694,7 @@
                 document.body.removeChild(link);
             };
             return new Promise((resolve, reject) => {
-                var _a, _b;
+                var _a;
                 if (this._form.typeExport === 'pdf') {
                     this._pdf.doc.save(this._config.filename + '.pdf');
                     resolve();
@@ -1712,7 +1702,7 @@
                 else {
                     const pdf = this._pdf.doc.output('dataurlstring');
                     // UMD support
-                    const versionPdfJS = ((_b = (_a = window) === null || _a === void 0 ? void 0 : _a.pdfjsLib) === null || _b === void 0 ? void 0 : _b.version) || pdfjsDist.version;
+                    const versionPdfJS = ((_a = window === null || window === void 0 ? void 0 : window.pdfjsLib) === null || _a === void 0 ? void 0 : _a.version) || pdfjsDist.version;
                     pdfjsDist.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${versionPdfJS}/pdf.worker.js`;
                     pdfjsDist.getDocument(pdf).promise.then((pdf) => {
                         pdf.getPage(1).then((page) => {
@@ -3074,11 +3064,11 @@
     });
 
     function compassIcon() {
-      return (new DOMParser().parseFromString("<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<svg version=\"1.1\" id=\"compass\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"\r\n\t viewBox=\"0 0 300 300\" style=\"enable-background:new 0 0 300 300;\" xml:space=\"preserve\">\r\n<style type=\"text/css\">\r\n\t.st0{fill:#EA6868;}\r\n</style>\r\n<g>\r\n\t<g>\r\n\t\t<g>\r\n\t\t\t<g>\r\n\t\t\t\t<g>\r\n\t\t\t\t\t<path class=\"st0\" d=\"M146.3,9.1L75.5,287.2c-0.5,1.8,0.5,3.7,2.1,4.4c1.8,0.8,3.7,0.2,4.7-1.5l68.4-106.7l66.8,106.7\r\n\t\t\t\t\t\tc0.6,1.1,1.9,1.8,3.2,1.8c0.5,0,1-0.2,1.5-0.3c1.8-0.8,2.6-2.6,2.3-4.4L153.7,9.1C152.9,5.7,147.2,5.7,146.3,9.1z M154.2,174.2\r\n\t\t\t\t\t\tc-0.6-1.1-1.9-1.8-3.2-1.8l0,0c-1.3,0-2.6,0.6-3.2,1.8l-59,92L150,25.5l61.1,239.9L154.2,174.2z\"/>\r\n\t\t\t\t</g>\r\n\t\t\t</g>\r\n\t\t\t<g>\r\n\t\t\t\t<g>\r\n\t\t\t\t\t<path class=\"st0\" d=\"M220.8,293.1c-1.8,0-3.4-1-4.2-2.3l-65.8-105.1L83.4,290.8c-1.3,1.9-4,2.9-6.1,1.9c-2.3-1-3.4-3.4-2.9-5.8\r\n\t\t\t\t\t\tL145.1,8.8c0.5-2.1,2.4-3.4,4.9-3.4s4.4,1.3,4.9,3.4l70.8,278.1c0.6,2.4-0.6,4.9-2.9,5.8C222.1,292.9,221.5,293.1,220.8,293.1z\r\n\t\t\t\t\t\t M150.8,181.2l1,1.6l66.8,106.7c0.6,1,1.9,1.5,3.2,1c1.1-0.5,1.8-1.8,1.5-3.1L152.4,9.3c-0.3-1.1-1.6-1.6-2.6-1.6\r\n\t\t\t\t\t\ts-2.3,0.5-2.6,1.6L76.4,287.4c-0.3,1.3,0.3,2.6,1.5,3.1c1.1,0.5,2.6,0,3.2-1L150.8,181.2z M85.6,273.2L150,20.6l64.2,251.9\r\n\t\t\t\t\t\tl-61.1-97.7c-1-1.6-3.4-1.5-4.4,0L85.6,273.2z\"/>\r\n\t\t\t\t</g>\r\n\t\t\t</g>\r\n\t\t</g>\r\n\t</g>\r\n</g>\r\n</svg>\r\n", 'image/svg+xml')).firstChild;
+      return (new DOMParser().parseFromString("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<svg version=\"1.1\" id=\"compass\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"\n\t viewBox=\"0 0 300 300\" style=\"enable-background:new 0 0 300 300;\" xml:space=\"preserve\">\n<style type=\"text/css\">\n\t.st0{fill:#EA6868;}\n</style>\n<g>\n\t<g>\n\t\t<g>\n\t\t\t<g>\n\t\t\t\t<g>\n\t\t\t\t\t<path class=\"st0\" d=\"M146.3,9.1L75.5,287.2c-0.5,1.8,0.5,3.7,2.1,4.4c1.8,0.8,3.7,0.2,4.7-1.5l68.4-106.7l66.8,106.7\n\t\t\t\t\t\tc0.6,1.1,1.9,1.8,3.2,1.8c0.5,0,1-0.2,1.5-0.3c1.8-0.8,2.6-2.6,2.3-4.4L153.7,9.1C152.9,5.7,147.2,5.7,146.3,9.1z M154.2,174.2\n\t\t\t\t\t\tc-0.6-1.1-1.9-1.8-3.2-1.8l0,0c-1.3,0-2.6,0.6-3.2,1.8l-59,92L150,25.5l61.1,239.9L154.2,174.2z\"/>\n\t\t\t\t</g>\n\t\t\t</g>\n\t\t\t<g>\n\t\t\t\t<g>\n\t\t\t\t\t<path class=\"st0\" d=\"M220.8,293.1c-1.8,0-3.4-1-4.2-2.3l-65.8-105.1L83.4,290.8c-1.3,1.9-4,2.9-6.1,1.9c-2.3-1-3.4-3.4-2.9-5.8\n\t\t\t\t\t\tL145.1,8.8c0.5-2.1,2.4-3.4,4.9-3.4s4.4,1.3,4.9,3.4l70.8,278.1c0.6,2.4-0.6,4.9-2.9,5.8C222.1,292.9,221.5,293.1,220.8,293.1z\n\t\t\t\t\t\t M150.8,181.2l1,1.6l66.8,106.7c0.6,1,1.9,1.5,3.2,1c1.1-0.5,1.8-1.8,1.5-3.1L152.4,9.3c-0.3-1.1-1.6-1.6-2.6-1.6\n\t\t\t\t\t\ts-2.3,0.5-2.6,1.6L76.4,287.4c-0.3,1.3,0.3,2.6,1.5,3.1c1.1,0.5,2.6,0,3.2-1L150.8,181.2z M85.6,273.2L150,20.6l64.2,251.9\n\t\t\t\t\t\tl-61.1-97.7c-1-1.6-3.4-1.5-4.4,0L85.6,273.2z\"/>\n\t\t\t\t</g>\n\t\t\t</g>\n\t\t</g>\n\t</g>\n</g>\n</svg>\n", 'image/svg+xml')).firstChild;
     }
 
     function pdfIcon() {
-      return (new DOMParser().parseFromString("<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"\r\n\t viewBox=\"0 0 490 490\" xml:space=\"preserve\">\r\n<g>\r\n\t<path d=\"M65.4,6v157.1c0,3.3-2.9,6-6.5,6H33.6c-3.6,0-6.5,2.7-6.5,6v189.6h0l36.3,33.8c1.2,1.1,1.9,2.7,1.9,4.3l0,81.2\r\n\t\tc0,3.3,2.9,6,6.5,6h383.8c3.6,0,6.5-2.7,6.5-6V104.9c0-1.6-0.7-3.1-1.9-4.3l-106-98.9c-1.2-1.1-2.9-1.8-4.6-1.8H71.8\r\n\t\tC68.2,0,65.4,2.7,65.4,6z M431.3,357.4h-374c-3.8,0-6.9-4-6.9-9V203.2c0-5,3.1-9,6.9-9h374c3.8,0,6.9,4,6.9,9v145.2\r\n\t\tC438.2,353.4,435.1,357.4,431.3,357.4z M340.2,27.6l70.8,66c7.2,6.7,2.1,18.2-8.1,18.2h-70.8c-6.3,0-11.4-4.8-11.4-10.7v-66\r\n\t\tC320.7,25.6,333,20.9,340.2,27.6z\"/>\r\n\t<path d=\"M136.9,207.4h-6.5H87.9c-5.8,0-10.5,4.9-10.5,11v115.5c0,6.1,4.7,11,10.5,11h4c5.8,0,10.5-4.9,10.5-11v-22.4\r\n\t\tc0-6.1,4.7-11,10.5-11h18.9l5.8-0.1c18,0,29.9-3,35.8-9.1c5.9-6.1,8.9-18.3,8.9-36.7c0-18.5-3.1-31-9.3-37.5\r\n\t\tC166.6,210.6,154.7,207.4,136.9,207.4z M152.2,274.4c-3.1,2.7-10.2,4.1-21.5,4.1h-17.9c-5.8,0-10.5-4.9-10.5-11v-27.2\r\n\t\tc0-6.1,4.7-11,10.5-11h20.4c10.6,0,17.2,1.4,19.8,4.2c2.5,2.8,3.8,10,3.8,21.6C156.8,265.2,155.3,271.6,152.2,274.4z\"/>\r\n\t<path d=\"M262.6,207.4h-54.1c-5.8,0-10.5,4.9-10.5,11v115.5c0,6.1,4.7,11,10.5,11h54.9c20.7,0,34.1-4.9,39.9-14.6\r\n\t\tc5.9-9.8,8.9-31.8,8.9-66.1c0-21-3.7-35.7-11-44.1C293.8,211.5,281,207.4,262.6,207.4z M281.6,314.2c-3.5,5.8-11.2,8.6-23.1,8.6\r\n\t\th-25c-5.8,0-10.5-4.9-10.5-11v-71.6c0-6.1,4.7-11,10.5-11H260c11.6,0,19,2.7,22.1,8.2c3.1,5.5,4.7,18.4,4.7,38.7\r\n\t\tC286.9,295.8,285.1,308.5,281.6,314.2z\"/>\r\n\t<path d=\"M340.9,344.8h3.9c5.8,0,10.5-4.9,10.5-11v-34.5c0-6.1,4.7-11,10.5-11h37.9c5.8,0,10.5-4.9,10.5-11v0\r\n\t\tc0-6.1-4.7-11-10.5-11h-37.9c-5.8,0-10.5-4.9-10.5-11v-15.1c0-6.1,4.7-11,10.5-11h41.1c5.8,0,10.5-4.9,10.5-11v0\r\n\t\tc0-6.1-4.7-11-10.5-11h-66c-5.8,0-10.5,4.9-10.5,11v115.5C330.4,339.9,335.1,344.8,340.9,344.8z\"/>\r\n</g>\r\n</svg>\r\n", 'image/svg+xml')).firstChild;
+      return (new DOMParser().parseFromString("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"\n\t viewBox=\"0 0 490 490\" xml:space=\"preserve\">\n<g>\n\t<path d=\"M65.4,6v157.1c0,3.3-2.9,6-6.5,6H33.6c-3.6,0-6.5,2.7-6.5,6v189.6h0l36.3,33.8c1.2,1.1,1.9,2.7,1.9,4.3l0,81.2\n\t\tc0,3.3,2.9,6,6.5,6h383.8c3.6,0,6.5-2.7,6.5-6V104.9c0-1.6-0.7-3.1-1.9-4.3l-106-98.9c-1.2-1.1-2.9-1.8-4.6-1.8H71.8\n\t\tC68.2,0,65.4,2.7,65.4,6z M431.3,357.4h-374c-3.8,0-6.9-4-6.9-9V203.2c0-5,3.1-9,6.9-9h374c3.8,0,6.9,4,6.9,9v145.2\n\t\tC438.2,353.4,435.1,357.4,431.3,357.4z M340.2,27.6l70.8,66c7.2,6.7,2.1,18.2-8.1,18.2h-70.8c-6.3,0-11.4-4.8-11.4-10.7v-66\n\t\tC320.7,25.6,333,20.9,340.2,27.6z\"/>\n\t<path d=\"M136.9,207.4h-6.5H87.9c-5.8,0-10.5,4.9-10.5,11v115.5c0,6.1,4.7,11,10.5,11h4c5.8,0,10.5-4.9,10.5-11v-22.4\n\t\tc0-6.1,4.7-11,10.5-11h18.9l5.8-0.1c18,0,29.9-3,35.8-9.1c5.9-6.1,8.9-18.3,8.9-36.7c0-18.5-3.1-31-9.3-37.5\n\t\tC166.6,210.6,154.7,207.4,136.9,207.4z M152.2,274.4c-3.1,2.7-10.2,4.1-21.5,4.1h-17.9c-5.8,0-10.5-4.9-10.5-11v-27.2\n\t\tc0-6.1,4.7-11,10.5-11h20.4c10.6,0,17.2,1.4,19.8,4.2c2.5,2.8,3.8,10,3.8,21.6C156.8,265.2,155.3,271.6,152.2,274.4z\"/>\n\t<path d=\"M262.6,207.4h-54.1c-5.8,0-10.5,4.9-10.5,11v115.5c0,6.1,4.7,11,10.5,11h54.9c20.7,0,34.1-4.9,39.9-14.6\n\t\tc5.9-9.8,8.9-31.8,8.9-66.1c0-21-3.7-35.7-11-44.1C293.8,211.5,281,207.4,262.6,207.4z M281.6,314.2c-3.5,5.8-11.2,8.6-23.1,8.6\n\t\th-25c-5.8,0-10.5-4.9-10.5-11v-71.6c0-6.1,4.7-11,10.5-11H260c11.6,0,19,2.7,22.1,8.2c3.1,5.5,4.7,18.4,4.7,38.7\n\t\tC286.9,295.8,285.1,308.5,281.6,314.2z\"/>\n\t<path d=\"M340.9,344.8h3.9c5.8,0,10.5-4.9,10.5-11v-34.5c0-6.1,4.7-11,10.5-11h37.9c5.8,0,10.5-4.9,10.5-11v0\n\t\tc0-6.1-4.7-11-10.5-11h-37.9c-5.8,0-10.5-4.9-10.5-11v-15.1c0-6.1,4.7-11,10.5-11h41.1c5.8,0,10.5-4.9,10.5-11v0\n\t\tc0-6.1-4.7-11-10.5-11h-66c-5.8,0-10.5,4.9-10.5,11v115.5C330.4,339.9,335.1,344.8,340.9,344.8z\"/>\n</g>\n</svg>\n", 'image/svg+xml')).firstChild;
     }
 
     /**
@@ -3109,7 +3099,7 @@
         });
         return target;
     }
-    class PdfPrinter extends Control__default['default'] {
+    class PdfPrinter extends Control__default["default"] {
         constructor(opt_options) {
             const controlElement = document.createElement('button');
             super({
@@ -3253,10 +3243,10 @@
         _setFormatOptions(string = '') {
             const layers = this._map.getLayers();
             layers.forEach((layer) => {
-                if (layer instanceof Tile__default['default']) {
+                if (layer instanceof Tile__default["default"]) {
                     const source = layer.getSource();
                     // Set WMS DPI
-                    if (source instanceof TileWMS__default['default']) {
+                    if (source instanceof TileWMS__default["default"]) {
                         source.updateParams({
                             FORMAT_OPTIONS: string
                         });
@@ -3282,12 +3272,11 @@
                 this._isCanceled = false;
                 // To allow intermediate zoom levels
                 this._view.setConstrainResolution(false);
-                // this._prepareLayers(form);
                 let dim = this._options.paperSizes.find((e) => e.value === form.format).size;
                 dim =
                     form.orientation === 'landscape'
                         ? dim
-                        : dim.reverse();
+                        : [...dim].reverse();
                 const widthPaper = dim[0];
                 const heightPaper = dim[1];
                 const mapSizeForPrint = this._setMapSizForPrint(widthPaper, heightPaper, form.resolution);
@@ -3379,5 +3368,5 @@
 
     return PdfPrinter;
 
-})));
+}));
 //# sourceMappingURL=ol-pdf-printer.js.map
