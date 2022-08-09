@@ -286,15 +286,14 @@ export default class PdfPrinter extends Control {
             // To allow intermediate zoom levels
             this._view.setConstrainResolution(false);
 
-            // this._prepareLayers(form);
-
             let dim = this._options.paperSizes.find(
                 (e) => e.value === form.format
             ).size;
+
             dim =
                 form.orientation === 'landscape'
                     ? dim
-                    : (dim.reverse() as [number, number]);
+                    : ([...dim].reverse() as [number, number]);
 
             const widthPaper = dim[0];
             const heightPaper = dim[1];
