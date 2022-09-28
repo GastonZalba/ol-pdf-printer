@@ -1,4 +1,4 @@
-import { PluggableMap, View } from 'ol';
+import { Map, View } from 'ol';
 import Control, { Options as ControlOptions } from 'ol/control/Control';
 import { EventsKey } from 'ol/events';
 import Pdf from './components/Pdf';
@@ -8,7 +8,7 @@ import { Locale } from 'locale-enum';
 import './assets/css/ol-pdf-printer.css';
 export default class PdfPrinter extends Control {
     protected _i18n: I18n;
-    protected _map: PluggableMap;
+    protected _map: Map;
     protected _view: View;
     protected _mapTarget: HTMLElement;
     protected _pdf: Pdf;
