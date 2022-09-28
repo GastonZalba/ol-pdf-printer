@@ -404,22 +404,27 @@ export default class PdfPrinter extends Control {
      * @public
      */
     createPdf(options: IPrintOptions, showLoading: boolean): void {
-        options = {
-            format: (
-                this._options.paperSizes.find((p) => p.selected) ||
-                this._options.paperSizes[0]
-            ).value,
-            resolution: (
-                this._options.dpi.find((p) => p.selected) ||
-                this._options.dpi[0]
-            ).value,
-            orientation: 'landscape',
-            compass: true,
-            attributions: true,
-            scale: true,
-            ...options
-        };
-        this._printMap(options, showLoading);
+        options = {};
+        this._printMap(
+            {
+                format: (
+                    this._options.paperSizes.find((p) => p.selected) ||
+                    this._options.paperSizes[0]
+                ).value,
+                resolution: (
+                    this._options.dpi.find((p) => p.selected) ||
+                    this._options.dpi[0]
+                ).value,
+                orientation: 'landscape',
+                compass: true,
+                attributions: true,
+                scalebar: true,
+                scale: 1000,
+                typeExport: 'pdf',
+                ...options
+            },
+            showLoading
+        );
     }
 }
 
@@ -442,7 +447,7 @@ export interface IPrintOptions {
     /**
      *
      */
-    scale: IScale;
+    scale?: IScale;
     /**
      *
      */

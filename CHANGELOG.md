@@ -64,3 +64,6 @@
 ## v1.0.18
 * Ol 7 compatibility
 * Updated dependencies
+
+## v1.0.19
+* Minor fix on createPdf public function
