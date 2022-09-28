@@ -1,4 +1,4 @@
-import { PluggableMap } from 'ol';
+import Map from 'ol/Map';
 import { METERS_PER_UNIT } from 'ol/proj/Units';
 
 /**
@@ -8,7 +8,7 @@ import { METERS_PER_UNIT } from 'ol/proj/Units';
  * @returns
  * @protected
  */
-export const getMapScale = (map: PluggableMap, opt_round = true): number => {
+export const getMapScale = (map: Map, opt_round = true): number => {
     const dpi = 25.4 / 0.28;
 
     const view = map.getView();

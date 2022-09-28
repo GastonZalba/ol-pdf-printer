@@ -1,4 +1,4 @@
-import { PluggableMap, View } from 'ol';
+import { Map, View } from 'ol';
 import { getPointResolution } from 'ol/proj';
 import Control, { Options as ControlOptions } from 'ol/control/Control';
 import TileWMS from 'ol/source/TileWMS';
@@ -55,7 +55,7 @@ function deepObjectAssign(target, ...sources) {
 export default class PdfPrinter extends Control {
     protected _i18n: I18n;
 
-    protected _map: PluggableMap;
+    protected _map: Map;
     protected _view: View;
     protected _mapTarget: HTMLElement;
 

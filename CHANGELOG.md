@@ -60,3 +60,7 @@
 
 ## v1.0.17
 * Fix bug when printing multiples times on protrait mode
+
+## v1.0.18
+* Ol 7 compatibility
+* Updated dependencies

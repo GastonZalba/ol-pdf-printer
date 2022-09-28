@@ -3,7 +3,7 @@ import babel from '@rollup/plugin-babel';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import svg from 'rollup-plugin-svg-import';
-import builtins from 'rollup-plugin-node-builtins';
+import nodePolyfills from 'rollup-plugin-polyfill-node';
 import { terser } from "rollup-plugin-terser";
 import postcss from 'rollup-plugin-postcss';
 import css from 'rollup-plugin-css-only';
@@ -109,7 +109,7 @@ export default function (commandOptions) {
                 exclude: 'node_modules/**'
             }),
             nodeGlobals(),
-            builtins(), // Events
+            nodePolyfills(), // Events
             resolve({
                 extensions: ['.mjs', '.js', '.ts', '.json', '.node', '.tsx', '.jsx']
             }),
@@ -134,7 +134,7 @@ export default function (commandOptions) {
                 contentBase: ['', 'examples'],
                 historyApiFallback: '/basic.html',
                 host: 'localhost',
-                port: 3000,
+                port: 3007,
                 // execute function after server has begun listening
                 onListening: function (server) {
                     const address = server.address()
