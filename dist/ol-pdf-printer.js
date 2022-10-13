@@ -41,21 +41,6 @@
     	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
     }
 
-    function getAugmentedNamespace(n) {
-    	if (n.__esModule) return n;
-    	var a = Object.defineProperty({}, '__esModule', {value: true});
-    	Object.keys(n).forEach(function (k) {
-    		var d = Object.getOwnPropertyDescriptor(n, k);
-    		Object.defineProperty(a, k, d.get ? d : {
-    			enumerable: true,
-    			get: function () {
-    				return n[k];
-    			}
-    		});
-    	});
-    	return a;
-    }
-
     function createCommonjsModule(fn) {
       var module = { exports: {} };
     	return fn(module, module.exports), module.exports;
@@ -1039,24 +1024,20 @@
 
     function createElement(tagName) {
       var attrs = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
       for (var _len = arguments.length, children = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
         children[_key - 2] = arguments[_key];
       }
-
       if (tagName === 'null') return children;
       if (typeof tagName === 'function') return tagName(attrs, children);
       var elem = document.createElement(tagName);
       Object.entries(attrs || {}).forEach(function (_ref) {
         var _ref2 = _slicedToArray(_ref, 2),
-            name = _ref2[0],
-            value = _ref2[1];
-
+          name = _ref2[0],
+          value = _ref2[1];
         if (name.startsWith('on') && name.toLowerCase() in window) elem.addEventListener(name.toLowerCase().substr(2), value);else {
           if (name === 'className') elem.setAttribute('class', value.toString());else if (name === 'htmlFor') elem.setAttribute('for', value.toString());else elem.setAttribute(name, value.toString());
         }
       });
-
       for (var _i = 0, _children = children; _i < _children.length; _i++) {
         var child = _children[_i];
         if (!child) continue;
@@ -1064,7 +1045,6 @@
           elem.appendChild(child.nodeType === undefined ? document.createTextNode(child.toString()) : child);
         }
       }
-
       return elem;
     }
 
@@ -2226,80 +2206,170 @@
       return ret;
     }
 
-    /**
-     * Vanilla JS Modal compatible with Bootstrap
-     * modal-vanilla 0.8.0 <https://github.com/KaneCohen/modal-vanilla>
-     * Copyright 2020 Kane Cohen <https://github.com/KaneCohen>
-     * Available under BSD-3-Clause license
-     */
+    var modal = createCommonjsModule(function (module) {
+    module.exports =
+    /******/ (function(modules) { // webpackBootstrap
+    /******/ 	// The module cache
+    /******/ 	var installedModules = {};
+    /******/
+    /******/ 	// The require function
+    /******/ 	function __webpack_require__(moduleId) {
+    /******/
+    /******/ 		// Check if module is in cache
+    /******/ 		if(installedModules[moduleId]) {
+    /******/ 			return installedModules[moduleId].exports;
+    /******/ 		}
+    /******/ 		// Create a new module (and put it into the cache)
+    /******/ 		var module = installedModules[moduleId] = {
+    /******/ 			i: moduleId,
+    /******/ 			l: false,
+    /******/ 			exports: {}
+    /******/ 		};
+    /******/
+    /******/ 		// Execute the module function
+    /******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+    /******/
+    /******/ 		// Flag the module as loaded
+    /******/ 		module.l = true;
+    /******/
+    /******/ 		// Return the exports of the module
+    /******/ 		return module.exports;
+    /******/ 	}
+    /******/
+    /******/
+    /******/ 	// expose the modules object (__webpack_modules__)
+    /******/ 	__webpack_require__.m = modules;
+    /******/
+    /******/ 	// expose the module cache
+    /******/ 	__webpack_require__.c = installedModules;
+    /******/
+    /******/ 	// define getter function for harmony exports
+    /******/ 	__webpack_require__.d = function(exports, name, getter) {
+    /******/ 		if(!__webpack_require__.o(exports, name)) {
+    /******/ 			Object.defineProperty(exports, name, {
+    /******/ 				configurable: false,
+    /******/ 				enumerable: true,
+    /******/ 				get: getter
+    /******/ 			});
+    /******/ 		}
+    /******/ 	};
+    /******/
+    /******/ 	// getDefaultExport function for compatibility with non-harmony modules
+    /******/ 	__webpack_require__.n = function(module) {
+    /******/ 		var getter = module && module.__esModule ?
+    /******/ 			function getDefault() { return module['default']; } :
+    /******/ 			function getModuleExports() { return module; };
+    /******/ 		__webpack_require__.d(getter, 'a', getter);
+    /******/ 		return getter;
+    /******/ 	};
+    /******/
+    /******/ 	// Object.prototype.hasOwnProperty.call
+    /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+    /******/
+    /******/ 	// __webpack_public_path__
+    /******/ 	__webpack_require__.p = "";
+    /******/
+    /******/ 	// Load entry module and return exports
+    /******/ 	return __webpack_require__(__webpack_require__.s = 0);
+    /******/ })
+    /************************************************************************/
+    /******/ ([
+    /* 0 */
+    /***/ (function(module, exports, __webpack_require__) {
 
-    const _factory = document.createElement('div');
+    module.exports = __webpack_require__(1).default;
 
-    const _scrollbarWidth = calcScrollbarWidth();
 
-    const _defaults = Object.freeze({
-      el: null,               // Existing DOM element that will be 'Modal-ized'.
-      animate: true,          // Show Modal using animation.
-      animateClass: 'fade',   //
+    /***/ }),
+    /* 1 */
+    /***/ (function(module, exports, __webpack_require__) {
+
+
+    Object.defineProperty(exports, "__esModule", {
+      value: true
+    });
+
+    var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+    var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+    var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; /**
+                                                                                                                                                                                                                                                                                   * Vanilla JS Modal compatible with Bootstrap
+                                                                                                                                                                                                                                                                                   * modal-vanilla 0.12.0 <https://github.com/KaneCohen/modal-vanilla>
+                                                                                                                                                                                                                                                                                   * Copyright 2020 Kane Cohen <https://github.com/KaneCohen>
+                                                                                                                                                                                                                                                                                   * Available under BSD-3-Clause license
+                                                                                                                                                                                                                                                                                   */
+
+
+    var _events = __webpack_require__(2);
+
+    var _events2 = _interopRequireDefault(_events);
+
+    function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+    function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+    function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+    function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+    var _factory = null;
+
+    var _defaults = Object.freeze({
+      el: null, // Existing DOM element that will be 'Modal-ized'.
+      animate: true, // Show Modal using animation.
+      animateClass: 'fade', //
       animateInClass: 'show', //
-      appendTo: 'body',       // DOM element to which constructed Modal will be appended.
-      backdrop: true,         // Boolean or 'static', Show Modal backdrop blocking content.
-      keyboard: true,         // Close modal on esc key.
-      title: false,           // Content of the title in the constructed dialog.
-      header: true,           // Show header content.
-      content: false,         // Either string or an HTML element.
-      footer: true,           // Footer content. By default will use buttons.
-      buttons: null,          //
-      headerClose: true,      // Show close button in the header.
-      construct: false,       // Creates new HTML with a given content.
-      transition: 300,        //
+      appendTo: 'body', // DOM element to which constructed Modal will be appended.
+      backdrop: true, // Boolean or 'static', Show Modal backdrop blocking content.
+      keyboard: true, // Close modal on esc key.
+      title: false, // Content of the title in the constructed dialog.
+      header: true, // Show header content.
+      content: false, // Either string or an HTML element.
+      footer: true, // Footer content. By default will use buttons.
+      buttons: null, //
+      headerClose: true, // Show close button in the header.
+      construct: false, // Creates new HTML with a given content.
+      transition: 300, //
       backdropTransition: 150 //
     });
 
-    const _buttons = deepFreeze({
-      dialog: [
-        {text: 'Cancel',
-          value: false,
-          attr: {
-            'class': 'btn btn-default',
-            'data-dismiss': 'modal'
-          }
-        },
-        {text: 'OK',
-          value: true,
-          attr: {
-            'class': 'btn btn-primary',
-            'data-dismiss': 'modal'
-          }
+    var _buttons = deepFreeze({
+      dialog: [{ text: 'Cancel',
+        value: false,
+        attr: {
+          'class': 'btn btn-default',
+          'data-dismiss': 'modal'
         }
-      ],
-      alert: [
-        {text: 'OK',
-          attr: {
-            'class': 'btn btn-primary',
-            'data-dismiss': 'modal'
-          }
+      }, { text: 'OK',
+        value: true,
+        attr: {
+          'class': 'btn btn-primary',
+          'data-dismiss': 'modal'
         }
-      ],
-      confirm: [
-        {text: 'Cancel',
-          value: false,
-          attr: {
-            'class': 'btn btn-default',
-            'data-dismiss': 'modal'
-          }
-        },
-        {text: 'OK',
-          value: true,
-          attr: {
-            'class': 'btn btn-primary',
-            'data-dismiss': 'modal'
-          }
+      }],
+      alert: [{ text: 'OK',
+        attr: {
+          'class': 'btn btn-primary',
+          'data-dismiss': 'modal'
         }
-      ]
+      }],
+      confirm: [{ text: 'Cancel',
+        value: false,
+        attr: {
+          'class': 'btn btn-default',
+          'data-dismiss': 'modal'
+        }
+      }, { text: 'OK',
+        value: true,
+        attr: {
+          'class': 'btn btn-primary',
+          'data-dismiss': 'modal'
+        }
+      }]
     });
 
-    const _templates = {
+    var _templates = {
       container: '<div class="modal"></div>',
       dialog: '<div class="modal-dialog"></div>',
       content: '<div class="modal-content"></div>',
@@ -2311,12 +2381,12 @@
     };
 
     function deepFreeze(obj) {
-      for (let k in obj) {
+      for (var k in obj) {
         if (Array.isArray(obj[k])) {
-          obj[k].forEach(v => {
+          obj[k].forEach(function (v) {
             deepFreeze(v);
           });
-        } else if (obj[k] !== null && typeof obj[k] === 'object') {
+        } else if (obj[k] !== null && _typeof(obj[k]) === 'object') {
           Object.freeze(obj[k]);
         }
       }
@@ -2324,33 +2394,36 @@
     }
 
     function guid() {
-      return (((1 + Math.random()) * 0x10000) | 0).toString(16) +
-        (((1 + Math.random()) * 0x10000) | 0).toString(16);
+      return ((1 + Math.random()) * 0x10000 | 0).toString(16) + ((1 + Math.random()) * 0x10000 | 0).toString(16);
     }
 
     function data(el, prop, value) {
-     let prefix = 'data';
-     let elData = el[prefix] || {};
-     if (typeof value === 'undefined') {
-       if (el[prefix] && el[prefix][prop]) {
-         return el[prefix][prop];
-       } else {
-         var dataAttr = el.getAttribute(`${prefix}-${prop}`);
-         if (typeof dataAttr !== 'undefined') {
-           return dataAttr;
-         }
-         return null;
-       }
-     } else {
-       elData[prop] = value;
-       el[prefix] = elData;
-       return el;
-     }
+      var prefix = 'data';
+      var elData = el[prefix] || {};
+      if (typeof value === 'undefined') {
+        if (el[prefix] && el[prefix][prop]) {
+          return el[prefix][prop];
+        } else {
+          var dataAttr = el.getAttribute(prefix + '-' + prop);
+          if (typeof dataAttr !== 'undefined') {
+            return dataAttr;
+          }
+          return null;
+        }
+      } else {
+        elData[prop] = value;
+        el[prefix] = elData;
+        return el;
+      }
     }
 
     function build(html, all) {
       if (html.nodeName) return html;
       html = html.replace(/(\t|\n$)/g, '');
+
+      if (!_factory) {
+        _factory = document.createElement('div');
+      }
 
       _factory.innerHTML = '';
       _factory.innerHTML = html;
@@ -2362,11 +2435,11 @@
     }
 
     function calcScrollbarWidth() {
-      let inner;
-      let width;
-      let outerWidth;
-      let outer = document.createElement('div');
-      Object.assign(outer.style, {
+      var inner = void 0;
+      var width = void 0;
+      var outerWidth = void 0;
+      var outer = document.createElement('div');
+      _extends(outer.style, {
         visibility: 'hidden',
         width: '100px'
       });
@@ -2386,7 +2459,7 @@
     }
 
     function getPath(node) {
-      let nodes = [node];
+      var nodes = [node];
       while (node.parentNode) {
         node = node.parentNode;
         nodes.push(node);
@@ -2394,434 +2467,485 @@
       return nodes;
     }
 
-    class Modal extends EventEmitter {
-      static set templates(templates) {
-        this._baseTemplates = templates;
-      }
+    var Modal = function (_EventEmitter) {
+      _inherits(Modal, _EventEmitter);
 
-      static get templates() {
-        return Object.assign({}, _templates, Modal._baseTemplates || {});
-      }
+      _createClass(Modal, null, [{
+        key: 'alert',
+        value: function alert(message) {
+          var _options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-      static set buttons(buttons) {
-        this._baseButtons = buttons;
-      }
-
-      static get buttons() {
-        return Object.assign({}, _buttons, Modal._baseButtons || {});
-      }
-
-      static set options(options) {
-        this._baseOptions = options;
-      }
-
-      static get options() {
-        return Object.assign({}, _defaults, Modal._baseOptions || {});
-      }
-
-      static get version() {
-        return '0.8.0';
-      }
-
-      static alert(message, _options = {}) {
-        let options = Object.assign({},
-          _defaults,
-          {
-            title:  message,
+          var options = _extends({}, _defaults, {
+            title: message,
             content: false,
             construct: true,
             headerClose: false,
             buttons: Modal.buttons.alert
-          },
-          _options
-        );
+          }, _options);
 
-        return new Modal(options);
-      }
+          return new Modal(options);
+        }
+      }, {
+        key: 'confirm',
+        value: function confirm(question) {
+          var _options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-      static confirm(question, _options = {}) {
-        let options = Object.assign({},
-          _defaults,
-          {
-            title:  question,
+          var options = _extends({}, _defaults, {
+            title: question,
             content: false,
             construct: true,
             headerClose: false,
             buttons: Modal.buttons.confirm
-          },
-          _options
-        );
+          }, _options);
 
-        return new Modal(options);
-      }
+          return new Modal(options);
+        }
+      }, {
+        key: 'templates',
+        set: function set(templates) {
+          this._baseTemplates = templates;
+        },
+        get: function get() {
+          return _extends({}, _templates, Modal._baseTemplates || {});
+        }
+      }, {
+        key: 'buttons',
+        set: function set(buttons) {
+          this._baseButtons = buttons;
+        },
+        get: function get() {
+          return _extends({}, _buttons, Modal._baseButtons || {});
+        }
+      }, {
+        key: 'options',
+        set: function set(options) {
+          this._baseOptions = options;
+        },
+        get: function get() {
+          return _extends({}, _defaults, Modal._baseOptions || {});
+        }
+      }, {
+        key: 'version',
+        get: function get() {
+          return '0.12.0';
+        }
+      }]);
 
-      constructor(options = {}) {
-        super();
+      function Modal() {
+        var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-        this.id = guid();
-        this.el = null;
-        this._html = {};
-        this._events = {};
-        this._visible = false;
-        this._options = Object.assign({}, Modal.options, options);
-        this._templates = Object.assign({}, Modal.templates, options.templates || {});
-        this._html.appendTo = document.querySelector(this._options.appendTo);
+        _classCallCheck(this, Modal);
 
-        if (this._options.buttons === null) {
-          this._options.buttons = Modal.buttons.dialog;
+        var _this = _possibleConstructorReturn(this, (Modal.__proto__ || Object.getPrototypeOf(Modal)).call(this));
+
+        _this.id = guid();
+        _this.el = null;
+        _this._html = {};
+        _this._events = {};
+        _this._visible = false;
+        _this._pointerInContent = false;
+        _this._options = _extends({}, Modal.options, options);
+        _this._templates = _extends({}, Modal.templates, options.templates || {});
+        _this._html.appendTo = document.querySelector(_this._options.appendTo);
+        _this._scrollbarWidth = calcScrollbarWidth();
+
+        if (_this._options.buttons === null) {
+          _this._options.buttons = Modal.buttons.dialog;
         }
 
-        if (this._options.el) {
-          let el = this._options.el;
-          if (typeof this._options.el == 'string') {
-            el = document.querySelector(this._options.el);
-            if (! el) {
-              throw new Error(`Selector: DOM Element ${this._options.el} not found.`);
+        if (_this._options.el) {
+          var el = _this._options.el;
+          if (typeof _this._options.el == 'string') {
+            el = document.querySelector(_this._options.el);
+            if (!el) {
+              throw new Error('Selector: DOM Element ' + _this._options.el + ' not found.');
             }
           }
-          data(el, 'modal', this);
-          this.el = el;
+          data(el, 'modal', _this);
+          _this.el = el;
         } else {
-          this._options.construct = true;
+          _this._options.construct = true;
         }
 
-        if (this._options.construct) {
-          this._render();
+        if (_this._options.construct) {
+          _this._render();
         } else {
-          this._mapDom();
+          _this._mapDom();
         }
+        return _this;
       }
 
-      _render() {
-        let html = this._html;
-        let o = this._options;
-        let t = this._templates;
-        let animate = o.animate ? o.animateClass : false;
+      _createClass(Modal, [{
+        key: '_render',
+        value: function _render() {
+          var html = this._html;
+          var o = this._options;
+          var t = this._templates;
+          var animate = o.animate ? o.animateClass : false;
 
-        html.container = build(t.container);
-        html.dialog = build(t.dialog);
-        html.content = build(t.content);
-        html.header = build(t.header);
-        html.headerClose = build(t.headerClose);
-        html.body = build(t.body);
-        html.footer = build(t.footer);
-        if (animate) html.container.classList.add(animate);
+          html.container = build(t.container);
+          html.dialog = build(t.dialog);
+          html.content = build(t.content);
+          html.header = build(t.header);
+          html.headerClose = build(t.headerClose);
+          html.body = build(t.body);
+          html.footer = build(t.footer);
+          if (animate) html.container.classList.add(animate);
 
-        this._setHeader();
-        this._setContent();
-        this._setFooter();
+          this._setHeader();
+          this._setContent();
+          this._setFooter();
 
-        this.el = html.container;
+          this.el = html.container;
 
-        html.dialog.appendChild(html.content);
-        html.container.appendChild(html.dialog);
+          html.dialog.appendChild(html.content);
+          html.container.appendChild(html.dialog);
 
-        return this;
-      }
-
-      _mapDom() {
-        let html = this._html;
-        let o = this._options;
-
-        if (this.el.classList.contains(o.animateClass)) {
-          o.animate = true;
+          return this;
         }
+      }, {
+        key: '_mapDom',
+        value: function _mapDom() {
+          var html = this._html;
+          var o = this._options;
 
-        html.container = this.el;
-        html.dialog = this.el.querySelector('.modal-dialog');
-        html.content = this.el.querySelector('.modal-content');
-        html.header = this.el.querySelector('.modal-header');
-        html.headerClose = this.el.querySelector('.modal-header .close');
-        html.body = this.el.querySelector('.modal-body');
-        html.footer = this.el.querySelector('.modal-footer');
-
-        this._setHeader();
-        this._setContent();
-        this._setFooter();
-
-        return this;
-      }
-
-      _setHeader() {
-        let html = this._html;
-        let o = this._options;
-
-        if (o.header && html.header) {
-          if (o.title.nodeName) {
-            html.header.innerHTML = o.title.outerHTML;
-          } else if (typeof o.title === 'string') {
-            html.header.innerHTML = `<h4 class="modal-title">${o.title}</h4>`;
+          if (this.el.classList.contains(o.animateClass)) {
+            o.animate = true;
           }
-          // Add header close button only to constructed modals.
-          if (this.el === null && html.headerClose && o.headerClose) {
-            html.header.appendChild(html.headerClose);
-          }
-          if (o.construct) {
-            html.content.appendChild(html.header);
-          }
+
+          html.container = this.el;
+          html.dialog = this.el.querySelector('.modal-dialog');
+          html.content = this.el.querySelector('.modal-content');
+          html.header = this.el.querySelector('.modal-header');
+          html.headerClose = this.el.querySelector('.modal-header .close');
+          html.body = this.el.querySelector('.modal-body');
+          html.footer = this.el.querySelector('.modal-footer');
+
+          this._setHeader();
+          this._setContent();
+          this._setFooter();
+
+          return this;
         }
-      }
+      }, {
+        key: '_setHeader',
+        value: function _setHeader() {
+          var html = this._html;
+          var o = this._options;
 
-      _setContent() {
-        let html = this._html;
-        let o = this._options;
-
-        if (o.content && html.body) {
-          if (typeof o.content === 'string') {
-            html.body.innerHTML = o.content;
-          } else {
-            html.body.innerHTML = o.content.outerHTML;
-          }
-          if (o.construct) {
-            html.content.appendChild(html.body);
+          if (o.header && html.header) {
+            if (o.title.nodeName) {
+              html.header.innerHTML = o.title.outerHTML;
+            } else if (typeof o.title === 'string') {
+              html.header.innerHTML = '<h4 class="modal-title">' + o.title + '</h4>';
+            }
+            // Add header close button only to constructed modals.
+            if (this.el === null && html.headerClose && o.headerClose) {
+              html.header.appendChild(html.headerClose);
+            }
+            if (o.construct) {
+              html.content.appendChild(html.header);
+            }
           }
         }
-      }
+      }, {
+        key: '_setContent',
+        value: function _setContent() {
+          var html = this._html;
+          var o = this._options;
 
-      _setFooter() {
-        let html = this._html;
-        let o = this._options;
-
-        if (o.footer && html.footer) {
-          if (o.footer.nodeName) {
-            html.footer.ineerHTML = o.footer.outerHTML;
-          } else if (typeof o.footer === 'string') {
-            html.footer.innerHTML = o.footer;
-          } else if (! html.footer.children.length) {
-            o.buttons.forEach((button) => {
-              let el = document.createElement('button');
-              data(el, 'button', button);
-              el.innerHTML = button.text;
-              el.setAttribute('type', 'button');
-              for (let j in button.attr) {
-                el.setAttribute(j, button.attr[j]);
-              }
-              html.footer.appendChild(el);
-            });
-          }
-          if (o.construct) {
-            html.content.appendChild(html.footer);
+          if (o.content && html.body) {
+            if (typeof o.content === 'string') {
+              html.body.innerHTML = o.content;
+            } else {
+              html.body.innerHTML = o.content.outerHTML;
+            }
+            if (o.construct) {
+              html.content.appendChild(html.body);
+            }
           }
         }
+      }, {
+        key: '_setFooter',
+        value: function _setFooter() {
+          var html = this._html;
+          var o = this._options;
 
-      }
-
-      _setEvents() {
-        this._options;
-        let html = this._html;
-
-        this._events.keydownHandler = this._handleKeydownEvent.bind(this);
-        document.body.addEventListener('keydown',
-          this._events.keydownHandler
-        );
-
-        this._events.clickHandler = this._handleClickEvent.bind(this);
-        html.container.addEventListener('click',
-          this._events.clickHandler
-        );
-
-        this._events.resizeHandler = this._handleResizeEvent.bind(this);
-        window.addEventListener('resize',
-          this._events.resizeHandler
-        );
-      }
-
-      _handleClickEvent(e) {
-        let path = getPath(e.target);
-        path.every(node => {
-          if (node.tagName === 'HTML') {
-            return false;
+          if (o.footer && html.footer) {
+            if (o.footer.nodeName) {
+              html.footer.ineerHTML = o.footer.outerHTML;
+            } else if (typeof o.footer === 'string') {
+              html.footer.innerHTML = o.footer;
+            } else if (!html.footer.children.length) {
+              o.buttons.forEach(function (button) {
+                var el = document.createElement('button');
+                data(el, 'button', button);
+                el.innerHTML = button.text;
+                el.setAttribute('type', 'button');
+                for (var j in button.attr) {
+                  el.setAttribute(j, button.attr[j]);
+                }
+                html.footer.appendChild(el);
+              });
+            }
+            if (o.construct) {
+              html.content.appendChild(html.footer);
+            }
           }
-          if (this._options.backdrop !== true && node.classList.contains('modal')) {
-            return false;
-          }
-          if (node.classList.contains('modal-content')) {
-            return false;
-          }
-          if (node.getAttribute('data-dismiss') === 'modal') {
-            this.emit('dismiss', this, e, data(e.target, 'button'));
-            this.hide();
-            return false;
-          }
-          if (node.classList.contains('modal')) {
+        }
+      }, {
+        key: '_setEvents',
+        value: function _setEvents() {
+          this._options;
+          var html = this._html;
+
+          this._events.keydownHandler = this._handleKeydownEvent.bind(this);
+          document.body.addEventListener('keydown', this._events.keydownHandler);
+
+          this._events.mousedownHandler = this._handleMousedownEvent.bind(this);
+          html.container.addEventListener('mousedown', this._events.mousedownHandler);
+
+          this._events.clickHandler = this._handleClickEvent.bind(this);
+          html.container.addEventListener('click', this._events.clickHandler);
+
+          this._events.resizeHandler = this._handleResizeEvent.bind(this);
+          window.addEventListener('resize', this._events.resizeHandler);
+        }
+      }, {
+        key: '_handleMousedownEvent',
+        value: function _handleMousedownEvent(e) {
+          var _this2 = this;
+
+          this._pointerInContent = false;
+          var path = getPath(e.target);
+          path.every(function (node) {
+            if (node.classList && node.classList.contains('modal-content')) {
+              _this2._pointerInContent = true;
+              return false;
+            }
+            return true;
+          });
+        }
+      }, {
+        key: '_handleClickEvent',
+        value: function _handleClickEvent(e) {
+          var _this3 = this;
+
+          var path = getPath(e.target);
+          path.every(function (node) {
+            if (node.tagName === 'HTML') {
+              return false;
+            }
+            if (_this3._options.backdrop !== true && node.classList.contains('modal')) {
+              return false;
+            }
+            if (node.classList.contains('modal-content')) {
+              return false;
+            }
+            if (node.getAttribute('data-dismiss') === 'modal') {
+              _this3.emit('dismiss', _this3, e, data(e.target, 'button'));
+              _this3.hide();
+              return false;
+            }
+
+            if (!_this3._pointerInContent && node.classList.contains('modal')) {
+              _this3.emit('dismiss', _this3, e, null);
+              _this3.hide();
+              return false;
+            }
+            return true;
+          });
+
+          this._pointerInContent = false;
+        }
+      }, {
+        key: '_handleKeydownEvent',
+        value: function _handleKeydownEvent(e) {
+          if (e.which === 27 && this._options.keyboard) {
             this.emit('dismiss', this, e, null);
             this.hide();
-            return false;
           }
-          return true;
-        });
-      }
-
-      _handleKeydownEvent(e) {
-        if (e.which === 27 && this._options.keyboard) {
-          this.emit('dismiss', this, e, null);
-          this.hide();
         }
-      }
-
-      _handleResizeEvent(e) {
-        this._resize();
-      }
-
-      show() {
-        let o = this._options;
-        let html = this._html;
-        this.emit('show', this);
-
-        this._checkScrollbar();
-        this._setScrollbar();
-        document.body.classList.add('modal-open');
-
-        if (o.construct) {
-          html.appendTo.appendChild(html.container);
+      }, {
+        key: '_handleResizeEvent',
+        value: function _handleResizeEvent(e) {
+          this._resize();
         }
+      }, {
+        key: 'show',
+        value: function show() {
+          var _this4 = this;
 
-        html.container.style.display = 'block';
-        html.container.scrollTop = 0;
+          var o = this._options;
+          var html = this._html;
+          this.emit('show', this);
 
-        if (o.backdrop !== false) {
-          this.once('showBackdrop', () => {
+          this._checkScrollbar();
+          this._setScrollbar();
+          document.body.classList.add('modal-open');
+
+          if (o.construct) {
+            html.appendTo.appendChild(html.container);
+          }
+
+          html.container.style.display = 'block';
+          html.container.scrollTop = 0;
+
+          if (o.backdrop !== false) {
+            this.once('showBackdrop', function () {
+              _this4._setEvents();
+
+              if (o.animate) html.container.offsetWidth; // Force reflow
+
+              html.container.classList.add(o.animateInClass);
+
+              setTimeout(function () {
+                _this4._visible = true;
+                _this4.emit('shown', _this4);
+              }, o.transition);
+            });
+            this._backdrop();
+          } else {
             this._setEvents();
 
             if (o.animate) html.container.offsetWidth; // Force reflow
 
             html.container.classList.add(o.animateInClass);
 
-            setTimeout(() => {
-              this._visible = true;
-              this.emit('shown', this);
+            setTimeout(function () {
+              _this4._visible = true;
+              _this4.emit('shown', _this4);
             }, o.transition);
-          });
-          this._backdrop();
-        } else {
-          this._setEvents();
+          }
+          this._resize();
 
-          if (o.animate) html.container.offsetWidth; // Force reflow
-
-          html.container.classList.add(o.animateInClass);
-
-          setTimeout(() => {
-            this._visible = true;
-            this.emit('shown', this);
-          }, o.transition);
+          return this;
         }
-        this._resize();
-
-        return this;
-      }
-
-      toggle() {
-        if (this._visible) {
-          this.hide();
-        } else {
-          this.show();
+      }, {
+        key: 'toggle',
+        value: function toggle() {
+          if (this._visible) {
+            this.hide();
+          } else {
+            this.show();
+          }
         }
-      }
+      }, {
+        key: '_resize',
+        value: function _resize() {
+          var modalIsOverflowing = this._html.container.scrollHeight > document.documentElement.clientHeight;
 
-      _resize() {
-        var modalIsOverflowing =
-          this._html.container.scrollHeight > document.documentElement.clientHeight;
+          this._html.container.style.paddingLeft = !this.bodyIsOverflowing && modalIsOverflowing ? this._scrollbarWidth + 'px' : '';
 
-        this._html.container.style.paddingLeft =
-          ! this.bodyIsOverflowing && modalIsOverflowing ? _scrollbarWidth + 'px' : '';
-
-        this._html.container.style.paddingRight =
-          this.bodyIsOverflowing && ! modalIsOverflowing ? _scrollbarWidth + 'px' : '';
-      }
-
-      _backdrop() {
-        let html = this._html;
-        let t = this._templates;
-        let o = this._options;
-        let animate = o.animate ? o.animateClass : false;
-
-        html.backdrop = build(t.backdrop);
-        if (animate) html.backdrop.classList.add(animate);
-        html.appendTo.appendChild(html.backdrop);
-
-        if (animate) html.backdrop.offsetWidth;
-
-        html.backdrop.classList.add(o.animateInClass);
-
-        setTimeout(() => {
-          this.emit('showBackdrop', this);
-        }, this._options.backdropTransition);
-      }
-
-      hide() {
-        let html = this._html;
-        let o = this._options;
-        let contCList = html.container.classList;
-        this.emit('hide', this);
-
-        contCList.remove(o.animateInClass);
-
-        if (o.backdrop) {
-          let backCList = html.backdrop.classList;
-          backCList.remove(o.animateInClass);
+          this._html.container.style.paddingRight = this.bodyIsOverflowing && !modalIsOverflowing ? this._scrollbarWidth + 'px' : '';
         }
+      }, {
+        key: '_backdrop',
+        value: function _backdrop() {
+          var _this5 = this;
 
-        this._removeEvents();
+          var html = this._html;
+          var t = this._templates;
+          var o = this._options;
+          var animate = o.animate ? o.animateClass : false;
 
-        setTimeout(() => {
-          document.body.classList.remove('modal-open');
-          document.body.style.paddingRight = this.originalBodyPad;
-        }, o.backdropTransition);
+          html.backdrop = build(t.backdrop);
+          if (animate) html.backdrop.classList.add(animate);
+          html.appendTo.appendChild(html.backdrop);
 
-        setTimeout(() => {
+          if (animate) html.backdrop.offsetWidth;
+
+          html.backdrop.classList.add(o.animateInClass);
+
+          setTimeout(function () {
+            _this5.emit('showBackdrop', _this5);
+          }, this._options.backdropTransition);
+        }
+      }, {
+        key: 'hide',
+        value: function hide() {
+          var _this6 = this;
+
+          var html = this._html;
+          var o = this._options;
+          var contCList = html.container.classList;
+          this.emit('hide', this);
+
+          contCList.remove(o.animateInClass);
+
           if (o.backdrop) {
-            html.backdrop.parentNode.removeChild(html.backdrop);
-          }
-          html.container.style.display = 'none';
-
-          if (o.construct) {
-            html.container.parentNode.removeChild(html.container);
+            var backCList = html.backdrop.classList;
+            backCList.remove(o.animateInClass);
           }
 
-          this._visible = false;
-          this.emit('hidden', this);
-        }, o.transition);
+          this._removeEvents();
 
-        return this;
-      }
+          setTimeout(function () {
+            document.body.classList.remove('modal-open');
+            document.body.style.paddingRight = _this6.originalBodyPad;
+          }, o.backdropTransition);
 
-      _removeEvents() {
-        if (this._events.keydownHandler) {
-          document.body.removeEventListener('keydown',
-            this._events.keydownHandler
-          );
+          setTimeout(function () {
+            if (o.backdrop) {
+              html.backdrop.parentNode.removeChild(html.backdrop);
+            }
+            html.container.style.display = 'none';
+
+            if (o.construct) {
+              html.container.parentNode.removeChild(html.container);
+            }
+
+            _this6._visible = false;
+            _this6.emit('hidden', _this6);
+          }, o.transition);
+
+          return this;
         }
+      }, {
+        key: '_removeEvents',
+        value: function _removeEvents() {
+          if (this._events.keydownHandler) {
+            document.body.removeEventListener('keydown', this._events.keydownHandler);
+          }
 
-        this._html.container.removeEventListener('click',
-          this._events.clickHandler
-        );
+          this._html.container.removeEventListener('mousedown', this._events.mousedownHandler);
 
-        window.removeEventListener('resize',
-          this._events.resizeHandler
-        );
-      }
+          this._html.container.removeEventListener('click', this._events.clickHandler);
 
-      _checkScrollbar() {
-        this.bodyIsOverflowing = document.body.clientWidth < window.innerWidth;
-      }
-
-      _setScrollbar() {
-        this.originalBodyPad = document.body.style.paddingRight || '';
-        if (this.bodyIsOverflowing) {
-          let basePadding = parseInt(this.originalBodyPad || 0, 10);
-          document.body.style.paddingRight = basePadding + _scrollbarWidth + 'px';
+          window.removeEventListener('resize', this._events.resizeHandler);
         }
-      }
-    }
+      }, {
+        key: '_checkScrollbar',
+        value: function _checkScrollbar() {
+          this.bodyIsOverflowing = document.body.clientWidth < window.innerWidth;
+        }
+      }, {
+        key: '_setScrollbar',
+        value: function _setScrollbar() {
+          this.originalBodyPad = document.body.style.paddingRight || '';
+          if (this.bodyIsOverflowing) {
+            var basePadding = parseInt(this.originalBodyPad || 0, 10);
+            document.body.style.paddingRight = basePadding + this._scrollbarWidth + 'px';
+          }
+        }
+      }]);
 
-    var modal = /*#__PURE__*/Object.freeze({
-        __proto__: null,
-        'default': Modal
+      return Modal;
+    }(_events2.default);
+
+    exports.default = Modal;
+
+    /***/ }),
+    /* 2 */
+    /***/ (function(module, exports) {
+
+    module.exports = EventEmitter;
+
+    /***/ })
+    /******/ ]);
     });
 
-    var require$$0 = /*@__PURE__*/getAugmentedNamespace(modal);
-
-    var modalVanilla = require$$0.default;
+    var Modal = /*@__PURE__*/getDefaultExportFromCjs(modal);
 
     /**
      *
@@ -2848,7 +2972,7 @@
      */
     class SettingsModal {
         constructor(map, options, i18n, printMap) {
-            this._modal = new modalVanilla(Object.assign({ headerClose: true, header: true, animate: true, title: i18n.printPdf, content: this.Content(i18n, options), footer: this.Footer(i18n, options) }, options.modal));
+            this._modal = new Modal(Object.assign({ headerClose: true, header: true, animate: true, title: i18n.printPdf, content: this.Content(i18n, options), footer: this.Footer(i18n, options) }, options.modal));
             this._modal.on('dismiss', (modal, event) => {
                 const print = event.target.dataset.print;
                 if (!print)
@@ -2967,7 +3091,7 @@
          */
         constructor(i18n, options, onEndPrint) {
             this._i18n = i18n;
-            this._modal = new modalVanilla(Object.assign({ headerClose: false, title: this._i18n.printing, backdrop: 'static', content: ' ', footer: `
+            this._modal = new Modal(Object.assign({ headerClose: false, title: this._i18n.printing, backdrop: 'static', content: ' ', footer: `
             <button
                 type="button"
                 class="btn-sm btn btn-secondary"
