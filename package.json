@@ -1,6 +1,6 @@
 {
   "name": "ol-pdf-printer",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "description": "PDF Printer for Open Layers",
   "browser": "dist/ol-pdf-printer.min.js",
   "main": "dist/ol-pdf-printer.js",
@@ -40,32 +40,34 @@
   },
   "homepage": "https://github.com/GastonZalba/ol-pdf-printer#readme",
   "peerDependencies": {
-    "ol": ">=5.0.0"
+    "ol": ">=5.0.0",
+    "modal-vanilla": ">=0.8.0" 
   },
   "devDependencies": {
-    "@babel/core": "^7.12.3",
-    "@babel/plugin-transform-react-jsx": "^7.14.9",
-    "@babel/plugin-transform-runtime": "^7.12.15",
-    "@babel/preset-env": "^7.12.1",
+    "@babel/core": "^7.19.3",
+    "@babel/plugin-transform-react-jsx": "^7.19.0",
+    "@babel/plugin-transform-runtime": "^7.19.1",
+    "@babel/preset-env": "^7.19.4",
     "@rollup/plugin-babel": "^5.2.1",
     "@rollup/plugin-commonjs": "^17.0.0",
     "@rollup/plugin-node-resolve": "^11.0.1",
     "@rollup/plugin-typescript": "^8.5.0",
-    "@types/node": "^14.14.10",
-    "@typescript-eslint/eslint-plugin": "^5.38.1",
-    "@typescript-eslint/parser": "^5.38.1",
+    "@types/node": "^14.18.32",
+    "@typescript-eslint/eslint-plugin": "^5.40.0",
+    "@typescript-eslint/parser": "^5.40.0",
     "acorn-jsx": "^5.3.2",
     "babel-plugin-jsx-pragmatic": "^1.0.2",
     "clean-css": "^5.1.5",
     "del-cli": "^4.0.1",
     "documentation": "^14.0.0",
-    "eslint": "^8.24.0",
+    "eslint": "^8.25.0",
     "eslint-config-openlayers": "^17.0.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
+    "modal-vanilla": "^0.12.0",
     "ol": "^7.1.0",
     "prettier": "^2.7.1",
-    "rollup": "^2.33.3",
+    "rollup": "^2.79.1",
     "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-css-only": "^3.1.0",
     "rollup-plugin-delete": "^2.0.0",
@@ -82,7 +84,6 @@
     "dom-to-image-improved": "^2.8.0",
     "jspdf": "^2.3.1",
     "locale-enum": "^1.1.1",
-    "modal-vanilla": "^0.8.0",
-    "pdfjs-dist": "^2.9.359"
+    "pdfjs-dist": "^2.16.105"
   }
 }

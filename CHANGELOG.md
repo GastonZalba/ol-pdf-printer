@@ -64,6 +64,11 @@
 ## v1.0.18
 * Ol 7 compatibility
 * Updated dependencies
+* Updated CDNs in examples
 
 ## v1.0.19
 * Minor fix on createPdf public function
+
+## v1.0.20
+* Moved modal-vanilla to peer dependencies
+* Updated dependencies
