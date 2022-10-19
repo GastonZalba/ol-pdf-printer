@@ -1,5 +1,17 @@
 # OpenLayers Pdf Printer
 
+<p align="center">
+    <a href="https://www.npmjs.com/package/ol-pdf-printer">
+        <img src="https://img.shields.io/npm/v/ol-pdf-printer.svg" alt="npm version">
+    </a>
+    <a href="https://img.shields.io/npm/dm/ol-pdf-printer">
+        <img alt="npm" src="https://img.shields.io/npm/dm/ol-pdf-printer">
+    </a>
+    <a href="https://github.com/gastonzalba/ol-pdf-printer/blob/master/LICENSE">
+        <img src="https://img.shields.io/npm/l/ol-pdf-printer.svg" alt="license">
+    </a>
+</p>
+
 Basic Pdf Printer for Open Layers.
 
 Tested with OpenLayers version 5, 6 and 7.
@@ -101,14 +113,14 @@ See [CHANGELOG](./CHANGELOG.md) for details of changes in each release.
 Load `ol-pdf-printer.js` after [OpenLayers](https://www.npmjs.com/package/ol), [jspdf](https://www.npmjs.com/package/jspdf) and PDF.js\[https://www.npmjs.com/package/pdfjs-dist]. Ol Pdf Printer is available as `PdfPrinter`.
 
 ```HTML
-<script src="https://unpkg.com/ol-pdf-printer@1.0.20"></script>
+<script src="https://unpkg.com/ol-pdf-printer@1.0.21"></script>
 ```
 
 #### CSS
 
 ```HTML
-<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.0.20/dist/css/ol-pdf-printer.css" />
-<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.0.20/dist/css/bootstrap.min.css" /> <!-- Bootstrap bundle -->
+<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.0.21/dist/css/ol-pdf-printer.css" />
+<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.0.21/dist/css/bootstrap.min.css" /> <!-- Bootstrap bundle -->
 ```
 
 ### Parcel, Webpack, etc.

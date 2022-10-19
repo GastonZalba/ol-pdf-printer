@@ -1,8 +1,11 @@
 import Modal from 'modal-vanilla';
+
 import Map from 'ol/Map';
+
 import { I18n, IValues, Options } from '../ol-pdf-printer';
 import { getMapScale } from './Helpers';
 import myPragma from '../myPragma';
+
 /**
  * @private
  */

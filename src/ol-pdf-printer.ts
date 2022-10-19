@@ -227,6 +227,7 @@ export default class PdfPrinter extends Control {
 
         this._cancel();
     }
+
     /**
      * @protected
      */
@@ -381,6 +382,7 @@ export default class PdfPrinter extends Control {
 
         this._isCanceled = true;
     }
+
     /**
      * Show the Settings Modal
      * @public

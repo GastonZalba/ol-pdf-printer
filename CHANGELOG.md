@@ -72,3 +72,7 @@
 ## v1.0.20
 * Moved modal-vanilla to peer dependencies
 * Updated dependencies
+
+## v1.0.21
+* Improved README
+* Added LICENSE FILE
