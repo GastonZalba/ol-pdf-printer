@@ -96,7 +96,7 @@ export interface IPrintOptions {
     /**
      *
      */
-    scale: IScale;
+    scale?: IScale;
     /**
      *
      */

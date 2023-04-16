@@ -116,7 +116,7 @@ export default function (commandOptions) {
                 contentBase: ['', 'examples'],
                 historyApiFallback: '/basic.html',
                 host: 'localhost',
-                port: 3000,
+                port: 3007,
                 // execute function after server has begun listening
                 onListening: function (server) {
                     const address = server.address()

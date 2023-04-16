@@ -58,6 +58,25 @@
 ## v1.0.16
 * Remove unnecessary max-width on texts
 
+## v1.0.17
+* Fix bug when printing multiples times on protrait mode
+
+## v1.0.18
+* Ol 7 compatibility
+* Updated dependencies
+* Updated CDNs in examples
+
+## v1.0.19
+* Minor fix on createPdf public function
+
+## v1.0.20
+* Moved modal-vanilla to peer dependencies
+* Updated dependencies
+
+## v1.0.21
+* Improved README
+* Added LICENSE FILE
+
 ## v1.1.0
 * Removed "browser" attribute from package.json
 * Added "type" module attribute to package.json

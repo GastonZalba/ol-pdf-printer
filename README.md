@@ -1,8 +1,20 @@
 # OpenLayers Pdf Printer
 
+<p align="center">
+    <a href="https://www.npmjs.com/package/ol-pdf-printer">
+        <img src="https://img.shields.io/npm/v/ol-pdf-printer.svg" alt="npm version">
+    </a>
+    <a href="https://img.shields.io/npm/dm/ol-pdf-printer">
+        <img alt="npm" src="https://img.shields.io/npm/dm/ol-pdf-printer">
+    </a>
+    <a href="https://github.com/gastonzalba/ol-pdf-printer/blob/master/LICENSE">
+        <img src="https://img.shields.io/npm/l/ol-pdf-printer.svg" alt="license">
+    </a>
+</p>
+
 Basic Pdf Printer for Open Layers.
 
-Tested with OpenLayers version 5 and 6.
+Tested with OpenLayers version 5, 6 and 7.
 
 ## IMPORTANT
 

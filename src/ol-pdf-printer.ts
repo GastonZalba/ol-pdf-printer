@@ -227,6 +227,7 @@ export default class PdfPrinter extends Control {
 
         this._cancel();
     }
+
     /**
      * @protected
      */
@@ -286,15 +287,14 @@ export default class PdfPrinter extends Control {
             // To allow intermediate zoom levels
             this._view.setConstrainResolution(false);
 
-            // this._prepareLayers(form);
-
             let dim = this._options.paperSizes.find(
                 (e) => e.value === form.format
             ).size;
+
             dim =
                 form.orientation === 'landscape'
                     ? dim
-                    : (dim.reverse() as [number, number]);
+                    : ([...dim].reverse() as [number, number]);
 
             const widthPaper = dim[0];
             const heightPaper = dim[1];
@@ -382,6 +382,7 @@ export default class PdfPrinter extends Control {
 
         this._isCanceled = true;
     }
+
     /**
      * Show the Settings Modal
      * @public
@@ -405,22 +406,27 @@ export default class PdfPrinter extends Control {
      * @public
      */
     createPdf(options: IPrintOptions, showLoading: boolean): void {
-        options = {
-            format: (
-                this._options.paperSizes.find((p) => p.selected) ||
-                this._options.paperSizes[0]
-            ).value,
-            resolution: (
-                this._options.dpi.find((p) => p.selected) ||
-                this._options.dpi[0]
-            ).value,
-            orientation: 'landscape',
-            compass: true,
-            attributions: true,
-            scale: true,
-            ...options
-        };
-        this._printMap(options, showLoading);
+        options = {};
+        this._printMap(
+            {
+                format: (
+                    this._options.paperSizes.find((p) => p.selected) ||
+                    this._options.paperSizes[0]
+                ).value,
+                resolution: (
+                    this._options.dpi.find((p) => p.selected) ||
+                    this._options.dpi[0]
+                ).value,
+                orientation: 'landscape',
+                compass: true,
+                attributions: true,
+                scalebar: true,
+                scale: 1000,
+                typeExport: 'pdf',
+                ...options
+            },
+            showLoading
+        );
     }
 }
 
@@ -443,7 +449,7 @@ export interface IPrintOptions {
     /**
      *
      */
-    scale: IScale;
+    scale?: IScale;
     /**
      *
      */

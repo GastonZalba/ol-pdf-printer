@@ -3233,12 +3233,11 @@
                 this._isCanceled = false;
                 // To allow intermediate zoom levels
                 this._view.setConstrainResolution(false);
-                // this._prepareLayers(form);
                 let dim = this._options.paperSizes.find((e) => e.value === form.format).size;
                 dim =
                     form.orientation === 'landscape'
                         ? dim
-                        : dim.reverse();
+                        : [...dim].reverse();
                 const widthPaper = dim[0];
                 const heightPaper = dim[1];
                 const mapSizeForPrint = this._setMapSizForPrint(widthPaper, heightPaper, form.resolution);
@@ -3321,10 +3320,10 @@
          * @public
          */
         createPdf(options, showLoading) {
-            options = Object.assign({ format: (this._options.paperSizes.find((p) => p.selected) ||
+            options = {};
+            this._printMap(Object.assign({ format: (this._options.paperSizes.find((p) => p.selected) ||
                     this._options.paperSizes[0]).value, resolution: (this._options.dpi.find((p) => p.selected) ||
-                    this._options.dpi[0]).value, orientation: 'landscape', compass: true, attributions: true, scale: true }, options);
-            this._printMap(options, showLoading);
+                    this._options.dpi[0]).value, orientation: 'landscape', compass: true, attributions: true, scalebar: true, scale: 1000, typeExport: 'pdf' }, options), showLoading);
         }
     }
 
