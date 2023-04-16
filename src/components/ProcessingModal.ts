@@ -1,5 +1,5 @@
 import Modal from 'modal-vanilla';
-import { I18n, Options } from 'src/ol-pdf-printer';
+import { I18n, Options } from '../ol-pdf-printer';
 
 /**
  * @private

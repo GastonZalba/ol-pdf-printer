@@ -1,8 +1,11 @@
 import View from 'ol/View';
 import { getPointResolution } from 'ol/proj';
-import { I18n, Options, IPrintOptions, IWatermark } from 'src/ol-pdf-printer';
+
 import { jsPDF, TextOptionsLight } from 'jspdf';
 import { getDocument, GlobalWorkerOptions, version } from 'pdfjs-dist';
+
+import { I18n, Options, IPrintOptions, IWatermark } from '../ol-pdf-printer';
+
 import myPragma from '../myPragma';
 
 /**

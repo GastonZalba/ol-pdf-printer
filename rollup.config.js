@@ -4,11 +4,10 @@ import postcss from 'rollup-plugin-postcss';
 import typescript from '@rollup/plugin-typescript';
 import del from 'rollup-plugin-delete';
 import copy from 'rollup-plugin-copy';
-import jsx from 'acorn-jsx';
 import resolve from '@rollup/plugin-node-resolve';
 import path from 'path';
 
-module.exports = {
+export default {
     input: 'src/ol-pdf-printer.ts',
     output: [
         {
@@ -17,7 +16,6 @@ module.exports = {
             sourcemap: true
         }
     ],
-    acornInjectPlugins: [jsx()],
     plugins: [
         del({ targets: 'lib/*' }),
         typescript({
@@ -46,23 +44,7 @@ module.exports = {
                 ]
             ],
             babelHelpers: 'bundled',
-            exclude: "node_modules/**",
-            plugins: [
-                [
-                    '@babel/plugin-transform-react-jsx',
-                    {
-                        pragma: 'myPragma',
-                        pragmaFrag: "'fragment'"
-                    }
-                ],
-                [
-                    'babel-plugin-jsx-pragmatic',
-                    {
-                        module: 'myPragma',
-                        import: 'myPragma'
-                    }
-                ]
-            ]
+            exclude: "node_modules/**"
         }),
         postcss({
             extensions: ['.css', '.sass', '.scss'], 

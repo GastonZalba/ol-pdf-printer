@@ -1,5 +1,6 @@
 import Modal from 'modal-vanilla';
-import { PluggableMap } from 'ol';
+import Map from 'ol/Map';
+
 import { I18n, IValues, Options } from '../ol-pdf-printer';
 import { getMapScale } from './Helpers';
 import myPragma from '../myPragma';
@@ -10,7 +11,7 @@ export default class SettingsModal {
     _modal: Modal;
 
     constructor(
-        map: PluggableMap,
+        map: Map,
         options: Options,
         i18n: I18n,
         printMap: (values: IValues, showLoading: boolean, delay: number) => void

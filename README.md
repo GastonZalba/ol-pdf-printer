@@ -101,14 +101,14 @@ See [CHANGELOG](./CHANGELOG.md) for details of changes in each release.
 Load `ol-pdf-printer.js` after [OpenLayers](https://www.npmjs.com/package/ol), [jspdf](https://www.npmjs.com/package/jspdf) and PDF.js\[https://www.npmjs.com/package/pdfjs-dist]. Ol Pdf Printer is available as `PdfPrinter`.
 
 ```HTML
-<script src="https://unpkg.com/ol-pdf-printer@1.0.16"></script>
+<script src="https://unpkg.com/ol-pdf-printer@1.1.0"></script>
 ```
 
 #### CSS
 
 ```HTML
-<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.0.16/dist/css/ol-pdf-printer.css" />
-<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.0.16/dist/css/bootstrap.min.css" /> <!-- Bootstrap bundle -->
+<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.1.0/dist/css/ol-pdf-printer.css" />
+<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.1.0/dist/css/bootstrap.min.css" /> <!-- Bootstrap bundle -->
 ```
 
 ### Parcel, Webpack, etc.
@@ -155,6 +155,7 @@ TypeScript types are shipped with the project in the dist directory and should b
     -   [attributions](#attributions)
     -   [scalebar](#scalebar)
     -   [typeExport](#typeexport)
+-   [IValues](#ivalues)
 -   [I18n](#i18n)
 -   [IPaperSize](#ipapersize)
     -   [size](#size)
@@ -212,13 +213,13 @@ TypeScript types are shipped with the project in the dist directory and should b
 
 Show the Settings Modal
 
-Returns **void**
+Returns **void**&#x20;
 
 ### hidePrintSettingsModal
 
 Hide the Settings Modal
 
-Returns **void**
+Returns **void**&#x20;
 
 ### createPdf
 
@@ -226,10 +227,10 @@ Create PDF programatically without displaying the Settings Modal
 
 #### Parameters
 
--   `options` **[IPrintOptions](#iprintoptions)**
--   `showLoading` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**
+-   `options` **[IPrintOptions](#iprintoptions)**&#x20;
+-   `showLoading` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**&#x20;
 
-Returns **void**
+Returns **void**&#x20;
 
 ### IPrintOptions
 
@@ -270,6 +271,10 @@ Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Glob
 #### typeExport
 
 Type: any
+
+### IValues
+
+**_\[interface]_** - Custom translations specified when creating an instance
 
 ### I18n
 

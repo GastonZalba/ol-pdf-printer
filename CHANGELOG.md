@@ -57,3 +57,9 @@
 
 ## v1.0.16
 * Remove unnecessary max-width on texts
+
+## v1.1.0
+* Removed "browser" attribute from package.json
+* Added "type" module attribute to package.json
+* Removed index.js
+* Updated dependencies

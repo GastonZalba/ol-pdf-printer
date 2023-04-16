@@ -1,45 +1,44 @@
-import pkg from './package.json';
 import babel from '@rollup/plugin-babel';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import svg from 'rollup-plugin-svg-import';
-import builtins from 'rollup-plugin-node-builtins';
-import { terser } from "rollup-plugin-terser";
+import nodePolyfills from 'rollup-plugin-polyfill-node';
+import terser from '@rollup/plugin-terser';
 import postcss from 'rollup-plugin-postcss';
 import css from 'rollup-plugin-css-only';
 import CleanCss from 'clean-css';
 import { mkdirSync, writeFileSync } from 'fs';
-import nodeGlobals from 'rollup-plugin-node-globals';
 import typescript from '@rollup/plugin-typescript';
 import del from 'rollup-plugin-delete';
 import copy from 'rollup-plugin-copy';
-import jsx from 'acorn-jsx';
 import serve from 'rollup-plugin-serve';
 import livereload from 'rollup-plugin-livereload';
 
-let globals = {
-    'ol/Map': 'ol.Map',
-    'ol/control/Control': 'ol.control.Control',
-    'ol/proj': 'ol.proj',
-    'ol/proj/Units': 'ol.proj.Units',
-    'ol/events': 'ol.events',
-    'ol/Observable': 'ol.Observable',
-    'ol/source/TileWMS': 'ol.source.TileWMS',
-    'ol/layer/Tile': 'ol.layer.Tile',
-    'jspdf': 'jsPDF',
-    'dom-to-image-improved': 'domtoimage',
-    'modal-vanilla': 'Modal',
-    'events': 'EventEmitter',
-    'myPragma': 'myPragma',
-    'pdfjs-dist': 'pdfjsLib'
-};
+const globals = (id) => {
+    const globals = {
+        'jspdf': 'jsPDF',
+        'dom-to-image-improved': 'domtoimage',
+        'modal-vanilla': 'Modal',
+        'events': 'EventEmitter',
+        'myPragma': 'myPragma',
+        'pdfjs-dist': 'pdfjsLib'
+    }
+
+    if (/ol(\\|\/)/.test(id)) {
+        return id.replace(/\//g, '.').replace('.js', '');
+    } else if (id in globals) {
+        return globals[id];
+    }
+
+    return id;
+}
 
 export default function (commandOptions) {
     return {
         input: 'src/ol-pdf-printer.ts',
         output: [
             {
-                dir: 'dist',
+                file: 'dist/ol-pdf-printer.js',
                 format: 'umd',
                 name: 'PdfPrinter',
                 globals: globals,
@@ -48,7 +47,7 @@ export default function (commandOptions) {
             },
             !commandOptions.dev && {
                 intro: 'var global = window;',
-                file: pkg.browser,
+                file: 'dist/ol-pdf-printer.min.js',
                 format: 'umd',
                 plugins: [terser()],
                 name: 'PdfPrinter',
@@ -56,7 +55,6 @@ export default function (commandOptions) {
                 sourcemap: true
             }
         ],
-        acornInjectPlugins: [jsx()],
         plugins: [
             del({ targets: 'dist/*' }),
             typescript(
@@ -73,43 +71,27 @@ export default function (commandOptions) {
             }),
             babel({
                 presets: [
+                    '@babel/preset-react',
                     [
                         '@babel/preset-env',
                         {
                             targets: {
                                 browsers: [
-                                    "Chrome >= 52",
-                                    "FireFox >= 44",
-                                    "Safari >= 7",
-                                    "Explorer 11",
-                                    "last 4 Edge versions"
+                                    'Chrome >= 52',
+                                    'FireFox >= 44',
+                                    'Safari >= 7',
+                                    'Explorer 11',
+                                    'last 4 Edge versions'
                                 ]
                             }
                         }
                     ]
                 ],
-                plugins: [
-                    "@babel/plugin-transform-runtime",
-                    [
-                        '@babel/plugin-transform-react-jsx',
-                        {
-                            pragma: 'myPragma',
-                            pragmaFrag: "'null'"
-                        }
-                    ],
-                    [
-                        'babel-plugin-jsx-pragmatic',
-                        {
-                            module: 'myPragma',
-                            import: 'myPragma'
-                        }
-                    ]
-                ],
                 babelHelpers: 'runtime',
-                exclude: 'node_modules/**'
+                exclude: ['node_modules/**', 'src/assets/**'],
+                plugins: ['@babel/plugin-transform-runtime']
             }),
-            nodeGlobals(),
-            builtins(), // Events
+            nodePolyfills(), // Events
             resolve({
                 extensions: ['.mjs', '.js', '.ts', '.json', '.node', '.tsx', '.jsx']
             }),

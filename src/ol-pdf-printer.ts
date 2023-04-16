@@ -1,13 +1,15 @@
-import { PluggableMap, View } from 'ol';
-import { getPointResolution } from 'ol/proj';
+import Map from 'ol/Map';
+import View from 'ol/View';
 import Control, { Options as ControlOptions } from 'ol/control/Control';
 import TileWMS from 'ol/source/TileWMS';
 import Tile from 'ol/layer/Tile';
-
+import { getPointResolution } from 'ol/proj';
 import { EventsKey } from 'ol/events';
 import { unByKey } from 'ol/Observable';
 
 import domtoimage from 'dom-to-image-improved';
+
+import { Locale } from 'locale-enum';
 
 import Pdf from './components/Pdf';
 import SettingsModal from './components/SettingsModal';
@@ -16,8 +18,6 @@ import * as i18n from './components/i18n/index.js';
 
 import compassIcon from './assets/images/compass.svg';
 import pdfIcon from './assets/images/pdf.svg';
-
-import { Locale } from 'locale-enum';
 
 import './assets/css/ol-pdf-printer.css';
 
@@ -55,7 +55,7 @@ function deepObjectAssign(target, ...sources) {
 export default class PdfPrinter extends Control {
     protected _i18n: I18n;
 
-    protected _map: PluggableMap;
+    protected _map: Map;
     protected _view: View;
     protected _mapTarget: HTMLElement;
 
