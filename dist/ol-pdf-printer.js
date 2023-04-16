@@ -1,16 +1,10 @@
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('ol/proj'), require('ol/control/Control'), require('ol/source/TileWMS'), require('ol/layer/Tile'), require('ol/Observable'), require('jspdf'), require('pdfjs-dist'), require('ol/proj/Units')) :
-    typeof define === 'function' && define.amd ? define(['ol/proj', 'ol/control/Control', 'ol/source/TileWMS', 'ol/layer/Tile', 'ol/Observable', 'jspdf', 'pdfjs-dist', 'ol/proj/Units'], factory) :
-    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.PdfPrinter = factory(global.ol.proj, global.ol.control.Control, global.ol.source.TileWMS, global.ol.layer.Tile, global.ol.Observable, global.jsPDF, global.pdfjsLib, global.ol.proj.Units));
-}(this, (function (proj, Control, TileWMS, Tile, Observable, jspdf, pdfjsDist, Units) { 'use strict';
+    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('ol/control/Control'), require('ol/source/TileWMS'), require('ol/layer/Tile'), require('ol/proj'), require('ol/Observable'), require('jspdf'), require('pdfjs-dist'), require('ol/proj/Units')) :
+    typeof define === 'function' && define.amd ? define(['ol/control/Control', 'ol/source/TileWMS', 'ol/layer/Tile', 'ol/proj', 'ol/Observable', 'jspdf', 'pdfjs-dist', 'ol/proj/Units'], factory) :
+    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.PdfPrinter = factory(global.ol.control.Control, global.ol.source.TileWMS, global.ol.layer.Tile, global.ol.proj, global.ol.Observable, global.jsPDF, global.pdfjsLib, global.ol.proj.Units));
+})(this, (function (Control, TileWMS, Tile, proj, Observable, jspdf, pdfjsDist, Units) { 'use strict';
 
     var global = window;
-
-    function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
-
-    var Control__default = /*#__PURE__*/_interopDefaultLegacy(Control);
-    var TileWMS__default = /*#__PURE__*/_interopDefaultLegacy(TileWMS);
-    var Tile__default = /*#__PURE__*/_interopDefaultLegacy(Tile);
 
     /*! *****************************************************************************
     Copyright (c) Microsoft Corporation.
@@ -41,1040 +35,972 @@
     	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
     }
 
-    function getAugmentedNamespace(n) {
-    	if (n.__esModule) return n;
-    	var a = Object.defineProperty({}, '__esModule', {value: true});
-    	Object.keys(n).forEach(function (k) {
-    		var d = Object.getOwnPropertyDescriptor(n, k);
-    		Object.defineProperty(a, k, d.get ? d : {
-    			enumerable: true,
-    			get: function () {
-    				return n[k];
-    			}
-    		});
-    	});
-    	return a;
-    }
-
-    function createCommonjsModule(fn) {
-      var module = { exports: {} };
-    	return fn(module, module.exports), module.exports;
-    }
-
-    var domToImageImproved = createCommonjsModule(function (module, exports) {
-    (function(global) {
-
-        var util = newUtil();
-        var inliner = newInliner();
-        var fontFaces = newFontFaces();
-        var images = newImages();
-
-        // Default impl options
-        var defaultOptions = {
-            // Default is to fail on error, no placeholder
-            imagePlaceholder: undefined,
-            // Default cache bust is false, it will use the cache
-            cacheBust: false,
-            // Use (existing) authentication credentials for external URIs (CORS requests)
-            useCredentials: false
-        };
-
-        var domtoimage = {
-            toSvg: toSvg,
-            toPng: toPng,
-            toJpeg: toJpeg,
-            toBlob: toBlob,
-            toPixelData: toPixelData,
-            toCanvas: toCanvas,
-            impl: {
-                fontFaces: fontFaces,
-                images: images,
-                util: util,
-                inliner: inliner,
-                options: {}
-            }
-        };
-
-        module.exports = domtoimage;
-
-        /**
-         * @param {Node} node - The DOM Node object to render
-         * @param {Object} options - Rendering options
-         * @param {Function} options.filter - Should return true if passed node should be included in the output
-         *          (excluding node means excluding it's children as well). Not called on the root node.
-         * @param {String} options.bgcolor - color for the background, any valid CSS color value.
-         * @param {Number} options.width - width to be applied to node before rendering.
-         * @param {Number} options.height - height to be applied to node before rendering.
-         * @param {Object} options.style - an object whose properties to be copied to node's style before rendering.
-         * @param {Number} options.quality - a Number between 0 and 1 indicating image quality (applicable to JPEG only),
-         defaults to 1.0.
-         * @param {Number} options.scale - a Number multiplier to scale up the canvas before rendering to reduce fuzzy images, defaults to 1.0.
-         * @param {String} options.imagePlaceholder - dataURL to use as a placeholder for failed images, default behaviour is to fail fast on images we can't fetch
-         * @param {Boolean} options.cacheBust - set to true to cache bust by appending the time to the request url
-         * @return {Promise} - A promise that is fulfilled with a SVG image data URL
-         * */
-        function toSvg(node, options) {
-            options = options || {};
-            copyOptions(options);
-            return Promise.resolve(node)
-            .then(function(node) {
-                return cloneNode(node, options.filter, true);
-            })
-            .then(embedFonts)
-            .then(inlineImages)
-            .then(applyOptions)
-            .then(function(clone) {
-                return makeSvgDataUri(clone,
-                  options.width || util.width(node),
-                  options.height || util.height(node)
-                );
-            });
-
-            function applyOptions(clone) {
-                if (options.bgcolor) clone.style.backgroundColor = options.bgcolor;
-                if (options.width) clone.style.width = options.width + 'px';
-                if (options.height) clone.style.height = options.height + 'px';
-
-                if (options.style)
-                    Object.keys(options.style).forEach(function(property) {
-                        clone.style[property] = options.style[property];
-                    });
-
-                return clone;
-            }
-        }
-
-        /**
-         * @param {Node} node - The DOM Node object to render
-         * @param {Object} options - Rendering options, @see {@link toSvg}
-         * @return {Promise} - A promise that is fulfilled with a Uint8Array containing RGBA pixel data.
-         * */
-        function toPixelData(node, options) {
-            return draw(node, options || {})
-            .then(function(canvas) {
-                return canvas.getContext('2d').getImageData(
-                  0,
-                  0,
-                  util.width(node),
-                  util.height(node)
-                ).data;
-            });
-        }
-
-        /**
-         * @param {Node} node - The DOM Node object to render
-         * @param {Object} options - Rendering options, @see {@link toSvg}
-         * @return {Promise} - A promise that is fulfilled with a PNG image data URL
-         * */
-        function toPng(node, options) {
-            return draw(node, options || {})
-            .then(function(canvas) {
-                return canvas.toDataURL();
-            });
-        }
-
-        /**
-         * @param {Node} node - The DOM Node object to render
-         * @param {Object} options - Rendering options, @see {@link toSvg}
-         * @return {Promise} - A promise that is fulfilled with a JPEG image data URL
-         * */
-        function toJpeg(node, options) {
-            options = options || {};
-            return draw(node, options)
-            .then(function(canvas) {
-                return canvas.toDataURL('image/jpeg', options.quality || 1.0);
-            });
-        }
-
-        /**
-         * @param {Node} node - The DOM Node object to render
-         * @param {Object} options - Rendering options, @see {@link toSvg}
-         * @return {Promise} - A promise that is fulfilled with a PNG image blob
-         * */
-        function toBlob(node, options) {
-            return draw(node, options || {})
-            .then(util.canvasToBlob);
-        }
-
-        /**
-         * @param {Node} node - The DOM Node object to render
-         * @param {Object} options - Rendering options, @see {@link toSvg}
-         * @return {Promise} - A promise that is fulfilled with a canvas object
-         * */
-        function toCanvas(node, options) {
-            return draw(node, options || {});
-        }
-
-        function copyOptions(options) {
-            // Copy options to impl options for use in impl
-            if (typeof(options.imagePlaceholder) === 'undefined') {
-                domtoimage.impl.options.imagePlaceholder = defaultOptions.imagePlaceholder;
-            } else {
-                domtoimage.impl.options.imagePlaceholder = options.imagePlaceholder;
-            }
-
-            if (typeof(options.cacheBust) === 'undefined') {
-                domtoimage.impl.options.cacheBust = defaultOptions.cacheBust;
-            } else {
-                domtoimage.impl.options.cacheBust = options.cacheBust;
-            }
-
-            if(typeof(options.useCredentials) === 'undefined') {
-                domtoimage.impl.options.useCredentials = defaultOptions.useCredentials;
-            } else {
-                domtoimage.impl.options.useCredentials = options.useCredentials;
-            }
-        }
-
-        function draw(domNode, options) {
-            return toSvg(domNode, options)
-            .then(util.makeImage)
-            .then(util.delay(100))
-            .then(function(image) {
-                var scale = typeof(options.scale) !== 'number' ? 1 : options.scale;
-                console.log('scale', scale);
-                var canvas = newCanvas(domNode, scale);
-                var ctx = canvas.getContext('2d');
-                if (image) {
-                    //console.log('should be scaled', image);
-                    ctx.scale(scale, scale);
-                    //canvas.height = 620;
-                    //ctx.drawImage(image, 150, 600, 1150, 700, 0, 0, 1150, 700);
-                    // canvas.height = options.image.height + 50;
-                    // //canvas.width = options.image.width - 135;// - options.image.offsetRight
-                    // canvas.width = options.image.width - options.image.offsetRight - options.image.offsetLeft + 60;
-                    // ctx.drawImage(image, options.image.offsetLeft, options.image.offsetTop - 50, options.image.width, options.image.height + 50, 0, 0, options.image.width, options.image.height);
-
-                    if (options.canvas && options.canvas.width) {
-                        canvas.width = options.canvas.width;
-                    }
-
-                    if (options.canvas && options.canvas.height) {
-                        canvas.height = options.canvas.height;
-                    }
-
-                    if (options.canvas) {
-                        console.log('canv', options.canvas);
-                        ctx.drawImage(
-                          image,
-                          options.canvas.sx  || 0,
-                          options.canvas.sy || 0,
-                          options.canvas.sw || options.width,
-                          options.canvas.sh || options.height,
-                          options.canvas.dx || 0,
-                          options.canvas.dy || 0,
-                          options.canvas.dw || options.width,
-                          options.canvas.dh || options.height
-                        );
-                    } else {
-                        ctx.drawImage(image, 0, 0);
-                    }
-
-                }
-                return canvas;
-            });
-
-            function newCanvas(domNode, scale) {
-                var canvas = document.createElement('canvas');
-                canvas.width = (options.width || util.width(domNode)) * scale;
-                canvas.height = (options.height || util.height(domNode)) * scale;
-
-                console.log(canvas.width, canvas.height);
-
-                if (options.bgcolor) {
-                    var ctx = canvas.getContext('2d');
-                    ctx.fillStyle = options.bgcolor;
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                }
-
-                return canvas;
-            }
-        }
-
-        function cloneNode(node, filter, root) {
-            if (!root && filter && !filter(node)) return Promise.resolve();
-
-            return Promise.resolve(node)
-            .then(makeNodeCopy)
-            .then(function(clone) {
-                return cloneChildren(node, clone, filter);
-            })
-            .then(function(clone) {
-                return processClone(node, clone);
-            });
-
-            function makeNodeCopy(node) {
-                if (node instanceof HTMLCanvasElement) return util.makeImage(node.toDataURL());
-                return node.cloneNode(false);
-            }
-
-            function cloneChildren(original, clone, filter) {
-                var children = original.tagName === 'use' ? copyShadowChild(original) : original.childNodes;
-                if (children.length === 0) return Promise.resolve(clone);
-
-                return cloneChildrenInOrder(clone, util.asArray(children), filter)
-                .then(function() {
-                    return clone;
-                });
-
-                function cloneChildrenInOrder(parent, children, filter) {
-                    var done = Promise.resolve();
-                    children.forEach(function(child) {
-                        done = done
-                        .then(function() {
-                            return cloneNode(child, filter);
-                        })
-                        .then(function(childClone) {
-                            if (childClone) parent.appendChild(childClone);
-                        });
-                    });
-                    return done;
-                }
-            }
-
-            function copyShadowChild(original) {
-                var child = document.getElementById(original.href.baseVal.replace('#', ''));
-                return [child.cloneNode(true)];
-            }
-
-            function processClone(original, clone) {
-                if (!(clone instanceof Element)) return clone;
-
-                return Promise.resolve()
-                .then(cloneStyle)
-                .then(clonePseudoElements)
-                .then(copyUserInput)
-                .then(fixSvg)
-                .then(function() {
-                    return clone;
-                });
-
-                function cloneStyle() {
-                    copyStyle(window.getComputedStyle(original), clone.style);
-
-                    if (util.isChrome() && clone.style.marker && ( clone.tagName === 'line' || clone.tagName === 'path')) {
-                        clone.style.marker = '';
-                    }
-
-                    function copyStyle(source, target) {
-                        if (source.cssText) {
-                            target.cssText = source.cssText;
-                            target.font = source.font; // here, we re-assign the font prop.
-                        } else copyProperties(source, target);
-
-                        function copyProperties(source, target) {
-                            util.asArray(source).forEach(function(name) {
-                                target.setProperty(
-                                  name,
-                                  source.getPropertyValue(name),
-                                  source.getPropertyPriority(name)
-                                );
-                            });
-                        }
-                    }
-                }
-
-                function clonePseudoElements() {
-                    [':before', ':after'].forEach(function(element) {
-                        clonePseudoElement(element);
-                    });
-
-                    function clonePseudoElement(element) {
-                        var style = window.getComputedStyle(original, element);
-                        var content = style.getPropertyValue('content');
-
-                        if (content === '' || content === 'none') return;
-
-                        var className = util.uid();
-                        var currentClass = clone.getAttribute('class');
-                        if (currentClass) {
-                            clone.setAttribute('class', currentClass + ' ' + className);
-                        }
-
-                        var styleElement = document.createElement('style');
-                        styleElement.appendChild(formatPseudoElementStyle(className, element, style));
-                        clone.appendChild(styleElement);
-
-                        function formatPseudoElementStyle(className, element, style) {
-                            var selector = '.' + className + ':' + element;
-                            var cssText = style.cssText ? formatCssText(style) : formatCssProperties(style);
-                            return document.createTextNode(selector + '{' + cssText + '}');
-
-                            function formatCssText(style) {
-                                var content = style.getPropertyValue('content');
-                                return style.cssText + ' content: ' + content + ';';
-                            }
-
-                            function formatCssProperties(style) {
-
-                                return util.asArray(style)
-                                .map(formatProperty)
-                                .join('; ') + ';';
-
-                                function formatProperty(name) {
-                                    return name + ': ' +
-                                      style.getPropertyValue(name) +
-                                      (style.getPropertyPriority(name) ? ' !important' : '');
-                                }
-                            }
-                        }
-                    }
-                }
-
-                function copyUserInput() {
-                    if (original instanceof HTMLTextAreaElement) clone.innerHTML = original.value;
-                    if (original instanceof HTMLInputElement) clone.setAttribute("value", original.value);
-                }
-
-                function fixSvg() {
-                    if (!(clone instanceof SVGElement)) return;
-                    clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-
-                    if (!(clone instanceof SVGRectElement)) return;
-                    ['width', 'height'].forEach(function(attribute) {
-                        var value = clone.getAttribute(attribute);
-                        if (!value) return;
-
-                        clone.style.setProperty(attribute, value);
-                    });
-                }
-            }
-        }
-
-        function embedFonts(node) {
-            return fontFaces.resolveAll()
-            .then(function(cssText) {
-                var styleNode = document.createElement('style');
-                node.appendChild(styleNode);
-                styleNode.appendChild(document.createTextNode(cssText));
-                return node;
-            });
-        }
-
-        function inlineImages(node) {
-            return images.inlineAll(node)
-            .then(function() {
-                return node;
-            });
-        }
-
-        function makeSvgDataUri(node, width, height) {
-            return Promise.resolve(node)
-            .then(function(node) {
-                node.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
-                return new XMLSerializer().serializeToString(node);
-            })
-            .then(util.escapeXhtml)
-            .then(function(xhtml) {
-                return '<foreignObject x="0" y="0" width="100%" height="100%">' + xhtml + '</foreignObject>';
-            })
-            .then(function(foreignObject) {
-                return '<svg xmlns="http://www.w3.org/2000/svg" width="' + width + '" height="' + height + '">' +
-                  foreignObject + '</svg>';
-            })
-            .then(function(svg) {
-                return 'data:image/svg+xml;charset=utf-8,' + svg;
-            });
-        }
-
-        function newUtil() {
-            return {
-                escape: escape,
-                parseExtension: parseExtension,
-                mimeType: mimeType,
-                dataAsUrl: dataAsUrl,
-                isDataUrl: isDataUrl,
-                canvasToBlob: canvasToBlob,
-                resolveUrl: resolveUrl,
-                getAndEncode: getAndEncode,
-                uid: uid(),
-                delay: delay,
-                asArray: asArray,
-                isChrome: isChrome,
-                escapeXhtml: escapeXhtml,
-                makeImage: makeImage,
-                width: width,
-                height: height
-            };
-
-            function mimes() {
-                /*
-                 * Only WOFF and EOT mime types for fonts are 'real'
-                 * see http://www.iana.org/assignments/media-types/media-types.xhtml
-                 */
-                var WOFF = 'application/font-woff';
-                var JPEG = 'image/jpeg';
-
-                return {
-                    'woff': WOFF,
-                    'woff2': WOFF,
-                    'ttf': 'application/font-truetype',
-                    'eot': 'application/vnd.ms-fontobject',
-                    'png': 'image/png',
-                    'jpg': JPEG,
-                    'jpeg': JPEG,
-                    'gif': 'image/gif',
-                    'tiff': 'image/tiff',
-                    'svg': 'image/svg+xml'
-                };
-            }
-
-            function parseExtension(url) {
-                var match = /\.([^\.\/]*?)(\?|$)/g.exec(url);
-                if (match) return match[1];
-                else return '';
-            }
-
-            function mimeType(url) {
-                var extension = parseExtension(url).toLowerCase();
-                return mimes()[extension] || '';
-            }
-
-            function isDataUrl(url) {
-                return url.search(/^(data:)/) !== -1;
-            }
-
-            function toBlob(canvas) {
-                return new Promise(function(resolve) {
-                    var binaryString = window.atob(canvas.toDataURL().split(',')[1]);
-                    var length = binaryString.length;
-                    var binaryArray = new Uint8Array(length);
-
-                    for (var i = 0; i < length; i++)
-                        binaryArray[i] = binaryString.charCodeAt(i);
-
-                    resolve(new Blob([binaryArray], {
-                        type: 'image/png'
-                    }));
-                });
-            }
-
-            function canvasToBlob(canvas) {
-                if (canvas.toBlob)
-                    return new Promise(function(resolve) {
-                        canvas.toBlob(resolve);
-                    });
-
-                return toBlob(canvas);
-            }
-
-            function resolveUrl(url, baseUrl) {
-                var doc = document.implementation.createHTMLDocument();
-                var base = doc.createElement('base');
-                doc.head.appendChild(base);
-                var a = doc.createElement('a');
-                doc.body.appendChild(a);
-                base.href = baseUrl;
-                a.href = url;
-                return a.href;
-            }
-
-            function uid() {
-                var index = 0;
-
-                return function() {
-                    return 'u' + fourRandomChars() + index++;
-
-                    function fourRandomChars() {
-                        /* see http://stackoverflow.com/a/6248722/2519373 */
-                        return ('0000' + (Math.random() * Math.pow(36, 4) << 0).toString(36)).slice(-4);
-                    }
-                };
-            }
-
-            function makeImage(uri) {
-                if (uri === 'data:,') return Promise.resolve();
-                return new Promise(function(resolve, reject) {
-                    var image = new Image();
-                    if(domtoimage.impl.options.useCredentials) {
-                        image.crossOrigin = 'use-credentials';
-                    }
-                    image.onload = function() {
-                        resolve(image);
-                    };
-                    image.onerror = reject;
-                    image.src = uri;
-                });
-            }
-
-            function getAndEncode(url) {
-                var TIMEOUT = 30000;
-                if (domtoimage.impl.options.cacheBust) {
-                    // Cache bypass so we dont have CORS issues with cached images
-                    // Source: https://developer.mozilla.org/en/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest#Bypassing_the_cache
-                    url += ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime();
-                }
-
-                return new Promise(function(resolve) {
-                    var request = new XMLHttpRequest();
-
-                    request.onreadystatechange = done;
-                    request.ontimeout = timeout;
-                    request.responseType = 'blob';
-                    request.timeout = TIMEOUT;
-                    if(domtoimage.impl.options.useCredentials) {
-                        request.withCredentials = true;
-                    }
-                    request.open('GET', url, true);
-                    request.send();
-
-                    var placeholder;
-                    if (domtoimage.impl.options.imagePlaceholder) {
-                        var split = domtoimage.impl.options.imagePlaceholder.split(/,/);
-                        if (split && split[1]) {
-                            placeholder = split[1];
-                        }
-                    }
-
-                    function done() {
-                        if (request.readyState !== 4) return;
-
-                        if (request.status !== 200) {
-                            if (placeholder) {
-                                resolve(placeholder);
-                            } else {
-                                fail('cannot fetch resource: ' + url + ', status: ' + request.status);
-                            }
-
-                            return;
-                        }
-
-                        var encoder = new FileReader();
-                        encoder.onloadend = function() {
-                            var content = encoder.result.split(/,/)[1];
-                            resolve(content);
-                        };
-                        encoder.readAsDataURL(request.response);
-                    }
-
-                    function timeout() {
-                        if (placeholder) {
-                            resolve(placeholder);
-                        } else {
-                            fail('timeout of ' + TIMEOUT + 'ms occured while fetching resource: ' + url);
-                        }
-                    }
-
-                    function fail(message) {
-                        console.error(message);
-                        resolve('');
-                    }
-                });
-            }
-
-            function dataAsUrl(content, type) {
-                return 'data:' + type + ';base64,' + content;
-            }
-
-            function escape(string) {
-                return string.replace(/([.*+?^${}()|\[\]\/\\])/g, '\\$1');
-            }
-
-            function isChrome() {
-                return /chrome/i.test( navigator.userAgent );
-            }
-
-            function delay(ms) {
-                return function(arg) {
-                    return new Promise(function(resolve) {
-                        setTimeout(function() {
-                            resolve(arg);
-                        }, ms);
-                    });
-                };
-            }
-
-            function asArray(arrayLike) {
-                var array = [];
-                var length = arrayLike.length;
-                for (var i = 0; i < length; i++) array.push(arrayLike[i]);
-                return array;
-            }
-
-            function escapeXhtml(string) {
-                return string.replace(/#/g, '%23').replace(/\n/g, '%0A');
-            }
-
-            function width(node) {
-                var leftBorder = px(node, 'border-left-width');
-                var rightBorder = px(node, 'border-right-width');
-                return node.scrollWidth + leftBorder + rightBorder;
-            }
-
-            function height(node) {
-                var topBorder = px(node, 'border-top-width');
-                var bottomBorder = px(node, 'border-bottom-width');
-                return node.scrollHeight + topBorder + bottomBorder;
-            }
-
-            function px(node, styleProperty) {
-                var value = window.getComputedStyle(node).getPropertyValue(styleProperty);
-                return parseFloat(value.replace('px', ''));
-            }
-        }
-
-        function newInliner() {
-            var URL_REGEX = /url\(['"]?([^'"]+?)['"]?\)/g;
-
-            return {
-                inlineAll: inlineAll,
-                shouldProcess: shouldProcess,
-                impl: {
-                    readUrls: readUrls,
-                    inline: inline
-                }
-            };
-
-            function shouldProcess(string) {
-                return string.search(URL_REGEX) !== -1;
-            }
-
-            function readUrls(string) {
-                var result = [];
-                var match;
-                while ((match = URL_REGEX.exec(string)) !== null) {
-                    result.push(match[1]);
-                }
-                return result.filter(function(url) {
-                    return !util.isDataUrl(url);
-                });
-            }
-
-            function inline(string, url, baseUrl, get) {
-                return Promise.resolve(url)
-                .then(function(url) {
-                    return baseUrl ? util.resolveUrl(url, baseUrl) : url;
-                })
-                .then(get || util.getAndEncode)
-                .then(function(data) {
-                    return util.dataAsUrl(data, util.mimeType(url));
-                })
-                .then(function(dataUrl) {
-                    return string.replace(urlAsRegex(url), '$1' + dataUrl + '$3');
-                });
-
-                function urlAsRegex(url) {
-                    return new RegExp('(url\\([\'"]?)(' + util.escape(url) + ')([\'"]?\\))', 'g');
-                }
-            }
-
-            function inlineAll(string, baseUrl, get) {
-                if (nothingToInline()) return Promise.resolve(string);
-
-                return Promise.resolve(string)
-                .then(readUrls)
-                .then(function(urls) {
-                    var done = Promise.resolve(string);
-                    urls.forEach(function(url) {
-                        done = done.then(function(string) {
-                            return inline(string, url, baseUrl, get);
-                        });
-                    });
-                    return done;
-                });
-
-                function nothingToInline() {
-                    return !shouldProcess(string);
-                }
-            }
-        }
-
-        function newFontFaces() {
-            return {
-                resolveAll: resolveAll,
-                impl: {
-                    readAll: readAll
-                }
-            };
-
-            function resolveAll() {
-                return readAll()
-                .then(function(webFonts) {
-                    return Promise.all(
-                      webFonts.map(function(webFont) {
-                          return webFont.resolve();
-                      })
-                    );
-                })
-                .then(function(cssStrings) {
-                    return cssStrings.join('\n');
-                });
-            }
-
-            function readAll() {
-                return Promise.resolve(util.asArray(document.styleSheets))
-                .then(getCssRules)
-                .then(selectWebFontRules)
-                .then(function(rules) {
-                    return rules.map(newWebFont);
-                });
-
-                function selectWebFontRules(cssRules) {
-                    return cssRules
-                    .filter(function(rule) {
-                        return rule.type === CSSRule.FONT_FACE_RULE;
-                    })
-                    .filter(function(rule) {
-                        return inliner.shouldProcess(rule.style.getPropertyValue('src'));
-                    });
-                }
-
-                function getCssRules(styleSheets) {
-                    var cssRules = [];
-                    styleSheets.forEach(function(sheet) {
-                        if (sheet.hasOwnProperty("cssRules")) {
-                            try {
-                                util.asArray(sheet.cssRules || []).forEach(cssRules.push.bind(cssRules));
-                            } catch (e) {
-                                console.log('Error while reading CSS rules from ' + sheet.href, e.toString());
-                            }
-                        }
-                    });
-                    return cssRules;
-                }
-
-                function newWebFont(webFontRule) {
-                    return {
-                        resolve: function resolve() {
-                            var baseUrl = (webFontRule.parentStyleSheet || {}).href;
-                            return inliner.inlineAll(webFontRule.cssText, baseUrl);
-                        },
-                        src: function() {
-                            return webFontRule.style.getPropertyValue('src');
-                        }
-                    };
-                }
-            }
-        }
-
-        function newImages() {
-            return {
-                inlineAll: inlineAll,
-                impl: {
-                    newImage: newImage
-                }
-            };
-
-            function newImage(element) {
-                return {
-                    inline: inline
-                };
-
-                function inline(get) {
-                    if (util.isDataUrl(element.src)) return Promise.resolve();
-
-                    return Promise.resolve(element.src)
-                    .then(get || util.getAndEncode)
-                    .then(function(data) {
-                        return util.dataAsUrl(data, util.mimeType(element.src));
-                    })
-                    .then(function(dataUrl) {
-                        return new Promise(function(resolve, reject) {
-                            element.onload = resolve;
-                            // for any image with invalid src(such as <img src />), just ignore it
-                            element.onerror = resolve;
-                            element.src = dataUrl;
-                        });
-                    });
-                }
-            }
-
-            function inlineAll(node) {
-                if (!(node instanceof Element)) return Promise.resolve(node);
-
-                return inlineBackground(node)
-                .then(function() {
-                    if (node instanceof HTMLImageElement)
-                        return newImage(node).inline();
-                    else
-                        return Promise.all(
-                          util.asArray(node.childNodes).map(function(child) {
-                              return inlineAll(child);
-                          })
-                        );
-                });
-
-                function inlineBackground(node) {
-                    var background = node.style.getPropertyValue('background');
-
-                    if (!background) return Promise.resolve(node);
-
-                    return inliner.inlineAll(background)
-                    .then(function(inlined) {
-                        node.style.setProperty(
-                          'background',
-                          inlined,
-                          node.style.getPropertyPriority('background')
-                        );
-                    })
-                    .then(function() {
-                        return node;
-                    });
-                }
-            }
-        }
-    })();
-    });
-
-    var arrayLikeToArray = createCommonjsModule(function (module) {
+    var domToImageImproved = {exports: {}};
+
+    (function (module, exports) {
+    	(function(global) {
+
+    	    var util = newUtil();
+    	    var inliner = newInliner();
+    	    var fontFaces = newFontFaces();
+    	    var images = newImages();
+
+    	    // Default impl options
+    	    var defaultOptions = {
+    	        // Default is to fail on error, no placeholder
+    	        imagePlaceholder: undefined,
+    	        // Default cache bust is false, it will use the cache
+    	        cacheBust: false,
+    	        // Use (existing) authentication credentials for external URIs (CORS requests)
+    	        useCredentials: false
+    	    };
+
+    	    var domtoimage = {
+    	        toSvg: toSvg,
+    	        toPng: toPng,
+    	        toJpeg: toJpeg,
+    	        toBlob: toBlob,
+    	        toPixelData: toPixelData,
+    	        toCanvas: toCanvas,
+    	        impl: {
+    	            fontFaces: fontFaces,
+    	            images: images,
+    	            util: util,
+    	            inliner: inliner,
+    	            options: {}
+    	        }
+    	    };
+
+    	    module.exports = domtoimage;
+
+    	    /**
+    	     * @param {Node} node - The DOM Node object to render
+    	     * @param {Object} options - Rendering options
+    	     * @param {Function} options.filter - Should return true if passed node should be included in the output
+    	     *          (excluding node means excluding it's children as well). Not called on the root node.
+    	     * @param {String} options.bgcolor - color for the background, any valid CSS color value.
+    	     * @param {Number} options.width - width to be applied to node before rendering.
+    	     * @param {Number} options.height - height to be applied to node before rendering.
+    	     * @param {Object} options.style - an object whose properties to be copied to node's style before rendering.
+    	     * @param {Number} options.quality - a Number between 0 and 1 indicating image quality (applicable to JPEG only),
+    	     defaults to 1.0.
+    	     * @param {Number} options.scale - a Number multiplier to scale up the canvas before rendering to reduce fuzzy images, defaults to 1.0.
+    	     * @param {String} options.imagePlaceholder - dataURL to use as a placeholder for failed images, default behaviour is to fail fast on images we can't fetch
+    	     * @param {Boolean} options.cacheBust - set to true to cache bust by appending the time to the request url
+    	     * @return {Promise} - A promise that is fulfilled with a SVG image data URL
+    	     * */
+    	    function toSvg(node, options) {
+    	        options = options || {};
+    	        copyOptions(options);
+    	        return Promise.resolve(node)
+    	        .then(function(node) {
+    	            return cloneNode(node, options.filter, true);
+    	        })
+    	        .then(embedFonts)
+    	        .then(inlineImages)
+    	        .then(applyOptions)
+    	        .then(function(clone) {
+    	            return makeSvgDataUri(clone,
+    	              options.width || util.width(node),
+    	              options.height || util.height(node)
+    	            );
+    	        });
+
+    	        function applyOptions(clone) {
+    	            if (options.bgcolor) clone.style.backgroundColor = options.bgcolor;
+    	            if (options.width) clone.style.width = options.width + 'px';
+    	            if (options.height) clone.style.height = options.height + 'px';
+
+    	            if (options.style)
+    	                Object.keys(options.style).forEach(function(property) {
+    	                    clone.style[property] = options.style[property];
+    	                });
+
+    	            return clone;
+    	        }
+    	    }
+
+    	    /**
+    	     * @param {Node} node - The DOM Node object to render
+    	     * @param {Object} options - Rendering options, @see {@link toSvg}
+    	     * @return {Promise} - A promise that is fulfilled with a Uint8Array containing RGBA pixel data.
+    	     * */
+    	    function toPixelData(node, options) {
+    	        return draw(node, options || {})
+    	        .then(function(canvas) {
+    	            return canvas.getContext('2d').getImageData(
+    	              0,
+    	              0,
+    	              util.width(node),
+    	              util.height(node)
+    	            ).data;
+    	        });
+    	    }
+
+    	    /**
+    	     * @param {Node} node - The DOM Node object to render
+    	     * @param {Object} options - Rendering options, @see {@link toSvg}
+    	     * @return {Promise} - A promise that is fulfilled with a PNG image data URL
+    	     * */
+    	    function toPng(node, options) {
+    	        return draw(node, options || {})
+    	        .then(function(canvas) {
+    	            return canvas.toDataURL();
+    	        });
+    	    }
+
+    	    /**
+    	     * @param {Node} node - The DOM Node object to render
+    	     * @param {Object} options - Rendering options, @see {@link toSvg}
+    	     * @return {Promise} - A promise that is fulfilled with a JPEG image data URL
+    	     * */
+    	    function toJpeg(node, options) {
+    	        options = options || {};
+    	        return draw(node, options)
+    	        .then(function(canvas) {
+    	            return canvas.toDataURL('image/jpeg', options.quality || 1.0);
+    	        });
+    	    }
+
+    	    /**
+    	     * @param {Node} node - The DOM Node object to render
+    	     * @param {Object} options - Rendering options, @see {@link toSvg}
+    	     * @return {Promise} - A promise that is fulfilled with a PNG image blob
+    	     * */
+    	    function toBlob(node, options) {
+    	        return draw(node, options || {})
+    	        .then(util.canvasToBlob);
+    	    }
+
+    	    /**
+    	     * @param {Node} node - The DOM Node object to render
+    	     * @param {Object} options - Rendering options, @see {@link toSvg}
+    	     * @return {Promise} - A promise that is fulfilled with a canvas object
+    	     * */
+    	    function toCanvas(node, options) {
+    	        return draw(node, options || {});
+    	    }
+
+    	    function copyOptions(options) {
+    	        // Copy options to impl options for use in impl
+    	        if (typeof(options.imagePlaceholder) === 'undefined') {
+    	            domtoimage.impl.options.imagePlaceholder = defaultOptions.imagePlaceholder;
+    	        } else {
+    	            domtoimage.impl.options.imagePlaceholder = options.imagePlaceholder;
+    	        }
+
+    	        if (typeof(options.cacheBust) === 'undefined') {
+    	            domtoimage.impl.options.cacheBust = defaultOptions.cacheBust;
+    	        } else {
+    	            domtoimage.impl.options.cacheBust = options.cacheBust;
+    	        }
+
+    	        if(typeof(options.useCredentials) === 'undefined') {
+    	            domtoimage.impl.options.useCredentials = defaultOptions.useCredentials;
+    	        } else {
+    	            domtoimage.impl.options.useCredentials = options.useCredentials;
+    	        }
+    	    }
+
+    	    function draw(domNode, options) {
+    	        return toSvg(domNode, options)
+    	        .then(util.makeImage)
+    	        .then(util.delay(100))
+    	        .then(function(image) {
+    	            var scale = typeof(options.scale) !== 'number' ? 1 : options.scale;
+    	            console.log('scale', scale);
+    	            var canvas = newCanvas(domNode, scale);
+    	            var ctx = canvas.getContext('2d');
+    	            if (image) {
+    	                //console.log('should be scaled', image);
+    	                ctx.scale(scale, scale);
+    	                //canvas.height = 620;
+    	                //ctx.drawImage(image, 150, 600, 1150, 700, 0, 0, 1150, 700);
+    	                // canvas.height = options.image.height + 50;
+    	                // //canvas.width = options.image.width - 135;// - options.image.offsetRight
+    	                // canvas.width = options.image.width - options.image.offsetRight - options.image.offsetLeft + 60;
+    	                // ctx.drawImage(image, options.image.offsetLeft, options.image.offsetTop - 50, options.image.width, options.image.height + 50, 0, 0, options.image.width, options.image.height);
+
+    	                if (options.canvas && options.canvas.width) {
+    	                    canvas.width = options.canvas.width;
+    	                }
+
+    	                if (options.canvas && options.canvas.height) {
+    	                    canvas.height = options.canvas.height;
+    	                }
+
+    	                if (options.canvas) {
+    	                    console.log('canv', options.canvas);
+    	                    ctx.drawImage(
+    	                      image,
+    	                      options.canvas.sx  || 0,
+    	                      options.canvas.sy || 0,
+    	                      options.canvas.sw || options.width,
+    	                      options.canvas.sh || options.height,
+    	                      options.canvas.dx || 0,
+    	                      options.canvas.dy || 0,
+    	                      options.canvas.dw || options.width,
+    	                      options.canvas.dh || options.height
+    	                    );
+    	                } else {
+    	                    ctx.drawImage(image, 0, 0);
+    	                }
+
+    	            }
+    	            return canvas;
+    	        });
+
+    	        function newCanvas(domNode, scale) {
+    	            var canvas = document.createElement('canvas');
+    	            canvas.width = (options.width || util.width(domNode)) * scale;
+    	            canvas.height = (options.height || util.height(domNode)) * scale;
+
+    	            console.log(canvas.width, canvas.height);
+
+    	            if (options.bgcolor) {
+    	                var ctx = canvas.getContext('2d');
+    	                ctx.fillStyle = options.bgcolor;
+    	                ctx.fillRect(0, 0, canvas.width, canvas.height);
+    	            }
+
+    	            return canvas;
+    	        }
+    	    }
+
+    	    function cloneNode(node, filter, root) {
+    	        if (!root && filter && !filter(node)) return Promise.resolve();
+
+    	        return Promise.resolve(node)
+    	        .then(makeNodeCopy)
+    	        .then(function(clone) {
+    	            return cloneChildren(node, clone, filter);
+    	        })
+    	        .then(function(clone) {
+    	            return processClone(node, clone);
+    	        });
+
+    	        function makeNodeCopy(node) {
+    	            if (node instanceof HTMLCanvasElement) return util.makeImage(node.toDataURL());
+    	            return node.cloneNode(false);
+    	        }
+
+    	        function cloneChildren(original, clone, filter) {
+    	            var children = original.tagName === 'use' ? copyShadowChild(original) : original.childNodes;
+    	            if (children.length === 0) return Promise.resolve(clone);
+
+    	            return cloneChildrenInOrder(clone, util.asArray(children), filter)
+    	            .then(function() {
+    	                return clone;
+    	            });
+
+    	            function cloneChildrenInOrder(parent, children, filter) {
+    	                var done = Promise.resolve();
+    	                children.forEach(function(child) {
+    	                    done = done
+    	                    .then(function() {
+    	                        return cloneNode(child, filter);
+    	                    })
+    	                    .then(function(childClone) {
+    	                        if (childClone) parent.appendChild(childClone);
+    	                    });
+    	                });
+    	                return done;
+    	            }
+    	        }
+
+    	        function copyShadowChild(original) {
+    	            var child = document.getElementById(original.href.baseVal.replace('#', ''));
+    	            return [child.cloneNode(true)];
+    	        }
+
+    	        function processClone(original, clone) {
+    	            if (!(clone instanceof Element)) return clone;
+
+    	            return Promise.resolve()
+    	            .then(cloneStyle)
+    	            .then(clonePseudoElements)
+    	            .then(copyUserInput)
+    	            .then(fixSvg)
+    	            .then(function() {
+    	                return clone;
+    	            });
+
+    	            function cloneStyle() {
+    	                copyStyle(window.getComputedStyle(original), clone.style);
+
+    	                if (util.isChrome() && clone.style.marker && ( clone.tagName === 'line' || clone.tagName === 'path')) {
+    	                    clone.style.marker = '';
+    	                }
+
+    	                function copyStyle(source, target) {
+    	                    if (source.cssText) {
+    	                        target.cssText = source.cssText;
+    	                        target.font = source.font; // here, we re-assign the font prop.
+    	                    } else copyProperties(source, target);
+
+    	                    function copyProperties(source, target) {
+    	                        util.asArray(source).forEach(function(name) {
+    	                            target.setProperty(
+    	                              name,
+    	                              source.getPropertyValue(name),
+    	                              source.getPropertyPriority(name)
+    	                            );
+    	                        });
+    	                    }
+    	                }
+    	            }
+
+    	            function clonePseudoElements() {
+    	                [':before', ':after'].forEach(function(element) {
+    	                    clonePseudoElement(element);
+    	                });
+
+    	                function clonePseudoElement(element) {
+    	                    var style = window.getComputedStyle(original, element);
+    	                    var content = style.getPropertyValue('content');
+
+    	                    if (content === '' || content === 'none') return;
+
+    	                    var className = util.uid();
+    	                    var currentClass = clone.getAttribute('class');
+    	                    if (currentClass) {
+    	                        clone.setAttribute('class', currentClass + ' ' + className);
+    	                    }
+
+    	                    var styleElement = document.createElement('style');
+    	                    styleElement.appendChild(formatPseudoElementStyle(className, element, style));
+    	                    clone.appendChild(styleElement);
+
+    	                    function formatPseudoElementStyle(className, element, style) {
+    	                        var selector = '.' + className + ':' + element;
+    	                        var cssText = style.cssText ? formatCssText(style) : formatCssProperties(style);
+    	                        return document.createTextNode(selector + '{' + cssText + '}');
+
+    	                        function formatCssText(style) {
+    	                            var content = style.getPropertyValue('content');
+    	                            return style.cssText + ' content: ' + content + ';';
+    	                        }
+
+    	                        function formatCssProperties(style) {
+
+    	                            return util.asArray(style)
+    	                            .map(formatProperty)
+    	                            .join('; ') + ';';
+
+    	                            function formatProperty(name) {
+    	                                return name + ': ' +
+    	                                  style.getPropertyValue(name) +
+    	                                  (style.getPropertyPriority(name) ? ' !important' : '');
+    	                            }
+    	                        }
+    	                    }
+    	                }
+    	            }
+
+    	            function copyUserInput() {
+    	                if (original instanceof HTMLTextAreaElement) clone.innerHTML = original.value;
+    	                if (original instanceof HTMLInputElement) clone.setAttribute("value", original.value);
+    	            }
+
+    	            function fixSvg() {
+    	                if (!(clone instanceof SVGElement)) return;
+    	                clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+    	                if (!(clone instanceof SVGRectElement)) return;
+    	                ['width', 'height'].forEach(function(attribute) {
+    	                    var value = clone.getAttribute(attribute);
+    	                    if (!value) return;
+
+    	                    clone.style.setProperty(attribute, value);
+    	                });
+    	            }
+    	        }
+    	    }
+
+    	    function embedFonts(node) {
+    	        return fontFaces.resolveAll()
+    	        .then(function(cssText) {
+    	            var styleNode = document.createElement('style');
+    	            node.appendChild(styleNode);
+    	            styleNode.appendChild(document.createTextNode(cssText));
+    	            return node;
+    	        });
+    	    }
+
+    	    function inlineImages(node) {
+    	        return images.inlineAll(node)
+    	        .then(function() {
+    	            return node;
+    	        });
+    	    }
+
+    	    function makeSvgDataUri(node, width, height) {
+    	        return Promise.resolve(node)
+    	        .then(function(node) {
+    	            node.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+    	            return new XMLSerializer().serializeToString(node);
+    	        })
+    	        .then(util.escapeXhtml)
+    	        .then(function(xhtml) {
+    	            return '<foreignObject x="0" y="0" width="100%" height="100%">' + xhtml + '</foreignObject>';
+    	        })
+    	        .then(function(foreignObject) {
+    	            return '<svg xmlns="http://www.w3.org/2000/svg" width="' + width + '" height="' + height + '">' +
+    	              foreignObject + '</svg>';
+    	        })
+    	        .then(function(svg) {
+    	            return 'data:image/svg+xml;charset=utf-8,' + svg;
+    	        });
+    	    }
+
+    	    function newUtil() {
+    	        return {
+    	            escape: escape,
+    	            parseExtension: parseExtension,
+    	            mimeType: mimeType,
+    	            dataAsUrl: dataAsUrl,
+    	            isDataUrl: isDataUrl,
+    	            canvasToBlob: canvasToBlob,
+    	            resolveUrl: resolveUrl,
+    	            getAndEncode: getAndEncode,
+    	            uid: uid(),
+    	            delay: delay,
+    	            asArray: asArray,
+    	            isChrome: isChrome,
+    	            escapeXhtml: escapeXhtml,
+    	            makeImage: makeImage,
+    	            width: width,
+    	            height: height
+    	        };
+
+    	        function mimes() {
+    	            /*
+    	             * Only WOFF and EOT mime types for fonts are 'real'
+    	             * see http://www.iana.org/assignments/media-types/media-types.xhtml
+    	             */
+    	            var WOFF = 'application/font-woff';
+    	            var JPEG = 'image/jpeg';
+
+    	            return {
+    	                'woff': WOFF,
+    	                'woff2': WOFF,
+    	                'ttf': 'application/font-truetype',
+    	                'eot': 'application/vnd.ms-fontobject',
+    	                'png': 'image/png',
+    	                'jpg': JPEG,
+    	                'jpeg': JPEG,
+    	                'gif': 'image/gif',
+    	                'tiff': 'image/tiff',
+    	                'svg': 'image/svg+xml'
+    	            };
+    	        }
+
+    	        function parseExtension(url) {
+    	            var match = /\.([^\.\/]*?)(\?|$)/g.exec(url);
+    	            if (match) return match[1];
+    	            else return '';
+    	        }
+
+    	        function mimeType(url) {
+    	            var extension = parseExtension(url).toLowerCase();
+    	            return mimes()[extension] || '';
+    	        }
+
+    	        function isDataUrl(url) {
+    	            return url.search(/^(data:)/) !== -1;
+    	        }
+
+    	        function toBlob(canvas) {
+    	            return new Promise(function(resolve) {
+    	                var binaryString = window.atob(canvas.toDataURL().split(',')[1]);
+    	                var length = binaryString.length;
+    	                var binaryArray = new Uint8Array(length);
+
+    	                for (var i = 0; i < length; i++)
+    	                    binaryArray[i] = binaryString.charCodeAt(i);
+
+    	                resolve(new Blob([binaryArray], {
+    	                    type: 'image/png'
+    	                }));
+    	            });
+    	        }
+
+    	        function canvasToBlob(canvas) {
+    	            if (canvas.toBlob)
+    	                return new Promise(function(resolve) {
+    	                    canvas.toBlob(resolve);
+    	                });
+
+    	            return toBlob(canvas);
+    	        }
+
+    	        function resolveUrl(url, baseUrl) {
+    	            var doc = document.implementation.createHTMLDocument();
+    	            var base = doc.createElement('base');
+    	            doc.head.appendChild(base);
+    	            var a = doc.createElement('a');
+    	            doc.body.appendChild(a);
+    	            base.href = baseUrl;
+    	            a.href = url;
+    	            return a.href;
+    	        }
+
+    	        function uid() {
+    	            var index = 0;
+
+    	            return function() {
+    	                return 'u' + fourRandomChars() + index++;
+
+    	                function fourRandomChars() {
+    	                    /* see http://stackoverflow.com/a/6248722/2519373 */
+    	                    return ('0000' + (Math.random() * Math.pow(36, 4) << 0).toString(36)).slice(-4);
+    	                }
+    	            };
+    	        }
+
+    	        function makeImage(uri) {
+    	            if (uri === 'data:,') return Promise.resolve();
+    	            return new Promise(function(resolve, reject) {
+    	                var image = new Image();
+    	                if(domtoimage.impl.options.useCredentials) {
+    	                    image.crossOrigin = 'use-credentials';
+    	                }
+    	                image.onload = function() {
+    	                    resolve(image);
+    	                };
+    	                image.onerror = reject;
+    	                image.src = uri;
+    	            });
+    	        }
+
+    	        function getAndEncode(url) {
+    	            var TIMEOUT = 30000;
+    	            if (domtoimage.impl.options.cacheBust) {
+    	                // Cache bypass so we dont have CORS issues with cached images
+    	                // Source: https://developer.mozilla.org/en/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest#Bypassing_the_cache
+    	                url += ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime();
+    	            }
+
+    	            return new Promise(function(resolve) {
+    	                var request = new XMLHttpRequest();
+
+    	                request.onreadystatechange = done;
+    	                request.ontimeout = timeout;
+    	                request.responseType = 'blob';
+    	                request.timeout = TIMEOUT;
+    	                if(domtoimage.impl.options.useCredentials) {
+    	                    request.withCredentials = true;
+    	                }
+    	                request.open('GET', url, true);
+    	                request.send();
+
+    	                var placeholder;
+    	                if (domtoimage.impl.options.imagePlaceholder) {
+    	                    var split = domtoimage.impl.options.imagePlaceholder.split(/,/);
+    	                    if (split && split[1]) {
+    	                        placeholder = split[1];
+    	                    }
+    	                }
+
+    	                function done() {
+    	                    if (request.readyState !== 4) return;
+
+    	                    if (request.status !== 200) {
+    	                        if (placeholder) {
+    	                            resolve(placeholder);
+    	                        } else {
+    	                            fail('cannot fetch resource: ' + url + ', status: ' + request.status);
+    	                        }
+
+    	                        return;
+    	                    }
+
+    	                    var encoder = new FileReader();
+    	                    encoder.onloadend = function() {
+    	                        var content = encoder.result.split(/,/)[1];
+    	                        resolve(content);
+    	                    };
+    	                    encoder.readAsDataURL(request.response);
+    	                }
+
+    	                function timeout() {
+    	                    if (placeholder) {
+    	                        resolve(placeholder);
+    	                    } else {
+    	                        fail('timeout of ' + TIMEOUT + 'ms occured while fetching resource: ' + url);
+    	                    }
+    	                }
+
+    	                function fail(message) {
+    	                    console.error(message);
+    	                    resolve('');
+    	                }
+    	            });
+    	        }
+
+    	        function dataAsUrl(content, type) {
+    	            return 'data:' + type + ';base64,' + content;
+    	        }
+
+    	        function escape(string) {
+    	            return string.replace(/([.*+?^${}()|\[\]\/\\])/g, '\\$1');
+    	        }
+
+    	        function isChrome() {
+    	            return /chrome/i.test( navigator.userAgent );
+    	        }
+
+    	        function delay(ms) {
+    	            return function(arg) {
+    	                return new Promise(function(resolve) {
+    	                    setTimeout(function() {
+    	                        resolve(arg);
+    	                    }, ms);
+    	                });
+    	            };
+    	        }
+
+    	        function asArray(arrayLike) {
+    	            var array = [];
+    	            var length = arrayLike.length;
+    	            for (var i = 0; i < length; i++) array.push(arrayLike[i]);
+    	            return array;
+    	        }
+
+    	        function escapeXhtml(string) {
+    	            return string.replace(/#/g, '%23').replace(/\n/g, '%0A');
+    	        }
+
+    	        function width(node) {
+    	            var leftBorder = px(node, 'border-left-width');
+    	            var rightBorder = px(node, 'border-right-width');
+    	            return node.scrollWidth + leftBorder + rightBorder;
+    	        }
+
+    	        function height(node) {
+    	            var topBorder = px(node, 'border-top-width');
+    	            var bottomBorder = px(node, 'border-bottom-width');
+    	            return node.scrollHeight + topBorder + bottomBorder;
+    	        }
+
+    	        function px(node, styleProperty) {
+    	            var value = window.getComputedStyle(node).getPropertyValue(styleProperty);
+    	            return parseFloat(value.replace('px', ''));
+    	        }
+    	    }
+
+    	    function newInliner() {
+    	        var URL_REGEX = /url\(['"]?([^'"]+?)['"]?\)/g;
+
+    	        return {
+    	            inlineAll: inlineAll,
+    	            shouldProcess: shouldProcess,
+    	            impl: {
+    	                readUrls: readUrls,
+    	                inline: inline
+    	            }
+    	        };
+
+    	        function shouldProcess(string) {
+    	            return string.search(URL_REGEX) !== -1;
+    	        }
+
+    	        function readUrls(string) {
+    	            var result = [];
+    	            var match;
+    	            while ((match = URL_REGEX.exec(string)) !== null) {
+    	                result.push(match[1]);
+    	            }
+    	            return result.filter(function(url) {
+    	                return !util.isDataUrl(url);
+    	            });
+    	        }
+
+    	        function inline(string, url, baseUrl, get) {
+    	            return Promise.resolve(url)
+    	            .then(function(url) {
+    	                return baseUrl ? util.resolveUrl(url, baseUrl) : url;
+    	            })
+    	            .then(get || util.getAndEncode)
+    	            .then(function(data) {
+    	                return util.dataAsUrl(data, util.mimeType(url));
+    	            })
+    	            .then(function(dataUrl) {
+    	                return string.replace(urlAsRegex(url), '$1' + dataUrl + '$3');
+    	            });
+
+    	            function urlAsRegex(url) {
+    	                return new RegExp('(url\\([\'"]?)(' + util.escape(url) + ')([\'"]?\\))', 'g');
+    	            }
+    	        }
+
+    	        function inlineAll(string, baseUrl, get) {
+    	            if (nothingToInline()) return Promise.resolve(string);
+
+    	            return Promise.resolve(string)
+    	            .then(readUrls)
+    	            .then(function(urls) {
+    	                var done = Promise.resolve(string);
+    	                urls.forEach(function(url) {
+    	                    done = done.then(function(string) {
+    	                        return inline(string, url, baseUrl, get);
+    	                    });
+    	                });
+    	                return done;
+    	            });
+
+    	            function nothingToInline() {
+    	                return !shouldProcess(string);
+    	            }
+    	        }
+    	    }
+
+    	    function newFontFaces() {
+    	        return {
+    	            resolveAll: resolveAll,
+    	            impl: {
+    	                readAll: readAll
+    	            }
+    	        };
+
+    	        function resolveAll() {
+    	            return readAll()
+    	            .then(function(webFonts) {
+    	                return Promise.all(
+    	                  webFonts.map(function(webFont) {
+    	                      return webFont.resolve();
+    	                  })
+    	                );
+    	            })
+    	            .then(function(cssStrings) {
+    	                return cssStrings.join('\n');
+    	            });
+    	        }
+
+    	        function readAll() {
+    	            return Promise.resolve(util.asArray(document.styleSheets))
+    	            .then(getCssRules)
+    	            .then(selectWebFontRules)
+    	            .then(function(rules) {
+    	                return rules.map(newWebFont);
+    	            });
+
+    	            function selectWebFontRules(cssRules) {
+    	                return cssRules
+    	                .filter(function(rule) {
+    	                    return rule.type === CSSRule.FONT_FACE_RULE;
+    	                })
+    	                .filter(function(rule) {
+    	                    return inliner.shouldProcess(rule.style.getPropertyValue('src'));
+    	                });
+    	            }
+
+    	            function getCssRules(styleSheets) {
+    	                var cssRules = [];
+    	                styleSheets.forEach(function(sheet) {
+    	                    if (sheet.hasOwnProperty("cssRules")) {
+    	                        try {
+    	                            util.asArray(sheet.cssRules || []).forEach(cssRules.push.bind(cssRules));
+    	                        } catch (e) {
+    	                            console.log('Error while reading CSS rules from ' + sheet.href, e.toString());
+    	                        }
+    	                    }
+    	                });
+    	                return cssRules;
+    	            }
+
+    	            function newWebFont(webFontRule) {
+    	                return {
+    	                    resolve: function resolve() {
+    	                        var baseUrl = (webFontRule.parentStyleSheet || {}).href;
+    	                        return inliner.inlineAll(webFontRule.cssText, baseUrl);
+    	                    },
+    	                    src: function() {
+    	                        return webFontRule.style.getPropertyValue('src');
+    	                    }
+    	                };
+    	            }
+    	        }
+    	    }
+
+    	    function newImages() {
+    	        return {
+    	            inlineAll: inlineAll,
+    	            impl: {
+    	                newImage: newImage
+    	            }
+    	        };
+
+    	        function newImage(element) {
+    	            return {
+    	                inline: inline
+    	            };
+
+    	            function inline(get) {
+    	                if (util.isDataUrl(element.src)) return Promise.resolve();
+
+    	                return Promise.resolve(element.src)
+    	                .then(get || util.getAndEncode)
+    	                .then(function(data) {
+    	                    return util.dataAsUrl(data, util.mimeType(element.src));
+    	                })
+    	                .then(function(dataUrl) {
+    	                    return new Promise(function(resolve, reject) {
+    	                        element.onload = resolve;
+    	                        // for any image with invalid src(such as <img src />), just ignore it
+    	                        element.onerror = resolve;
+    	                        element.src = dataUrl;
+    	                    });
+    	                });
+    	            }
+    	        }
+
+    	        function inlineAll(node) {
+    	            if (!(node instanceof Element)) return Promise.resolve(node);
+
+    	            return inlineBackground(node)
+    	            .then(function() {
+    	                if (node instanceof HTMLImageElement)
+    	                    return newImage(node).inline();
+    	                else
+    	                    return Promise.all(
+    	                      util.asArray(node.childNodes).map(function(child) {
+    	                          return inlineAll(child);
+    	                      })
+    	                    );
+    	            });
+
+    	            function inlineBackground(node) {
+    	                var background = node.style.getPropertyValue('background');
+
+    	                if (!background) return Promise.resolve(node);
+
+    	                return inliner.inlineAll(background)
+    	                .then(function(inlined) {
+    	                    node.style.setProperty(
+    	                      'background',
+    	                      inlined,
+    	                      node.style.getPropertyPriority('background')
+    	                    );
+    	                })
+    	                .then(function() {
+    	                    return node;
+    	                });
+    	            }
+    	        }
+    	    }
+    	})(); 
+    } (domToImageImproved));
+
+    var domToImageImprovedExports = domToImageImproved.exports;
+    var domtoimage = /*@__PURE__*/getDefaultExportFromCjs(domToImageImprovedExports);
+
     function _arrayLikeToArray(arr, len) {
       if (len == null || len > arr.length) len = arr.length;
-
-      for (var i = 0, arr2 = new Array(len); i < len; i++) {
-        arr2[i] = arr[i];
-      }
-
+      for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
       return arr2;
     }
 
-    module.exports = _arrayLikeToArray;
-    module.exports["default"] = module.exports, module.exports.__esModule = true;
-    });
-
-    var arrayWithoutHoles = createCommonjsModule(function (module) {
     function _arrayWithoutHoles(arr) {
-      if (Array.isArray(arr)) return arrayLikeToArray(arr);
+      if (Array.isArray(arr)) return _arrayLikeToArray(arr);
     }
 
-    module.exports = _arrayWithoutHoles;
-    module.exports["default"] = module.exports, module.exports.__esModule = true;
-    });
-
-    var iterableToArray = createCommonjsModule(function (module) {
     function _iterableToArray(iter) {
       if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter);
     }
 
-    module.exports = _iterableToArray;
-    module.exports["default"] = module.exports, module.exports.__esModule = true;
-    });
-
-    var unsupportedIterableToArray = createCommonjsModule(function (module) {
     function _unsupportedIterableToArray(o, minLen) {
       if (!o) return;
-      if (typeof o === "string") return arrayLikeToArray(o, minLen);
+      if (typeof o === "string") return _arrayLikeToArray(o, minLen);
       var n = Object.prototype.toString.call(o).slice(8, -1);
       if (n === "Object" && o.constructor) n = o.constructor.name;
       if (n === "Map" || n === "Set") return Array.from(o);
-      if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return arrayLikeToArray(o, minLen);
+      if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
     }
 
-    module.exports = _unsupportedIterableToArray;
-    module.exports["default"] = module.exports, module.exports.__esModule = true;
-    });
-
-    var nonIterableSpread = createCommonjsModule(function (module) {
     function _nonIterableSpread() {
       throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
     }
 
-    module.exports = _nonIterableSpread;
-    module.exports["default"] = module.exports, module.exports.__esModule = true;
-    });
-
-    var toConsumableArray = createCommonjsModule(function (module) {
     function _toConsumableArray(arr) {
-      return arrayWithoutHoles(arr) || iterableToArray(arr) || unsupportedIterableToArray(arr) || nonIterableSpread();
+      return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread();
     }
 
-    module.exports = _toConsumableArray;
-    module.exports["default"] = module.exports, module.exports.__esModule = true;
-    });
+    function _typeof(obj) {
+      "@babel/helpers - typeof";
 
-    var _toConsumableArray = /*@__PURE__*/getDefaultExportFromCjs(toConsumableArray);
+      return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) {
+        return typeof obj;
+      } : function (obj) {
+        return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+      }, _typeof(obj);
+    }
 
-    var arrayWithHoles = createCommonjsModule(function (module) {
     function _arrayWithHoles(arr) {
       if (Array.isArray(arr)) return arr;
     }
 
-    module.exports = _arrayWithHoles;
-    module.exports["default"] = module.exports, module.exports.__esModule = true;
-    });
-
-    var iterableToArrayLimit = createCommonjsModule(function (module) {
     function _iterableToArrayLimit(arr, i) {
-      var _i = arr && (typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]);
-
-      if (_i == null) return;
-      var _arr = [];
-      var _n = true;
-      var _d = false;
-
-      var _s, _e;
-
-      try {
-        for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) {
-          _arr.push(_s.value);
-
-          if (i && _arr.length === i) break;
-        }
-      } catch (err) {
-        _d = true;
-        _e = err;
-      } finally {
+      var _i = null == arr ? null : "undefined" != typeof Symbol && arr[Symbol.iterator] || arr["@@iterator"];
+      if (null != _i) {
+        var _s,
+          _e,
+          _x,
+          _r,
+          _arr = [],
+          _n = !0,
+          _d = !1;
         try {
-          if (!_n && _i["return"] != null) _i["return"]();
+          if (_x = (_i = _i.call(arr)).next, 0 === i) {
+            if (Object(_i) !== _i) return;
+            _n = !1;
+          } else for (; !(_n = (_s = _x.call(_i)).done) && (_arr.push(_s.value), _arr.length !== i); _n = !0);
+        } catch (err) {
+          _d = !0, _e = err;
         } finally {
-          if (_d) throw _e;
+          try {
+            if (!_n && null != _i["return"] && (_r = _i["return"](), Object(_r) !== _r)) return;
+          } finally {
+            if (_d) throw _e;
+          }
         }
+        return _arr;
       }
-
-      return _arr;
     }
 
-    module.exports = _iterableToArrayLimit;
-    module.exports["default"] = module.exports, module.exports.__esModule = true;
-    });
-
-    var nonIterableRest = createCommonjsModule(function (module) {
     function _nonIterableRest() {
       throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
     }
 
-    module.exports = _nonIterableRest;
-    module.exports["default"] = module.exports, module.exports.__esModule = true;
-    });
-
-    var slicedToArray = createCommonjsModule(function (module) {
     function _slicedToArray(arr, i) {
-      return arrayWithHoles(arr) || iterableToArrayLimit(arr, i) || unsupportedIterableToArray(arr, i) || nonIterableRest();
+      return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
     }
-
-    module.exports = _slicedToArray;
-    module.exports["default"] = module.exports, module.exports.__esModule = true;
-    });
-
-    var _slicedToArray = /*@__PURE__*/getDefaultExportFromCjs(slicedToArray);
 
     function createElement(tagName) {
       var attrs = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
       for (var _len = arguments.length, children = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
         children[_key - 2] = arguments[_key];
       }
-
-      if (tagName === 'null') return children;
+      if (tagName === 'null' || tagName === null) return children;
       if (typeof tagName === 'function') return tagName(attrs, children);
       var elem = document.createElement(tagName);
       Object.entries(attrs || {}).forEach(function (_ref) {
         var _ref2 = _slicedToArray(_ref, 2),
-            name = _ref2[0],
-            value = _ref2[1];
-
-        if (name.startsWith('on') && name.toLowerCase() in window) elem.addEventListener(name.toLowerCase().substr(2), value);else {
-          if (name === 'className') elem.setAttribute('class', value.toString());else if (name === 'htmlFor') elem.setAttribute('for', value.toString());else elem.setAttribute(name, value.toString());
+          name = _ref2[0],
+          value = _ref2[1];
+        if (_typeof(value) !== undefined && value !== null) {
+          if (name.startsWith('on') && name.toLowerCase() in window && typeof value === 'function') elem.addEventListener(name.toLowerCase().substr(2), value);else {
+            if (name === 'className') elem.setAttribute('class', value.toString());else if (name === 'htmlFor') elem.setAttribute('for', value.toString());else elem.setAttribute(name, value.toString());
+          }
         }
       });
-
       for (var _i = 0, _children = children; _i < _children.length; _i++) {
         var child = _children[_i];
         if (!child) continue;
         if (Array.isArray(child)) elem.append.apply(elem, _toConsumableArray(child));else {
-          elem.appendChild(child.nodeType === undefined ? document.createTextNode(child.toString()) : child);
+          if (child.nodeType === undefined) elem.innerHTML += child;else elem.appendChild(child);
         }
       }
-
       return elem;
     }
 
@@ -1704,7 +1630,7 @@
                 document.body.removeChild(link);
             };
             return new Promise((resolve, reject) => {
-                var _a, _b;
+                var _a;
                 if (this._form.typeExport === 'pdf') {
                     this._pdf.doc.save(this._config.filename + '.pdf');
                     resolve();
@@ -1712,7 +1638,7 @@
                 else {
                     const pdf = this._pdf.doc.output('dataurlstring');
                     // UMD support
-                    const versionPdfJS = ((_b = (_a = window) === null || _a === void 0 ? void 0 : _a.pdfjsLib) === null || _b === void 0 ? void 0 : _b.version) || pdfjsDist.version;
+                    const versionPdfJS = ((_a = window === null || window === void 0 ? void 0 : window.pdfjsLib) === null || _a === void 0 ? void 0 : _a.version) || pdfjsDist.version;
                     pdfjsDist.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${versionPdfJS}/pdf.worker.js`;
                     pdfjsDist.getDocument(pdf).promise.then((pdf) => {
                         pdf.getPage(1).then((page) => {
@@ -2108,6 +2034,12 @@
 
           return this;
         };
+        
+    // Alias for removeListener added in NodeJS 10.0
+    // https://nodejs.org/api/events.html#events_emitter_off_eventname_listener
+    EventEmitter.prototype.off = function(type, listener){
+        return this.removeListener(type, listener);
+    };
 
     EventEmitter.prototype.removeAllListeners =
         function removeAllListeners(type) {
@@ -2232,14 +2164,12 @@
 
     /**
      * Vanilla JS Modal compatible with Bootstrap
-     * modal-vanilla 0.8.0 <https://github.com/KaneCohen/modal-vanilla>
+     * modal-vanilla 0.12.0 <https://github.com/KaneCohen/modal-vanilla>
      * Copyright 2020 Kane Cohen <https://github.com/KaneCohen>
      * Available under BSD-3-Clause license
      */
 
-    const _factory = document.createElement('div');
-
-    const _scrollbarWidth = calcScrollbarWidth();
+    let _factory = null;
 
     const _defaults = Object.freeze({
       el: null,               // Existing DOM element that will be 'Modal-ized'.
@@ -2356,6 +2286,10 @@
       if (html.nodeName) return html;
       html = html.replace(/(\t|\n$)/g, '');
 
+      if (!_factory) {
+        _factory = document.createElement('div');
+      }
+
       _factory.innerHTML = '';
       _factory.innerHTML = html;
       if (all === true) {
@@ -2424,7 +2358,7 @@
       }
 
       static get version() {
-        return '0.8.0';
+        return '0.12.0';
       }
 
       static alert(message, _options = {}) {
@@ -2467,9 +2401,11 @@
         this._html = {};
         this._events = {};
         this._visible = false;
+        this._pointerInContent = false;
         this._options = Object.assign({}, Modal.options, options);
         this._templates = Object.assign({}, Modal.templates, options.templates || {});
         this._html.appendTo = document.querySelector(this._options.appendTo);
+        this._scrollbarWidth = calcScrollbarWidth();
 
         if (this._options.buttons === null) {
           this._options.buttons = Modal.buttons.dialog;
@@ -2619,6 +2555,11 @@
           this._events.keydownHandler
         );
 
+        this._events.mousedownHandler = this._handleMousedownEvent.bind(this);
+        html.container.addEventListener('mousedown',
+          this._events.mousedownHandler
+        );
+
         this._events.clickHandler = this._handleClickEvent.bind(this);
         html.container.addEventListener('click',
           this._events.clickHandler
@@ -2628,6 +2569,18 @@
         window.addEventListener('resize',
           this._events.resizeHandler
         );
+      }
+
+      _handleMousedownEvent(e) {
+        this._pointerInContent = false;
+        let path = getPath(e.target);
+        path.every(node => {
+          if (node.classList && node.classList.contains('modal-content')) {
+            this._pointerInContent = true;
+            return false;
+          }
+          return true;
+        });
       }
 
       _handleClickEvent(e) {
@@ -2647,13 +2600,16 @@
             this.hide();
             return false;
           }
-          if (node.classList.contains('modal')) {
+
+          if (!this._pointerInContent && node.classList.contains('modal')) {
             this.emit('dismiss', this, e, null);
             this.hide();
             return false;
           }
           return true;
         });
+
+        this._pointerInContent = false;
       }
 
       _handleKeydownEvent(e) {
@@ -2727,10 +2683,10 @@
           this._html.container.scrollHeight > document.documentElement.clientHeight;
 
         this._html.container.style.paddingLeft =
-          ! this.bodyIsOverflowing && modalIsOverflowing ? _scrollbarWidth + 'px' : '';
+          ! this.bodyIsOverflowing && modalIsOverflowing ? this._scrollbarWidth + 'px' : '';
 
         this._html.container.style.paddingRight =
-          this.bodyIsOverflowing && ! modalIsOverflowing ? _scrollbarWidth + 'px' : '';
+          this.bodyIsOverflowing && ! modalIsOverflowing ? this._scrollbarWidth + 'px' : '';
       }
 
       _backdrop() {
@@ -2796,6 +2752,10 @@
           );
         }
 
+        this._html.container.removeEventListener('mousedown',
+          this._events.mousedownHandler
+        );
+
         this._html.container.removeEventListener('click',
           this._events.clickHandler
         );
@@ -2813,19 +2773,10 @@
         this.originalBodyPad = document.body.style.paddingRight || '';
         if (this.bodyIsOverflowing) {
           let basePadding = parseInt(this.originalBodyPad || 0, 10);
-          document.body.style.paddingRight = basePadding + _scrollbarWidth + 'px';
+          document.body.style.paddingRight = basePadding + this._scrollbarWidth + 'px';
         }
       }
     }
-
-    var modal = /*#__PURE__*/Object.freeze({
-        __proto__: null,
-        'default': Modal
-    });
-
-    var require$$0 = /*@__PURE__*/getAugmentedNamespace(modal);
-
-    var modalVanilla = require$$0.default;
 
     /**
      *
@@ -2852,7 +2803,7 @@
      */
     class SettingsModal {
         constructor(map, options, i18n, printMap) {
-            this._modal = new modalVanilla(Object.assign({ headerClose: true, header: true, animate: true, title: i18n.printPdf, content: this.Content(i18n, options), footer: this.Footer(i18n, options) }, options.modal));
+            this._modal = new Modal(Object.assign({ headerClose: true, header: true, animate: true, title: i18n.printPdf, content: this.Content(i18n, options), footer: this.Footer(i18n, options) }, options.modal));
             this._modal.on('dismiss', (modal, event) => {
                 const print = event.target.dataset.print;
                 if (!print)
@@ -2971,7 +2922,7 @@
          */
         constructor(i18n, options, onEndPrint) {
             this._i18n = i18n;
-            this._modal = new modalVanilla(Object.assign({ headerClose: false, title: this._i18n.printing, backdrop: 'static', content: ' ', footer: `
+            this._modal = new Modal(Object.assign({ headerClose: false, title: this._i18n.printing, backdrop: 'static', content: ' ', footer: `
             <button
                 type="button"
                 class="btn-sm btn btn-secondary"
@@ -3069,16 +3020,16 @@
 
     var i18n = /*#__PURE__*/Object.freeze({
         __proto__: null,
-        es: es,
-        en: en
+        en: en,
+        es: es
     });
 
     function compassIcon() {
-      return (new DOMParser().parseFromString("<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<svg version=\"1.1\" id=\"compass\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"\r\n\t viewBox=\"0 0 300 300\" style=\"enable-background:new 0 0 300 300;\" xml:space=\"preserve\">\r\n<style type=\"text/css\">\r\n\t.st0{fill:#EA6868;}\r\n</style>\r\n<g>\r\n\t<g>\r\n\t\t<g>\r\n\t\t\t<g>\r\n\t\t\t\t<g>\r\n\t\t\t\t\t<path class=\"st0\" d=\"M146.3,9.1L75.5,287.2c-0.5,1.8,0.5,3.7,2.1,4.4c1.8,0.8,3.7,0.2,4.7-1.5l68.4-106.7l66.8,106.7\r\n\t\t\t\t\t\tc0.6,1.1,1.9,1.8,3.2,1.8c0.5,0,1-0.2,1.5-0.3c1.8-0.8,2.6-2.6,2.3-4.4L153.7,9.1C152.9,5.7,147.2,5.7,146.3,9.1z M154.2,174.2\r\n\t\t\t\t\t\tc-0.6-1.1-1.9-1.8-3.2-1.8l0,0c-1.3,0-2.6,0.6-3.2,1.8l-59,92L150,25.5l61.1,239.9L154.2,174.2z\"/>\r\n\t\t\t\t</g>\r\n\t\t\t</g>\r\n\t\t\t<g>\r\n\t\t\t\t<g>\r\n\t\t\t\t\t<path class=\"st0\" d=\"M220.8,293.1c-1.8,0-3.4-1-4.2-2.3l-65.8-105.1L83.4,290.8c-1.3,1.9-4,2.9-6.1,1.9c-2.3-1-3.4-3.4-2.9-5.8\r\n\t\t\t\t\t\tL145.1,8.8c0.5-2.1,2.4-3.4,4.9-3.4s4.4,1.3,4.9,3.4l70.8,278.1c0.6,2.4-0.6,4.9-2.9,5.8C222.1,292.9,221.5,293.1,220.8,293.1z\r\n\t\t\t\t\t\t M150.8,181.2l1,1.6l66.8,106.7c0.6,1,1.9,1.5,3.2,1c1.1-0.5,1.8-1.8,1.5-3.1L152.4,9.3c-0.3-1.1-1.6-1.6-2.6-1.6\r\n\t\t\t\t\t\ts-2.3,0.5-2.6,1.6L76.4,287.4c-0.3,1.3,0.3,2.6,1.5,3.1c1.1,0.5,2.6,0,3.2-1L150.8,181.2z M85.6,273.2L150,20.6l64.2,251.9\r\n\t\t\t\t\t\tl-61.1-97.7c-1-1.6-3.4-1.5-4.4,0L85.6,273.2z\"/>\r\n\t\t\t\t</g>\r\n\t\t\t</g>\r\n\t\t</g>\r\n\t</g>\r\n</g>\r\n</svg>\r\n", 'image/svg+xml')).firstChild;
+    	return (new DOMParser().parseFromString("<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<svg version=\"1.1\" id=\"compass\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"\r\n\t viewBox=\"0 0 300 300\" style=\"enable-background:new 0 0 300 300;\" xml:space=\"preserve\">\r\n<style type=\"text/css\">\r\n\t.st0{fill:#EA6868;}\r\n</style>\r\n<g>\r\n\t<g>\r\n\t\t<g>\r\n\t\t\t<g>\r\n\t\t\t\t<g>\r\n\t\t\t\t\t<path class=\"st0\" d=\"M146.3,9.1L75.5,287.2c-0.5,1.8,0.5,3.7,2.1,4.4c1.8,0.8,3.7,0.2,4.7-1.5l68.4-106.7l66.8,106.7\r\n\t\t\t\t\t\tc0.6,1.1,1.9,1.8,3.2,1.8c0.5,0,1-0.2,1.5-0.3c1.8-0.8,2.6-2.6,2.3-4.4L153.7,9.1C152.9,5.7,147.2,5.7,146.3,9.1z M154.2,174.2\r\n\t\t\t\t\t\tc-0.6-1.1-1.9-1.8-3.2-1.8l0,0c-1.3,0-2.6,0.6-3.2,1.8l-59,92L150,25.5l61.1,239.9L154.2,174.2z\"/>\r\n\t\t\t\t</g>\r\n\t\t\t</g>\r\n\t\t\t<g>\r\n\t\t\t\t<g>\r\n\t\t\t\t\t<path class=\"st0\" d=\"M220.8,293.1c-1.8,0-3.4-1-4.2-2.3l-65.8-105.1L83.4,290.8c-1.3,1.9-4,2.9-6.1,1.9c-2.3-1-3.4-3.4-2.9-5.8\r\n\t\t\t\t\t\tL145.1,8.8c0.5-2.1,2.4-3.4,4.9-3.4s4.4,1.3,4.9,3.4l70.8,278.1c0.6,2.4-0.6,4.9-2.9,5.8C222.1,292.9,221.5,293.1,220.8,293.1z\r\n\t\t\t\t\t\t M150.8,181.2l1,1.6l66.8,106.7c0.6,1,1.9,1.5,3.2,1c1.1-0.5,1.8-1.8,1.5-3.1L152.4,9.3c-0.3-1.1-1.6-1.6-2.6-1.6\r\n\t\t\t\t\t\ts-2.3,0.5-2.6,1.6L76.4,287.4c-0.3,1.3,0.3,2.6,1.5,3.1c1.1,0.5,2.6,0,3.2-1L150.8,181.2z M85.6,273.2L150,20.6l64.2,251.9\r\n\t\t\t\t\t\tl-61.1-97.7c-1-1.6-3.4-1.5-4.4,0L85.6,273.2z\"/>\r\n\t\t\t\t</g>\r\n\t\t\t</g>\r\n\t\t</g>\r\n\t</g>\r\n</g>\r\n</svg>\r\n", 'image/svg+xml')).firstChild;
     }
 
     function pdfIcon() {
-      return (new DOMParser().parseFromString("<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"\r\n\t viewBox=\"0 0 490 490\" xml:space=\"preserve\">\r\n<g>\r\n\t<path d=\"M65.4,6v157.1c0,3.3-2.9,6-6.5,6H33.6c-3.6,0-6.5,2.7-6.5,6v189.6h0l36.3,33.8c1.2,1.1,1.9,2.7,1.9,4.3l0,81.2\r\n\t\tc0,3.3,2.9,6,6.5,6h383.8c3.6,0,6.5-2.7,6.5-6V104.9c0-1.6-0.7-3.1-1.9-4.3l-106-98.9c-1.2-1.1-2.9-1.8-4.6-1.8H71.8\r\n\t\tC68.2,0,65.4,2.7,65.4,6z M431.3,357.4h-374c-3.8,0-6.9-4-6.9-9V203.2c0-5,3.1-9,6.9-9h374c3.8,0,6.9,4,6.9,9v145.2\r\n\t\tC438.2,353.4,435.1,357.4,431.3,357.4z M340.2,27.6l70.8,66c7.2,6.7,2.1,18.2-8.1,18.2h-70.8c-6.3,0-11.4-4.8-11.4-10.7v-66\r\n\t\tC320.7,25.6,333,20.9,340.2,27.6z\"/>\r\n\t<path d=\"M136.9,207.4h-6.5H87.9c-5.8,0-10.5,4.9-10.5,11v115.5c0,6.1,4.7,11,10.5,11h4c5.8,0,10.5-4.9,10.5-11v-22.4\r\n\t\tc0-6.1,4.7-11,10.5-11h18.9l5.8-0.1c18,0,29.9-3,35.8-9.1c5.9-6.1,8.9-18.3,8.9-36.7c0-18.5-3.1-31-9.3-37.5\r\n\t\tC166.6,210.6,154.7,207.4,136.9,207.4z M152.2,274.4c-3.1,2.7-10.2,4.1-21.5,4.1h-17.9c-5.8,0-10.5-4.9-10.5-11v-27.2\r\n\t\tc0-6.1,4.7-11,10.5-11h20.4c10.6,0,17.2,1.4,19.8,4.2c2.5,2.8,3.8,10,3.8,21.6C156.8,265.2,155.3,271.6,152.2,274.4z\"/>\r\n\t<path d=\"M262.6,207.4h-54.1c-5.8,0-10.5,4.9-10.5,11v115.5c0,6.1,4.7,11,10.5,11h54.9c20.7,0,34.1-4.9,39.9-14.6\r\n\t\tc5.9-9.8,8.9-31.8,8.9-66.1c0-21-3.7-35.7-11-44.1C293.8,211.5,281,207.4,262.6,207.4z M281.6,314.2c-3.5,5.8-11.2,8.6-23.1,8.6\r\n\t\th-25c-5.8,0-10.5-4.9-10.5-11v-71.6c0-6.1,4.7-11,10.5-11H260c11.6,0,19,2.7,22.1,8.2c3.1,5.5,4.7,18.4,4.7,38.7\r\n\t\tC286.9,295.8,285.1,308.5,281.6,314.2z\"/>\r\n\t<path d=\"M340.9,344.8h3.9c5.8,0,10.5-4.9,10.5-11v-34.5c0-6.1,4.7-11,10.5-11h37.9c5.8,0,10.5-4.9,10.5-11v0\r\n\t\tc0-6.1-4.7-11-10.5-11h-37.9c-5.8,0-10.5-4.9-10.5-11v-15.1c0-6.1,4.7-11,10.5-11h41.1c5.8,0,10.5-4.9,10.5-11v0\r\n\t\tc0-6.1-4.7-11-10.5-11h-66c-5.8,0-10.5,4.9-10.5,11v115.5C330.4,339.9,335.1,344.8,340.9,344.8z\"/>\r\n</g>\r\n</svg>\r\n", 'image/svg+xml')).firstChild;
+    	return (new DOMParser().parseFromString("<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"\r\n\t viewBox=\"0 0 490 490\" xml:space=\"preserve\">\r\n<g>\r\n\t<path d=\"M65.4,6v157.1c0,3.3-2.9,6-6.5,6H33.6c-3.6,0-6.5,2.7-6.5,6v189.6h0l36.3,33.8c1.2,1.1,1.9,2.7,1.9,4.3l0,81.2\r\n\t\tc0,3.3,2.9,6,6.5,6h383.8c3.6,0,6.5-2.7,6.5-6V104.9c0-1.6-0.7-3.1-1.9-4.3l-106-98.9c-1.2-1.1-2.9-1.8-4.6-1.8H71.8\r\n\t\tC68.2,0,65.4,2.7,65.4,6z M431.3,357.4h-374c-3.8,0-6.9-4-6.9-9V203.2c0-5,3.1-9,6.9-9h374c3.8,0,6.9,4,6.9,9v145.2\r\n\t\tC438.2,353.4,435.1,357.4,431.3,357.4z M340.2,27.6l70.8,66c7.2,6.7,2.1,18.2-8.1,18.2h-70.8c-6.3,0-11.4-4.8-11.4-10.7v-66\r\n\t\tC320.7,25.6,333,20.9,340.2,27.6z\"/>\r\n\t<path d=\"M136.9,207.4h-6.5H87.9c-5.8,0-10.5,4.9-10.5,11v115.5c0,6.1,4.7,11,10.5,11h4c5.8,0,10.5-4.9,10.5-11v-22.4\r\n\t\tc0-6.1,4.7-11,10.5-11h18.9l5.8-0.1c18,0,29.9-3,35.8-9.1c5.9-6.1,8.9-18.3,8.9-36.7c0-18.5-3.1-31-9.3-37.5\r\n\t\tC166.6,210.6,154.7,207.4,136.9,207.4z M152.2,274.4c-3.1,2.7-10.2,4.1-21.5,4.1h-17.9c-5.8,0-10.5-4.9-10.5-11v-27.2\r\n\t\tc0-6.1,4.7-11,10.5-11h20.4c10.6,0,17.2,1.4,19.8,4.2c2.5,2.8,3.8,10,3.8,21.6C156.8,265.2,155.3,271.6,152.2,274.4z\"/>\r\n\t<path d=\"M262.6,207.4h-54.1c-5.8,0-10.5,4.9-10.5,11v115.5c0,6.1,4.7,11,10.5,11h54.9c20.7,0,34.1-4.9,39.9-14.6\r\n\t\tc5.9-9.8,8.9-31.8,8.9-66.1c0-21-3.7-35.7-11-44.1C293.8,211.5,281,207.4,262.6,207.4z M281.6,314.2c-3.5,5.8-11.2,8.6-23.1,8.6\r\n\t\th-25c-5.8,0-10.5-4.9-10.5-11v-71.6c0-6.1,4.7-11,10.5-11H260c11.6,0,19,2.7,22.1,8.2c3.1,5.5,4.7,18.4,4.7,38.7\r\n\t\tC286.9,295.8,285.1,308.5,281.6,314.2z\"/>\r\n\t<path d=\"M340.9,344.8h3.9c5.8,0,10.5-4.9,10.5-11v-34.5c0-6.1,4.7-11,10.5-11h37.9c5.8,0,10.5-4.9,10.5-11v0\r\n\t\tc0-6.1-4.7-11-10.5-11h-37.9c-5.8,0-10.5-4.9-10.5-11v-15.1c0-6.1,4.7-11,10.5-11h41.1c5.8,0,10.5-4.9,10.5-11v0\r\n\t\tc0-6.1-4.7-11-10.5-11h-66c-5.8,0-10.5,4.9-10.5,11v115.5C330.4,339.9,335.1,344.8,340.9,344.8z\"/>\r\n</g>\r\n</svg>\r\n", 'image/svg+xml')).firstChild;
     }
 
     /**
@@ -3109,7 +3060,7 @@
         });
         return target;
     }
-    class PdfPrinter extends Control__default['default'] {
+    class PdfPrinter extends Control {
         constructor(opt_options) {
             const controlElement = document.createElement('button');
             super({
@@ -3253,10 +3204,10 @@
         _setFormatOptions(string = '') {
             const layers = this._map.getLayers();
             layers.forEach((layer) => {
-                if (layer instanceof Tile__default['default']) {
+                if (layer instanceof Tile) {
                     const source = layer.getSource();
                     // Set WMS DPI
-                    if (source instanceof TileWMS__default['default']) {
+                    if (source instanceof TileWMS) {
                         source.updateParams({
                             FORMAT_OPTIONS: string
                         });
@@ -3298,7 +3249,7 @@
                 const scaleResolution = form.scale /
                     proj.getPointResolution(this._view.getProjection(), pixelsPerMapMillimeter, this._view.getCenter());
                 this._renderCompleteKey = this._map.once('rendercomplete', () => {
-                    domToImageImproved
+                    domtoimage
                         .toJpeg(this._mapTarget.querySelector('.ol-unselectable.ol-layers'), {
                         width,
                         height
@@ -3379,5 +3330,5 @@
 
     return PdfPrinter;
 
-})));
+}));
 //# sourceMappingURL=ol-pdf-printer.js.map

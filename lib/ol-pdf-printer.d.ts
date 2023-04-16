@@ -1,14 +1,15 @@
-import { PluggableMap, View } from 'ol';
+import Map from 'ol/Map';
+import View from 'ol/View';
 import Control, { Options as ControlOptions } from 'ol/control/Control';
 import { EventsKey } from 'ol/events';
+import { Locale } from 'locale-enum';
 import Pdf from './components/Pdf';
 import SettingsModal from './components/SettingsModal';
 import ProcessingModal from './components/ProcessingModal';
-import { Locale } from 'locale-enum';
 import './assets/css/ol-pdf-printer.css';
 export default class PdfPrinter extends Control {
     protected _i18n: I18n;
-    protected _map: PluggableMap;
+    protected _map: Map;
     protected _view: View;
     protected _mapTarget: HTMLElement;
     protected _pdf: Pdf;
@@ -177,7 +178,7 @@ interface IPaperSize {
 /**
  * **_[type]_**
  */
-declare type IScale = number;
+type IScale = number;
 /**
  * **_[interface]_**
  */
