@@ -70,26 +70,28 @@ export default function (commandOptions) {
                 ]
             }),
             babel({
+                plugins: ["@babel/plugin-transform-runtime"],
+                babelHelpers: 'runtime',
+                include: ['src/**/*'],
+                extensions: [
+                    '.js', '.jsx', '.ts', '.tsx',
+                ],
                 presets: [
-                    '@babel/preset-react',
                     [
                         '@babel/preset-env',
                         {
                             targets: {
                                 browsers: [
-                                    'Chrome >= 52',
-                                    'FireFox >= 44',
-                                    'Safari >= 7',
-                                    'Explorer 11',
-                                    'last 4 Edge versions'
+                                    "Chrome >= 52",
+                                    "FireFox >= 44",
+                                    "Safari >= 7",
+                                    "Explorer 11",
+                                    "last 4 Edge versions"
                                 ]
                             }
                         }
                     ]
-                ],
-                babelHelpers: 'runtime',
-                exclude: ['node_modules/**', 'src/assets/**'],
-                plugins: ['@babel/plugin-transform-runtime']
+                ]
             }),
             nodePolyfills(), // Events
             resolve({

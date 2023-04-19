@@ -1,4 +1,3 @@
-import babel from '@rollup/plugin-babel';
 import svg from 'rollup-plugin-svg-import';
 import postcss from 'rollup-plugin-postcss';
 import typescript from '@rollup/plugin-typescript';
@@ -32,20 +31,6 @@ export default {
             extensions: ['.mjs', '.js', '.ts', '.json', '.node', '.tsx ', '.jsx']
         }),
         svg(),
-        babel({
-            presets: [
-                [
-                    "@babel/preset-env",
-                    {
-                        "targets": {
-                            "esmodules": true
-                        }
-                    }
-                ]
-            ],
-            babelHelpers: 'bundled',
-            exclude: "node_modules/**"
-        }),
         postcss({
             extensions: ['.css', '.sass', '.scss'], 
             inject: false,
