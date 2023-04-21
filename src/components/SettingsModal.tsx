@@ -1,5 +1,5 @@
 import Modal from 'modal-vanilla';
-import Map from 'ol/Map';
+import Map from 'ol/Map.js';
 
 import { I18n, IValues, Options } from '../ol-pdf-printer';
 import { getMapScale } from './Helpers';

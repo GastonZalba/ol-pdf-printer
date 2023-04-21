@@ -5,6 +5,17 @@ import del from 'rollup-plugin-delete';
 import copy from 'rollup-plugin-copy';
 import resolve from '@rollup/plugin-node-resolve';
 import path from 'path';
+import banner2 from 'rollup-plugin-banner2'
+import { readFileSync } from 'fs';
+const pkg = JSON.parse(readFileSync('./package.json', 'utf8'));
+
+const banner =
+`/*!
+ * ${pkg.name} - v${pkg.version}
+ * ${pkg.homepage}
+ * Built: ${new Date()}
+*/
+`;
 
 export default {
     input: 'src/ol-pdf-printer.ts',
@@ -16,6 +27,7 @@ export default {
         }
     ],
     plugins: [
+        banner2(() => banner),
         del({ targets: 'lib/*' }),
         typescript({
             outDir: './lib',

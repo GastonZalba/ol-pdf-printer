@@ -1,5 +1,5 @@
-import Map from 'ol/Map';
-import { METERS_PER_UNIT } from 'ol/proj/Units';
+import Map from 'ol/Map.js';
+import { METERS_PER_UNIT } from 'ol/proj/Units.js';
 
 /**
  *

@@ -1,6 +1,6 @@
 {
   "name": "ol-pdf-printer",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "PDF Printer for Open Layers",
   "main": "dist/ol-pdf-printer.js",
   "module": "lib/ol-pdf-printer.js",
@@ -44,10 +44,6 @@
     "ol": ">=6.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.21.4",
-    "@babel/plugin-transform-runtime": "^7.21.4",
-    "@babel/preset-env": "^7.21.4",
-    "@rollup/plugin-babel": "^6.0.3",
     "@rollup/plugin-commonjs": "^24.1.0",
     "@rollup/plugin-node-resolve": "^15.0.2",
     "@rollup/plugin-terser": "^0.4.1",
@@ -65,6 +61,7 @@
     "ol": "^7.3.0",
     "prettier": "^2.2.1",
     "rollup": "^3.20.3",
+    "rollup-plugin-banner2": "^1.2.2",
     "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-css-only": "^4.3.0",
     "rollup-plugin-delete": "^2.0.0",

@@ -1,4 +1,3 @@
-import babel from '@rollup/plugin-babel';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import svg from 'rollup-plugin-svg-import';
@@ -13,6 +12,17 @@ import del from 'rollup-plugin-delete';
 import copy from 'rollup-plugin-copy';
 import serve from 'rollup-plugin-serve';
 import livereload from 'rollup-plugin-livereload';
+import banner2 from 'rollup-plugin-banner2'
+import { readFileSync } from 'fs';
+const pkg = JSON.parse(readFileSync('./package.json', 'utf8'));
+
+const banner =
+`/*!
+ * ${pkg.name} - v${pkg.version}
+ * ${pkg.homepage}
+ * Built: ${new Date()}
+*/
+`;
 
 const globals = (id) => {
     const globals = {
@@ -56,6 +66,7 @@ export default function (commandOptions) {
             }
         ],
         plugins: [
+            banner2(() => banner),
             del({ targets: 'dist/*' }),
             typescript(
                 {
@@ -68,31 +79,7 @@ export default function (commandOptions) {
                 targets: [
                     { src: 'src/assets/css/bootstrap.min.css', dest: 'dist/css' },
                 ]
-            }),
-            babel({
-                plugins: ["@babel/plugin-transform-runtime"],
-                babelHelpers: 'runtime',
-                include: ['src/**/*'],
-                extensions: [
-                    '.js', '.jsx', '.ts', '.tsx',
-                ],
-                presets: [
-                    [
-                        '@babel/preset-env',
-                        {
-                            targets: {
-                                browsers: [
-                                    "Chrome >= 52",
-                                    "FireFox >= 44",
-                                    "Safari >= 7",
-                                    "Explorer 11",
-                                    "last 4 Edge versions"
-                                ]
-                            }
-                        }
-                    ]
-                ]
-            }),
+            }),           
             nodePolyfills(), // Events
             resolve({
                 extensions: ['.mjs', '.js', '.ts', '.json', '.node', '.tsx', '.jsx']

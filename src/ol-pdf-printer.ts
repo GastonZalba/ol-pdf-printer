@@ -1,11 +1,11 @@
-import Map from 'ol/Map';
-import View from 'ol/View';
-import Control, { Options as ControlOptions } from 'ol/control/Control';
-import TileWMS from 'ol/source/TileWMS';
-import Tile from 'ol/layer/Tile';
-import { getPointResolution } from 'ol/proj';
-import { EventsKey } from 'ol/events';
-import { unByKey } from 'ol/Observable';
+import Map from 'ol/Map.js';
+import View from 'ol/View.js';
+import Control, { Options as ControlOptions } from 'ol/control/Control.js';
+import TileWMS from 'ol/source/TileWMS.js';
+import Tile from 'ol/layer/Tile.js';
+import { getPointResolution } from 'ol/proj.js';
+import { EventsKey } from 'ol/events.js';
+import { unByKey } from 'ol/Observable.js';
 
 import domtoimage from 'dom-to-image-improved';
 
@@ -14,7 +14,7 @@ import { Locale } from 'locale-enum';
 import Pdf from './components/Pdf';
 import SettingsModal from './components/SettingsModal';
 import ProcessingModal from './components/ProcessingModal';
-import * as i18n from './components/i18n/index.js';
+import * as i18n from './components/i18n';
 
 import compassIcon from './assets/images/compass.svg';
 import pdfIcon from './assets/images/pdf.svg';

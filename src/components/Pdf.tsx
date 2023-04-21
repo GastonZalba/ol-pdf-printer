@@ -1,5 +1,5 @@
-import View from 'ol/View';
-import { getPointResolution } from 'ol/proj';
+import View from 'ol/View.js';
+import { getPointResolution } from 'ol/proj.js';
 
 import { jsPDF, TextOptionsLight } from 'jspdf';
 import { getDocument, GlobalWorkerOptions, version } from 'pdfjs-dist';
