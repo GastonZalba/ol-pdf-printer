@@ -1,7 +1,7 @@
-import Map from 'ol/Map';
-import View from 'ol/View';
-import Control, { Options as ControlOptions } from 'ol/control/Control';
-import { EventsKey } from 'ol/events';
+import Map from 'ol/Map.js';
+import View from 'ol/View.js';
+import Control, { Options as ControlOptions } from 'ol/control/Control.js';
+import { EventsKey } from 'ol/events.js';
 import { Locale } from 'locale-enum';
 import Pdf from './components/Pdf';
 import SettingsModal from './components/SettingsModal';
