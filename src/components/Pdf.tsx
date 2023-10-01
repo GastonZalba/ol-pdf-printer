@@ -1,3 +1,4 @@
+import Map from 'ol/Map';
 import View from 'ol/View.js';
 import { getPointResolution } from 'ol/proj.js';
 
@@ -7,6 +8,7 @@ import { getDocument, GlobalWorkerOptions, version } from 'pdfjs-dist';
 import { I18n, Options, IPrintOptions, IWatermark } from '../ol-pdf-printer';
 
 import myPragma from '../myPragma';
+import Legends from './MapElements/Legends.js';
 
 /**
  * @private
@@ -14,7 +16,9 @@ import myPragma from '../myPragma';
 export default class Pdf {
     protected _pdf: IPdf;
     protected _view: View;
+    protected _map: Map;
     protected _scaleDenominator: number;
+    protected _legends: Legends;
     protected _form: IPrintOptions;
     protected _style: Options['style'];
     protected _i18n: I18n;
@@ -22,10 +26,11 @@ export default class Pdf {
     protected _config: Options;
 
     constructor(params: IPdfOptions) {
-        const { view, form, i18n, config, height, width, scaleResolution } =
+        const { map, form, i18n, config, height, width, scaleResolution } =
             params;
 
-        this._view = view;
+        this._map = map;
+        this._view = map.getView();
         this._form = form;
         this._i18n = i18n;
         this._config = config;
@@ -41,6 +46,10 @@ export default class Pdf {
             this._form.resolution,
             scaleResolution
         );
+
+        if (config.mapElements && config.mapElements.legends) {
+            this._legends = new Legends(config.mapElements.legends, map);
+        }
     }
 
     /**
@@ -113,6 +122,10 @@ export default class Pdf {
 
             if (mapElements.attributions && this._form.attributions) {
                 this._addAttributions();
+            }
+
+            if (mapElements.legends && this._form.legends) {
+                await this._addLegends();
             }
         }
 
@@ -1023,6 +1036,62 @@ export default class Pdf {
             });
         }
     };
+
+    async _addLegends() {
+        const position = 'bottomleft';
+
+        const offset = {
+            x: 3,
+            y:
+                this._config.mapElements &&
+                this._config.mapElements.scalebar &&
+                this._form.scalebar
+                    ? 15
+                    : 2
+        };
+        const fontSize = 7;
+
+        this._pdf.doc.setFont('helvetica', 'normal');
+        this._pdf.doc.setFontSize(fontSize);
+        const { x, y } = this._calculateOffsetByPosition(position, offset);
+
+        let yPos = y;
+
+        const images: HTMLImageElement[] = await this._legends.getImages(
+            this._form.resolution
+        );
+
+        const largestWidth = Math.max(...images.map((i) => i.naturalWidth)) / 5;
+        const accumulativeHeight = images.reduce(
+            (acc, curr) => acc + curr.naturalHeight / 5,
+            0
+        );
+
+        const paddingBack = 1;
+
+        this._addRoundedBox(
+            x - paddingBack,
+            y - accumulativeHeight - paddingBack,
+            largestWidth + paddingBack * 2,
+            accumulativeHeight + paddingBack * 2,
+            '#ffffff',
+            this._style.brcolor
+        );
+
+        images.forEach((img) => {
+            const { naturalWidth, naturalHeight } = img;
+            const width = naturalWidth / 5;
+            const height = naturalHeight / 5;
+            this._pdf.doc.addImage(
+                img,
+                x - paddingBack,
+                yPos - height,
+                width,
+                height
+            );
+            yPos -= height;
+        });
+    }
 }
 
 /**
@@ -1045,7 +1114,7 @@ export interface IPdf {
 }
 
 interface IPdfOptions {
-    view: View;
+    map: Map;
     form: IPrintOptions;
     i18n: I18n;
     config: Options;

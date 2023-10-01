@@ -1,16 +1,18 @@
 export default function createElement(tagName, attrs = {}, ...children) {
-    if (tagName === 'null' || tagName === null) return children;
     if (typeof tagName === 'function') return tagName(attrs, children);
 
-    const elem = document.createElement(tagName);
+    const elem =
+        tagName === null
+            ? new DocumentFragment()
+            : document.createElement(tagName);
 
     Object.entries(attrs || {}).forEach(([name, value]) => {
-        if (typeof value !== undefined && value !== null) {
-            if (
-                name.startsWith('on') &&
-                name.toLowerCase() in window &&
-                typeof value === 'function'
-            )
+        if (
+            typeof value !== 'undefined' &&
+            value !== null &&
+            value !== undefined
+        ) {
+            if (name.startsWith('on') && name.toLowerCase() in window)
                 elem.addEventListener(name.toLowerCase().substr(2), value);
             else {
                 if (name === 'className')

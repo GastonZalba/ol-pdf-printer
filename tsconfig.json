@@ -1,25 +1,17 @@
 {
-  "compilerOptions": {
-    "declaration": true,
-    "allowJs": true,
-    "baseUrl": "./",
-    "outDir": "./tmp-dist",
-    "target": "ES2017",
-    "lib": [
-      "es2019",
-      "dom"
-    ],
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "moduleResolution": "node",
-    "skipLibCheck": true,
-    "jsx": "react",
-    "jsxFactory": "myPragma",
-    "jsxFragmentFactory": "null",
-    "declarationMap": true,
-    "incremental": true
-  },
-  "include": [
-    "./src"
-  ]
+    "compilerOptions": {
+        "declaration": true,
+        "allowJs": true,
+        "downlevelIteration": true,
+        "target": "ES2017",
+        "jsx": "react",
+        "jsxFactory": "myPragma",
+        "jsxFragmentFactory": "null",
+        "lib": ["ES2019", "dom"],
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+        "moduleResolution": "node",
+        "skipLibCheck": true
+    },
+    "include": ["./src"]
 }

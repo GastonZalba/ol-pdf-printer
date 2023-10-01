@@ -14,7 +14,7 @@
 
 Basic Pdf Printer for Open Layers.
 
-Tested with OpenLayers version 5, 6 and 7.
+Tested with OpenLayers version 5, 6, 7 and 8.
 
 ## IMPORTANT
 
@@ -26,7 +26,7 @@ WMS sources and Icons that use external urls must be setted to `crossOrigin: 'an
 
 ## Examples
 
--   [Basic usage](https://raw.githack.com/GastonZalba/ol-pdf-printer/master/examples/basic.html)
+-   [Basic usage](https://raw.githack.com/GastonZalba/ol-pdf-printer/v1.3.0/examples/basic.html)
 
 ## Usage
 
@@ -35,6 +35,7 @@ WMS sources and Icons that use external urls must be setted to `crossOrigin: 'an
 var opt_options = {
     language: 'en',
     i18n: {...}, // Custom translations. Default is according to selected language
+    showControlBtn: true,
     filename: 'Ol Pdf Printer',
     units: 'metric',
     style: {
@@ -52,7 +53,8 @@ var opt_options = {
         description: true,
         attributions: true,
         scalebar: true,
-        compass: './assets/images/compass.svg'
+        compass: './assets/images/compass.svg',
+        legends: true
     },
     watermark: {
         title: 'Ol Pdf Printer',
@@ -113,14 +115,14 @@ See [CHANGELOG](./CHANGELOG.md) for details of changes in each release.
 Load `ol-pdf-printer.js` after [OpenLayers](https://www.npmjs.com/package/ol), [jspdf](https://www.npmjs.com/package/jspdf) and PDF.js\[https://www.npmjs.com/package/pdfjs-dist]. Ol Pdf Printer is available as `PdfPrinter`.
 
 ```HTML
-<script src="https://unpkg.com/ol-pdf-printer@1.2.0"></script>
+<script src="https://unpkg.com/ol-pdf-printer@1.3.0"></script>
 ```
 
 #### CSS
 
 ```HTML
-<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.2.0/dist/css/ol-pdf-printer.css" />
-<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.2.0/dist/css/bootstrap.min.css" /> <!-- Bootstrap bundle -->
+<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.3.0/dist/css/ol-pdf-printer.css" />
+<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.3.0/dist/css/bootstrap.min.css" /> <!-- Bootstrap bundle -->
 ```
 
 ### Parcel, Webpack, etc.
@@ -153,10 +155,12 @@ TypeScript types are shipped with the project in the dist directory and should b
 
 #### Table of Contents
 
--   [showPrintSettingsModal](#showprintsettingsmodal)
--   [hidePrintSettingsModal](#hideprintsettingsmodal)
--   [createPdf](#createpdf)
+-   [PdfPrinter](#pdfprinter)
     -   [Parameters](#parameters)
+    -   [showPrintSettingsModal](#showprintsettingsmodal)
+    -   [hidePrintSettingsModal](#hideprintsettingsmodal)
+    -   [createPdf](#createpdf)
+        -   [Parameters](#parameters-1)
 -   [IPrintOptions](#iprintoptions)
     -   [format](#format)
     -   [orientation](#orientation)
@@ -166,6 +170,7 @@ TypeScript types are shipped with the project in the dist directory and should b
     -   [compass](#compass)
     -   [attributions](#attributions)
     -   [scalebar](#scalebar)
+    -   [legends](#legends)
     -   [typeExport](#typeexport)
 -   [IValues](#ivalues)
 -   [I18n](#i18n)
@@ -204,6 +209,7 @@ TypeScript types are shipped with the project in the dist directory and should b
     -   [attributions](#attributions-1)
     -   [scalebar](#scalebar-1)
     -   [compass](#compass-1)
+    -   [legends](#legends-1)
 -   [Options](#options)
     -   [filename](#filename)
     -   [units](#units)
@@ -216,28 +222,37 @@ TypeScript types are shipped with the project in the dist directory and should b
     -   [scales](#scales)
     -   [mimeTypeExports](#mimetypeexports)
     -   [dateFormat](#dateformat)
+    -   [showControlBtn](#showcontrolbtn)
     -   [ctrlBtnClass](#ctrlbtnclass)
     -   [modal](#modal)
     -   [language](#language)
     -   [i18n](#i18n-1)
 
-### showPrintSettingsModal
+### PdfPrinter
+
+**Extends ol/control/Control~Control**
+
+#### Parameters
+
+-   `opt_options` **[Options](#options)?**&#x20;
+
+#### showPrintSettingsModal
 
 Show the Settings Modal
 
 Returns **void**&#x20;
 
-### hidePrintSettingsModal
+#### hidePrintSettingsModal
 
 Hide the Settings Modal
 
 Returns **void**&#x20;
 
-### createPdf
+#### createPdf
 
 Create PDF programatically without displaying the Settings Modal
 
-#### Parameters
+##### Parameters
 
 -   `options` **[IPrintOptions](#iprintoptions)**&#x20;
 -   `showLoading` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**&#x20;
@@ -279,6 +294,10 @@ Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Glob
 #### scalebar
 
 Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)
+
+#### legends
+
+Type: (LegendsOptions | [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean))
 
 #### typeExport
 
@@ -448,6 +467,12 @@ Compass image. North must be pointing to the top
 
 Type: (`false` | [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [HTMLImageElement](https://developer.mozilla.org/docs/Web/API/HTMLImageElement) | [SVGElement](https://developer.mozilla.org/docs/Web/SVG/Element/animate))
 
+#### legends
+
+Display WMS legends
+
+Type: (LegendsOptions | [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean))
+
 ### Options
 
 **Extends ControlOptions**
@@ -524,6 +549,12 @@ Locale time zone. Default varies according to browser locale
 
 Type: Locale
 
+#### showControlBtn
+
+Show the Btn toggler on the map
+
+Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)
+
 #### ctrlBtnClass
 
 ClassName to add to the Btn Control
@@ -551,7 +582,7 @@ Type: [I18n](#i18n)
 ## TODO
 
 -   Interface comments
--   Legends support
+-   \~~Legends support~~
 -   \~~Imperial units option for scalebar~~
 -   \~~Customizable date format~~
 -   Tests!

@@ -14,12 +14,15 @@ import { Locale } from 'locale-enum';
 import Pdf from './components/Pdf';
 import SettingsModal from './components/SettingsModal';
 import ProcessingModal from './components/ProcessingModal';
+import { LegendsOptions } from './components/MapElements/Legends.js';
 import * as i18n from './components/i18n';
 
 import compassIcon from './assets/images/compass.svg';
 import pdfIcon from './assets/images/pdf.svg';
 
-import './assets/css/ol-pdf-printer.css';
+// Style
+import './assets/scss/-ol-pdf-printer.bootstrap5.scss';
+import './assets/scss/ol-pdf-printer.scss';
 
 /**
  * @protected
@@ -52,6 +55,11 @@ function deepObjectAssign(target, ...sources) {
     return target;
 }
 
+/**
+ * @constructor
+ * @extends {ol/control/Control~Control}
+ * @params options
+ */
 export default class PdfPrinter extends Control {
     protected _i18n: I18n;
 
@@ -81,7 +89,10 @@ export default class PdfPrinter extends Control {
 
         super({
             target: opt_options.target,
-            element: controlElement
+            element:
+                opt_options.showControlBtn === false
+                    ? document.createElement('div')
+                    : controlElement
         });
 
         // Check if the selected language exists
@@ -117,6 +128,7 @@ export default class PdfPrinter extends Control {
                 description: true,
                 attributions: true,
                 scalebar: true,
+                legends: true,
                 compass: compassIcon() as SVGElement
             },
             watermark: {
@@ -150,6 +162,7 @@ export default class PdfPrinter extends Control {
             ],
             units: 'metric',
             dateFormat: undefined,
+            showControlBtn: true,
             ctrlBtnClass: '',
             modal: {
                 animateClass: 'fade',
@@ -166,16 +179,23 @@ export default class PdfPrinter extends Control {
         // Merge options
         this._options = deepObjectAssign(this._options, opt_options);
 
-        controlElement.className = `ol-print-btn-menu ${this._options.ctrlBtnClass}`;
-        controlElement.title = this._i18n.printPdf;
-        controlElement.onclick = () => this.showPrintSettingsModal();
-        controlElement.append(pdfIcon());
+        if (this._options.showControlBtn) {
+            controlElement.className = `ol-print-btn-menu ${this._options.ctrlBtnClass}`;
+            controlElement.title = this._i18n.printPdf;
+            controlElement.onclick = () => this.showPrintSettingsModal();
+            controlElement.append(pdfIcon());
+        }
+    }
+
+    public setMap(map: Map) {
+        super.setMap(map);
+        if (!this._initialized && map) this._init();
     }
 
     /**
      * @protected
      */
-    _init(): void {
+    protected _init(): void {
         this._map = this.getMap();
         this._view = this._map.getView();
         this._mapTarget = this._map.getTargetElement();
@@ -198,7 +218,7 @@ export default class PdfPrinter extends Control {
     /**
      * @protected
      */
-    _setMapSizForPrint(
+    protected _getMapSizForPrint(
         width: number,
         height: number,
         resolution: number
@@ -214,7 +234,7 @@ export default class PdfPrinter extends Control {
      * Restore inital view, remove classes, disable loading
      * @protected
      */
-    _onEndPrint(): void {
+    protected _onEndPrint(): void {
         this._mapTarget.style.width = '';
         this._mapTarget.style.height = '';
         this._map.updateSize();
@@ -231,7 +251,7 @@ export default class PdfPrinter extends Control {
     /**
      * @protected
      */
-    _prepareLoading(): void {
+    protected _prepareLoading(): void {
         this._processingModal.show(this._i18n.pleaseWait);
 
         this._timeoutProcessing = setTimeout(() => {
@@ -242,7 +262,7 @@ export default class PdfPrinter extends Control {
     /**
      * @protected
      */
-    _disableLoading(): void {
+    protected _disableLoading(): void {
         this._processingModal.hide();
     }
 
@@ -250,7 +270,7 @@ export default class PdfPrinter extends Control {
      * This could be used to increment the DPI before printing
      * @protected
      */
-    _setFormatOptions(string = ''): void {
+    protected _setFormatOptions(string = ''): void {
         const layers = this._map.getLayers();
         layers.forEach((layer) => {
             if (layer instanceof Tile) {
@@ -272,7 +292,11 @@ export default class PdfPrinter extends Control {
      * @param delay Delay to prevent glitching with modals animation
      * @protected
      */
-    _printMap(form: IPrintOptions, showLoading = true, delay = 0): void {
+    protected _printMap(
+        form: IPrintOptions,
+        showLoading = true,
+        delay = 0
+    ): void {
         if (showLoading) {
             this._mapTarget.classList.add(CLASS_PRINT_MODE);
         }
@@ -299,7 +323,7 @@ export default class PdfPrinter extends Control {
             const widthPaper = dim[0];
             const heightPaper = dim[1];
 
-            const mapSizeForPrint = this._setMapSizForPrint(
+            const mapSizeForPrint = this._getMapSizForPrint(
                 widthPaper,
                 heightPaper,
                 form.resolution
@@ -334,7 +358,7 @@ export default class PdfPrinter extends Control {
                         if (this._isCanceled) return;
 
                         this._pdf = new Pdf({
-                            view: this._view,
+                            map: this._map,
                             i18n: this._i18n,
                             config: this._options,
                             form: form,
@@ -375,7 +399,7 @@ export default class PdfPrinter extends Control {
     /**
      * @protected
      */
-    _cancel(): void {
+    protected _cancel(): void {
         if (this._renderCompleteKey) {
             unByKey(this._renderCompleteKey);
         }
@@ -388,7 +412,6 @@ export default class PdfPrinter extends Control {
      * @public
      */
     showPrintSettingsModal(): void {
-        if (!this._initialized) this._init();
         this._settingsModal.show();
     }
 
@@ -421,6 +444,7 @@ export default class PdfPrinter extends Control {
                 compass: true,
                 attributions: true,
                 scalebar: true,
+                legends: true,
                 scale: 1000,
                 typeExport: 'pdf',
                 ...options
@@ -469,6 +493,10 @@ export interface IPrintOptions {
     /**
      *
      */
+    legends?: LegendsOptions | boolean;
+    /**
+     *
+     */
     typeExport?: IMimeTypeExport['value'];
 }
 
@@ -503,6 +531,7 @@ export interface I18n {
     mapElements: string;
     compass: string;
     scale: string;
+    legends: string;
     layersAttributions: string;
     addNote: string;
     resolution: string;
@@ -675,6 +704,10 @@ export interface IMapElements {
      * Compass image. North must be pointing to the top
      */
     compass?: false | string | HTMLImageElement | SVGElement;
+    /**
+     * Display WMS legends
+     */
+    legends?: LegendsOptions | boolean;
 }
 
 /**
@@ -739,6 +772,11 @@ export interface Options extends ControlOptions {
      * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString#using_locales
      */
     dateFormat?: Locale;
+
+    /**
+     * Show the Btn toggler on the map
+     */
+    showControlBtn?: boolean;
 
     /**
      * ClassName to add to the Btn Control

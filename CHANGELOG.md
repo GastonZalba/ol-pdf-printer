@@ -91,3 +91,12 @@
 * Lib is builded with es2017 target (downgraded from esnext)
 * Removed babel deps
 * Added header to dist files
+
+## v1.3.0
+* Addded Legends support
+* Added `showControlBtn` configuration to allow disable the control button
+* Refactored using setMap method (and fixed error while using `createPdf` before the modal was displayed)
+* Added `createPdf` button to the example
+* Updated to Ol8
+* Updated dev dependencies
+* Converted css to scss

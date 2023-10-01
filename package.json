@@ -1,11 +1,14 @@
 {
   "name": "ol-pdf-printer",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "PDF Printer for Open Layers",
   "main": "dist/ol-pdf-printer.js",
   "module": "lib/ol-pdf-printer.js",
   "types": "lib/ol-pdf-printer.d.ts",
-  "style": "lib/ol-pdf-printer.css",
+  "style": [
+    "lib/style/css/ol-pdf-printer.css",
+    "lib/style/css/ol-pdf-printer.bootstrap5.css"
+  ],
   "type": "module",
   "files": [
     "lib/**/*",
@@ -16,8 +19,7 @@
     "doc": "documentation readme src/ol-pdf-printer.ts --shallow --quiet=true --access=public --access=undefined --section=API --parse-extension ts && node scripts/external-links.js README.md && prettier --write README.md",
     "format": "eslint --fix src/** && prettier --write src",
     "lint": "eslint src/** && prettier --check src",
-    "build": "npm run lint src && rollup --config rollup.config.dist.js && rollup --config rollup.config.js",
-    "postbuild": "del-cli lib/components dist/components"
+    "build": "npm run lint src && rollup --config rollup.config.dist.js && rollup --config rollup.config.js"
   },
   "repository": {
     "type": "git",
@@ -39,38 +41,38 @@
   },
   "homepage": "https://github.com/GastonZalba/ol-pdf-printer#readme",
   "peerDependencies": {
-    "bootstrap": ">=5.0.0",
+    "bootstrap": ">=5.3.0",
     "modal-vanilla": ">=0.12.0",
     "ol": ">=6.0.0"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^24.1.0",
+    "@rollup/plugin-commonjs": "^24.0.1",
     "@rollup/plugin-node-resolve": "^15.0.2",
     "@rollup/plugin-terser": "^0.4.1",
-    "@rollup/plugin-typescript": "^11.1.0",
-    "@typescript-eslint/eslint-plugin": "^5.58.0",
-    "@typescript-eslint/parser": "^5.58.0",
-    "bootstrap": "^5.2.3",
-    "clean-css": "^5.1.5",
-    "del-cli": "^5.0.0",
+    "@rollup/plugin-typescript": "^11.1.1",
+    "@typescript-eslint/eslint-plugin": "^6.7.3",
+    "@typescript-eslint/parser": "^6.7.3",
+    "bootstrap": "^5.3.2",
     "documentation": "^14.0.1",
     "eslint-config-openlayers": "^18.0.0",
-    "eslint-config-prettier": "^8.8.0",
-    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
     "modal-vanilla": "^0.12.0",
-    "ol": "^7.3.0",
-    "prettier": "^2.2.1",
+    "ol": "^8.1.0",
+    "postcss-preset-env": "^9.1.4",
+    "prettier": "^3.0.3",
     "rollup": "^3.20.3",
     "rollup-plugin-banner2": "^1.2.2",
     "rollup-plugin-copy": "^3.4.0",
-    "rollup-plugin-css-only": "^4.3.0",
     "rollup-plugin-delete": "^2.0.0",
     "rollup-plugin-livereload": "^2.0.5",
     "rollup-plugin-polyfill-node": "^0.12.0",
     "rollup-plugin-postcss": "^4.0.1",
     "rollup-plugin-serve": "^2.0.2",
     "rollup-plugin-svg-import": "^2.0.0",
-    "typescript": "^5.0.4"
+    "sass": "^1.68.0",
+    "tslib": "^2.6.2",
+    "typescript": "^5.2.2"
   },
   "dependencies": {
     "dom-to-image-improved": "^2.8.0",

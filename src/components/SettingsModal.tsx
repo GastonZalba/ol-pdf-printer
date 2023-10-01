@@ -1,5 +1,6 @@
-import Modal from 'modal-vanilla';
 import Map from 'ol/Map.js';
+
+import Modal from 'modal-vanilla';
 
 import { I18n, IValues, Options } from '../ol-pdf-printer';
 import { getMapScale } from './Helpers';
@@ -44,6 +45,7 @@ export default class SettingsModal {
                 compass: formData.get('printCompass'),
                 attributions: formData.get('printAttributions'),
                 scalebar: formData.get('printScalebar'),
+                legends: formData.get('printLegends'),
                 typeExport: this._modal.el.querySelector(
                     'select[name="printTypeExport"]'
                 ).value
@@ -178,6 +180,17 @@ export default class SettingsModal {
                                         checked
                                     />
                                     {i18n.scale}
+                                </label>
+                            )}
+                            {mapElements.legends && (
+                                <label htmlFor="printLegends">
+                                    <input
+                                        type="checkbox"
+                                        id="printLegends"
+                                        name="printLegends"
+                                        checked
+                                    />
+                                    {i18n.legends}
                                 </label>
                             )}
                             {mapElements.attributions && (

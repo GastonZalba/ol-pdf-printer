@@ -13,6 +13,7 @@ export const es: I18n = {
     mapElements: 'Elementos en el mapa',
     compass: 'Brújula',
     scale: 'Escala',
+    legends: 'Leyendas',
     layersAttributions: 'Atribuciones de capas',
     addNote: 'Agregar nota (opcional)',
     resolution: 'Resolución',

@@ -3,7 +3,6 @@ import postcss from 'rollup-plugin-postcss';
 import typescript from '@rollup/plugin-typescript';
 import del from 'rollup-plugin-delete';
 import copy from 'rollup-plugin-copy';
-import resolve from '@rollup/plugin-node-resolve';
 import path from 'path';
 import banner2 from 'rollup-plugin-banner2'
 import { readFileSync } from 'fs';
@@ -21,7 +20,7 @@ export default {
     input: 'src/ol-pdf-printer.ts',
     output: [
         {
-            dir: 'lib',
+            file: 'lib/ol-pdf-printer.js',
             format: 'es',
             sourcemap: true
         }
@@ -30,24 +29,40 @@ export default {
         banner2(() => banner),
         del({ targets: 'lib/*' }),
         typescript({
-            outDir: './lib',
-            declarationDir: './lib',
-            outputToFilesystem: true
-        }),
-        copy({
-            targets: [
-                { src: 'src/assets/css/bootstrap.min.css', dest: 'lib/css' },
-            ]
-        }),
-        resolve({
-            extensions: ['.mjs', '.js', '.ts', '.json', '.node', '.tsx ', '.jsx']
+            outDir: 'lib',
+            outputToFilesystem: true,
+            declarationMap: true,
+            incremental: false                       
         }),
         svg(),
         postcss({
+            include: 'src/assets/scss/-ol-pdf-printer.bootstrap5.scss',
+            extensions: ['.css', '.sass', '.scss'],
+            extract: path.resolve('lib/style/css/ol-pdf-printer.bootstrap5.css'),
+            config: {
+                path: './postcss.config.cjs',
+                ctx: {
+                    isDev: false
+                }
+            }
+        }),
+        postcss({
+            include: 'src/assets/scss/ol-pdf-printer.scss',
             extensions: ['.css', '.sass', '.scss'], 
             inject: false,
-            extract: path.resolve('lib/css/ol-pdf-printer.css')
+            extract: path.resolve('lib/style/css/ol-pdf-printer.css'),
+            config: {
+                path: './postcss.config.cjs',
+                ctx: {
+                    isDev: false
+                }
+            }
         }),
+        copy({
+            targets: [
+                { src: 'src/assets/scss', dest: 'lib/style' }
+            ]
+        })
     ],
     external: id => !(path.isAbsolute(id) || id.startsWith("."))
 };
