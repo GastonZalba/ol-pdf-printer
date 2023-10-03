@@ -3,10 +3,11 @@ import { I18n } from '../../ol-pdf-printer';
 export const en: I18n = {
     printPdf: 'Print PDF',
     pleaseWait: 'Please wait...',
-    almostThere: 'Almost there...',
+    downloadFinished: 'Download finished, processing...',
+    downloadingImages: 'Downloading images',
     error: 'An error occurred while printing',
     errorImage: 'An error ocurred while loading an image',
-    printing: 'Exporting',
+    printing: 'Exporting, plaese wait...',
     cancel: 'Cancel',
     close: 'Close',
     print: 'Export',
@@ -22,5 +23,6 @@ export const en: I18n = {
     landscape: 'Landscape',
     portrait: 'Portrait',
     current: 'Current',
-    paper: 'Paper'
+    paper: 'Paper',
+    printerMargins: 'Add printer margins'
 };

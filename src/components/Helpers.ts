@@ -1,5 +1,10 @@
 import Map from 'ol/Map.js';
 import { METERS_PER_UNIT } from 'ol/proj/Units.js';
+import ImageWMS from 'ol/source/ImageWMS.js';
+import TileLayer from 'ol/layer/Tile.js';
+import ImageLayer from 'ol/layer/Image.js';
+import BaseLayer from 'ol/layer/Base.js';
+import TileWMS from 'ol/source/TileWMS.js';
 
 /**
  *
@@ -23,4 +28,17 @@ export const getMapScale = (map: Map, opt_round = true): number => {
     }
 
     return scale;
+};
+
+/**
+ *
+ * @param layer
+ * @returns
+ */
+export const isWmsLayer = (layer: BaseLayer): boolean => {
+    return (
+        (layer instanceof ImageLayer || layer instanceof TileLayer) &&
+        (layer.getSource() instanceof TileWMS ||
+            layer.getSource() instanceof ImageWMS)
+    );
 };

@@ -1,11 +1,13 @@
 import Map from 'ol/Map.js';
 import View from 'ol/View.js';
 import Control, { Options as ControlOptions } from 'ol/control/Control.js';
-import TileWMS from 'ol/source/TileWMS.js';
-import Tile from 'ol/layer/Tile.js';
 import { getPointResolution } from 'ol/proj.js';
 import { EventsKey } from 'ol/events.js';
 import { unByKey } from 'ol/Observable.js';
+import Cluster from 'ol/source/Cluster.js';
+import VectorLayer from 'ol/layer/Vector.js';
+import TileWMS from 'ol/source/TileWMS.js';
+import Layer from 'ol/layer/Layer.js';
 
 import domtoimage from 'dom-to-image-improved';
 
@@ -15,6 +17,7 @@ import Pdf from './components/Pdf';
 import SettingsModal from './components/SettingsModal';
 import ProcessingModal from './components/ProcessingModal';
 import { LegendsOptions } from './components/MapElements/Legends.js';
+import { isWmsLayer } from './components/Helpers.js';
 import * as i18n from './components/i18n';
 
 import compassIcon from './assets/images/compass.svg';
@@ -83,6 +86,8 @@ export default class PdfPrinter extends Control {
     protected _renderCompleteKey: EventsKey | EventsKey[];
 
     protected _isCanceled: boolean;
+    protected _eventsKey: EventsKey[];
+    protected _imageCount: number;
 
     constructor(opt_options?: Options) {
         const controlElement = document.createElement('button');
@@ -114,7 +119,12 @@ export default class PdfPrinter extends Control {
             language: DEFAULT_LANGUAGE,
             filename: 'Ol Pdf Printer',
             style: {
-                paperMargin: 10,
+                paperMargin: {
+                    left: 4,
+                    top: 4,
+                    right: 4,
+                    bottom: 4
+                },
                 brcolor: '#000000',
                 bkcolor: '#273f50',
                 txcolor: '#ffffff'
@@ -124,8 +134,8 @@ export default class PdfPrinter extends Control {
                 url: true,
                 specs: true
             },
+            description: true,
             mapElements: {
-                description: true,
                 attributions: true,
                 scalebar: true,
                 legends: true,
@@ -147,7 +157,6 @@ export default class PdfPrinter extends Control {
                 { size: [210, 148], value: 'A5' }
             ],
             dpi: [
-                { value: 72 },
                 { value: 96 },
                 { value: 150, selected: true },
                 { value: 200 },
@@ -242,6 +251,8 @@ export default class PdfPrinter extends Control {
         this._mapTarget.classList.remove(CLASS_PRINT_MODE);
 
         this._view.setConstrainResolution(true);
+        this._updateDPI(90);
+        this._removeListeners();
 
         clearTimeout(this._timeoutProcessing);
 
@@ -252,11 +263,8 @@ export default class PdfPrinter extends Control {
      * @protected
      */
     protected _prepareLoading(): void {
-        this._processingModal.show(this._i18n.pleaseWait);
-
-        this._timeoutProcessing = setTimeout(() => {
-            this._processingModal.show(this._i18n.almostThere);
-        }, 4000);
+        this._processingModal.show();
+        this._processingModal.set(this._i18n.pleaseWait);
     }
 
     /**
@@ -267,22 +275,40 @@ export default class PdfPrinter extends Control {
     }
 
     /**
-     * This could be used to increment the DPI before printing
+     *
+     * @param dpi
      * @protected
      */
-    protected _setFormatOptions(string = ''): void {
-        const layers = this._map.getLayers();
-        layers.forEach((layer) => {
-            if (layer instanceof Tile) {
-                const source = layer.getSource();
-                // Set WMS DPI
-                if (source instanceof TileWMS) {
-                    source.updateParams({
-                        FORMAT_OPTIONS: string
-                    });
+    protected _updateDPI(dpi: number = 90): void {
+        const pixelRatio = dpi / 90;
+
+        // @ts-expect-error There is no public method to do this
+        this._map.pixelRatio_ = pixelRatio;
+        this._map.getLayers().forEach((layer) => {
+            if (
+                layer.getVisible() &&
+                'getSource' in layer &&
+                typeof layer.getSource === 'function'
+            ) {
+                const source = layer.getSource() as TileWMS;
+
+                // @ts-expect-error There is no public method to do this
+                if (source.tilePixelRatio_ !== undefined) {
+                    // @ts-expect-error There is no public method to do this
+                    source.tilePixelRatio_ = pixelRatio;
+                    source.refresh();
+                } else {
+                    if (layer instanceof VectorLayer) {
+                        if (source instanceof Cluster) {
+                            source.getSource().changed();
+                        } else {
+                            source.changed();
+                        }
+                    }
                 }
             }
         });
+        this._map.updateSize();
     }
 
     /**
@@ -323,6 +349,9 @@ export default class PdfPrinter extends Control {
             const widthPaper = dim[0];
             const heightPaper = dim[1];
 
+            this._addListeners();
+            this._updateDPI(form.resolution);
+
             const mapSizeForPrint = this._getMapSizForPrint(
                 widthPaper,
                 heightPaper,
@@ -344,6 +373,8 @@ export default class PdfPrinter extends Control {
                 );
 
             this._renderCompleteKey = this._map.once('rendercomplete', () => {
+                this._processingModal.set(this._i18n.downloadFinished);
+
                 domtoimage
                     .toJpeg(
                         this._mapTarget.querySelector(
@@ -384,7 +415,7 @@ export default class PdfPrinter extends Control {
                             typeof err === 'string' ? err : this._i18n.error;
                         console.error(err);
                         this._onEndPrint();
-                        this._processingModal.show(message);
+                        this._processingModal.set(message);
                     });
             });
 
@@ -394,6 +425,41 @@ export default class PdfPrinter extends Control {
             this._map.updateSize();
             this._map.getView().setResolution(scaleResolution);
         }, delay);
+    }
+
+    /**
+     * Add tile listener to show downloaded images count
+     */
+    protected _addListeners() {
+        this._eventsKey = [];
+        this._imageCount = 0;
+
+        this._map
+            .getLayers()
+            .getArray()
+            .forEach((l) => {
+                if (isWmsLayer(l)) {
+                    this._eventsKey.push(
+                        (l as Layer<TileWMS>)
+                            .getSource()
+                            .on('tileloadend', () => {
+                                this._processingModal.set(
+                                    this._i18n.downloadingImages +
+                                        ': <b>' +
+                                        this._imageCount++ +
+                                        '</b>'
+                                );
+                            })
+                    );
+                }
+            });
+    }
+
+    /**
+     * Remove WMS listeners
+     */
+    protected _removeListeners() {
+        unByKey(this._eventsKey);
     }
 
     /**
@@ -497,6 +563,10 @@ export interface IPrintOptions {
     /**
      *
      */
+    safeMargins?: boolean;
+    /**
+     *
+     */
     typeExport?: IMimeTypeExport['value'];
 }
 
@@ -521,7 +591,8 @@ export interface IValues {
 export interface I18n {
     printPdf: string;
     pleaseWait: string;
-    almostThere: string;
+    downloadFinished: string;
+    downloadingImages: string;
     error: string;
     errorImage: string;
     printing: string;
@@ -541,6 +612,7 @@ export interface I18n {
     portrait: string;
     current: string;
     paper: string;
+    printerMargins: string;
 }
 
 /**
@@ -587,7 +659,14 @@ interface IStyle {
     /**
      *
      */
-    paperMargin?: number;
+    paperMargin?:
+        | number
+        | {
+              top: number;
+              right: number;
+              bottom: number;
+              left: number;
+          };
     /**
      *
      */
@@ -689,10 +768,6 @@ interface IExtraInfo {
  */
 export interface IMapElements {
     /**
-     * Print description
-     */
-    description?: boolean;
-    /**
      * Layers attributions
      */
     attributions?: boolean;
@@ -734,6 +809,12 @@ export interface Options extends ControlOptions {
      * False to disable
      */
     extraInfo?: false | IExtraInfo;
+
+    /**
+     * Allow add extra description to the print
+     * False to disable
+     */
+    description?: boolean;
 
     /**
      * Elements to be showed on the PDF and in the Settings Modal.

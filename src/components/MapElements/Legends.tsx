@@ -1,12 +1,14 @@
 import View from 'ol/View.js';
 import Map from 'ol/Map.js';
 import BaseLayer from 'ol/layer/Base.js';
-import { Projection } from 'ol/proj.js';
 import TileWMS from 'ol/source/TileWMS.js';
-import { appendParams } from 'ol/uri.js';
 import ImageWMS from 'ol/source/ImageWMS.js';
 import TileLayer from 'ol/layer/Tile.js';
 import ImageLayer from 'ol/layer/Image.js';
+import { appendParams } from 'ol/uri.js';
+import { Projection } from 'ol/proj.js';
+
+import { isWmsLayer } from '../Helpers.js';
 
 export const legendsDefaultConfig = {
     legendOptions: {
@@ -92,19 +94,6 @@ export default class Legends {
 
     /**
      *
-     * @param layer
-     * @returns
-     */
-    public isWmsLayer(layer: BaseLayer): boolean {
-        return (
-            (layer instanceof ImageLayer || layer instanceof TileLayer) &&
-            (layer.getSource() instanceof TileWMS ||
-                layer.getSource() instanceof ImageWMS)
-        );
-    }
-
-    /**
-     *
      * @returns
      */
     public getWmsLegendLayers(): Array<
@@ -114,7 +103,7 @@ export default class Legends {
             .getLayers()
             .getArray()
             .filter(
-                (layer) => this.isWmsLayer(layer) && layer.getVisible()
+                (layer) => isWmsLayer(layer) && layer.getVisible()
             ) as Array<TileLayer<TileWMS> | ImageLayer<ImageWMS>>;
     }
 
@@ -172,8 +161,7 @@ export default class Legends {
             bgColor: '0xffffff',
             forceLabels: 'on',
             forceTitles: 'on',
-            dpi: 130,
-            //fontSize:8,
+            fontSize: 8,
             ...this._legendOptions
         };
 

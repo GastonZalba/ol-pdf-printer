@@ -70,7 +70,6 @@ var opt_options = {
         { size: [210, 148], value: 'A5' }
     ],
     dpi: [
-        { value: 72 },
         { value: 96 },
         { value: 150, selected: true },
         { value: 200 },
@@ -171,6 +170,7 @@ TypeScript types are shipped with the project in the dist directory and should b
     -   [attributions](#attributions)
     -   [scalebar](#scalebar)
     -   [legends](#legends)
+    -   [safeMargins](#safemargins)
     -   [typeExport](#typeexport)
 -   [IValues](#ivalues)
 -   [I18n](#i18n)
@@ -205,7 +205,6 @@ TypeScript types are shipped with the project in the dist directory and should b
     -   [url](#url)
     -   [specs](#specs)
 -   [IMapElements](#imapelements)
-    -   [description](#description-1)
     -   [attributions](#attributions-1)
     -   [scalebar](#scalebar-1)
     -   [compass](#compass-1)
@@ -215,6 +214,7 @@ TypeScript types are shipped with the project in the dist directory and should b
     -   [units](#units)
     -   [style](#style)
     -   [extraInfo](#extrainfo)
+    -   [description](#description-1)
     -   [mapElements](#mapelements)
     -   [watermark](#watermark)
     -   [paperSizes](#papersizes)
@@ -299,6 +299,10 @@ Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Glob
 
 Type: (LegendsOptions | [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean))
 
+#### safeMargins
+
+Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)
+
 #### typeExport
 
 Type: any
@@ -351,7 +355,7 @@ Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Glob
 
 #### paperMargin
 
-Type: [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)
+Type: ([number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | {top: [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number), right: [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number), bottom: [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number), left: [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)})
 
 #### brcolor
 
@@ -443,12 +447,6 @@ Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Glob
 
 **_\[interface]_** - MapElements
 
-#### description
-
-Print description
-
-Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)
-
 #### attributions
 
 Layers attributions
@@ -503,6 +501,13 @@ Information to be inserted at the bottom of the PDF
 False to disable
 
 Type: (`false` | [IExtraInfo](#iextrainfo))
+
+#### description
+
+Allow add extra description to the print
+False to disable
+
+Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)
 
 #### mapElements
 
@@ -585,4 +590,5 @@ Type: [I18n](#i18n)
 -   \~~Legends support~~
 -   \~~Imperial units option for scalebar~~
 -   \~~Customizable date format~~
+-   Events
 -   Tests!

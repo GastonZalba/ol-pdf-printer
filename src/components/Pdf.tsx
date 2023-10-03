@@ -22,6 +22,7 @@ export default class Pdf {
     protected _form: IPrintOptions;
     protected _style: Options['style'];
     protected _i18n: I18n;
+    protected _printingMargins: IMargins;
 
     protected _config: Options;
 
@@ -34,6 +35,27 @@ export default class Pdf {
         this._form = form;
         this._i18n = i18n;
         this._config = config;
+
+        this._style = config.style;
+
+        if (this._form.safeMargins) {
+            this._printingMargins =
+                typeof config.style.paperMargin === 'number'
+                    ? {
+                          top: config.style.paperMargin,
+                          left: config.style.paperMargin,
+                          right: config.style.paperMargin,
+                          bottom: config.style.paperMargin
+                      }
+                    : config.style.paperMargin;
+        } else {
+            this._printingMargins = {
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0
+            };
+        }
 
         this._pdf = this.create(
             this._form.orientation,
@@ -87,10 +109,12 @@ export default class Pdf {
         this._pdf.doc.addImage(
             dataUrl,
             'JPEG',
-            this._config.style.paperMargin, // Add margins
-            this._config.style.paperMargin,
-            this._pdf.width - this._config.style.paperMargin * 2,
-            this._pdf.height - this._config.style.paperMargin * 2
+            this._printingMargins.left, // Add margins
+            this._printingMargins.top,
+            this._pdf.width -
+                (this._printingMargins.left + this._printingMargins.right),
+            this._pdf.height -
+                (this._printingMargins.top + this._printingMargins.bottom)
         );
     }
 
@@ -99,21 +123,19 @@ export default class Pdf {
      * @protected
      */
     addMapHelpers = async (): Promise<void> => {
-        const { mapElements, extraInfo, style, watermark } = this._config;
-
-        this._style = style;
+        const { mapElements, extraInfo, description, watermark } = this._config;
 
         if (watermark) {
             await this._addWatermark(watermark);
         }
 
+        if (description && this._form.description) {
+            this._addDescription();
+        }
+
         if (mapElements) {
             if (mapElements.compass && this._form.compass) {
                 await this._addCompass(mapElements.compass);
-            }
-
-            if (mapElements.description && this._form.description) {
-                this._addDescription();
             }
 
             if (mapElements.scalebar && this._form.scalebar) {
@@ -130,17 +152,17 @@ export default class Pdf {
         }
 
         if (extraInfo) {
-            // Bottom info
+            // Top info
+            if (extraInfo.specs) {
+                this._addSpecs();
+            }
+
             if (extraInfo.url) {
                 this._addUrl();
             }
 
             if (extraInfo.date) {
                 this._addDate();
-            }
-
-            if (extraInfo.specs) {
-                this._addSpecs();
             }
         }
     };
@@ -173,7 +195,8 @@ export default class Pdf {
                 getDocument(pdf).promise.then(
                     (pdf) => {
                         pdf.getPage(1).then((page) => {
-                            const scale = 2;
+                            // transform DPI correctly
+                            const scale = (this._form.resolution / 100) * 1.39;
 
                             const viewport = page.getViewport({ scale });
 
@@ -310,21 +333,21 @@ export default class Pdf {
 
         switch (position) {
             case 'topleft':
-                x = offset.x + this._style.paperMargin;
-                y = offset.y + this._style.paperMargin + size;
+                x = offset.x + this._printingMargins.left;
+                y = offset.y + this._printingMargins.top + size;
                 break;
 
             case 'topright':
-                x = this._pdf.width - offset.x - this._style.paperMargin;
-                y = offset.y + this._style.paperMargin + size;
+                x = this._pdf.width - offset.x - this._printingMargins.left;
+                y = offset.y + this._printingMargins.top + size;
                 break;
 
             case 'bottomright':
-                x = this._pdf.width - offset.x - this._style.paperMargin;
+                x = this._pdf.width - offset.x - this._printingMargins.left;
                 y =
                     this._pdf.height -
                     offset.y -
-                    this._style.paperMargin -
+                    this._printingMargins.bottom -
                     size;
                 break;
 
@@ -332,9 +355,9 @@ export default class Pdf {
                 y =
                     this._pdf.height -
                     offset.y -
-                    this._style.paperMargin -
+                    this._printingMargins.bottom -
                     size;
-                x = offset.x + this._style.paperMargin;
+                x = offset.x + this._printingMargins.left;
                 break;
         }
 
@@ -389,7 +412,6 @@ export default class Pdf {
     _addText = (
         x: number,
         y: number,
-        width: number,
         fontSize: number,
         color: string,
         align: TextOptionsLight['align'] = 'left',
@@ -399,7 +421,7 @@ export default class Pdf {
         this._pdf.doc.setFontSize(fontSize);
 
         this._pdf.doc.text(str, x, y, {
-            align: align
+            align
         });
     };
 
@@ -425,7 +447,7 @@ export default class Pdf {
     ): void => {
         const { x, y } = this._calculateOffsetByPosition(position, offset);
         const fixX = align === 'center' ? x - width / 2 : x;
-        this._addText(fixX, y, width, fontSize, color, align, str);
+        this._addText(fixX, y, fontSize, color, align, str);
     };
 
     /**
@@ -434,7 +456,7 @@ export default class Pdf {
     _addDescription = (): void => {
         const str = this._form.description.trim();
         const position = 'topleft';
-        const offset = { x: 2, y: 2 };
+        const offset = { x: 2, y: 10 };
         const fontSize = 8;
         const maxWidth = 50;
 
@@ -471,7 +493,7 @@ export default class Pdf {
      */
     _addWatermark = async (watermark: IWatermark): Promise<void> => {
         const position = 'topright';
-        const offset = { x: 0, y: 0 };
+        const offset = { x: 2, y: 0 };
         const fontSize = 14;
         const imageSize = 12;
         const fontSizeSubtitle = fontSize / 1.8;
@@ -623,14 +645,14 @@ export default class Pdf {
      * @protected
      */
     _addDate = (): void => {
-        const position = 'bottomright';
+        const position = 'topright';
         const width = 250;
         const offset = {
-            x: 0,
-            y: -5
+            x: 2,
+            y: 15
         };
         const fontSize = 7;
-        const txcolor = '#000000';
+        const txcolor = '#ffffff';
         const align = 'right';
 
         this._pdf.doc.setFont('helvetica', 'normal');
@@ -652,14 +674,14 @@ export default class Pdf {
      * @protected
      */
     _addUrl = (): void => {
-        const position = 'bottomleft';
+        const position = 'topleft';
         const width = 250;
         const offset = {
-            x: 0,
-            y: -6.5
+            x: 2,
+            y: 3
         };
         const fontSize = 6;
-        const txcolor = '#000000';
+        const txcolor = '#ffffff';
         const align = 'left';
 
         this._pdf.doc.setFont('helvetica', 'italic');
@@ -678,13 +700,13 @@ export default class Pdf {
      * @protected
      */
     _addSpecs = (): void => {
-        const position = 'bottomleft';
+        const position = 'topleft';
         const offset = {
-            x: 0,
-            y: -3.5
+            x: 2,
+            y: 6
         };
         const fontSize = 6;
-        const txcolor = '#000000';
+        const txcolor = '#ffffff';
         const align = 'left';
 
         this._pdf.doc.setFont('helvetica', 'bold');
@@ -870,7 +892,9 @@ export default class Pdf {
         let size = (length * unitConversionFactor) / this._scaleDenominator / 4;
 
         const percentageMargin = this._style.paperMargin
-            ? ((this._style.paperMargin * 2) / this._pdf.width) * 100
+            ? ((this._printingMargins.left + this._printingMargins.right) /
+                  this._pdf.width) *
+              100
             : null;
 
         // Reduce length acording to margins
@@ -881,10 +905,10 @@ export default class Pdf {
         const fullSize = size * 4;
 
         // x/y defaults to offset for topleft corner (normal x/y coordinates)
-        const x = offset.x + this._style.paperMargin;
-        let y = offset.y + this._style.paperMargin;
+        const x = offset.x + this._printingMargins.left;
+        let y = offset.y + this._printingMargins.top;
 
-        y = this._pdf.height - offset.y - 10 - this._style.paperMargin;
+        y = this._pdf.height - offset.y - 10 - this._printingMargins.bottom;
 
         // to give the outer white box 4mm padding
         const scaleBarX = x + 4;
@@ -1049,21 +1073,21 @@ export default class Pdf {
                     ? 15
                     : 2
         };
-        const fontSize = 7;
 
-        this._pdf.doc.setFont('helvetica', 'normal');
-        this._pdf.doc.setFontSize(fontSize);
         const { x, y } = this._calculateOffsetByPosition(position, offset);
 
         let yPos = y;
 
         const images: HTMLImageElement[] = await this._legends.getImages(
-            this._form.resolution
+            this._form.resolution * 1.5
         );
 
-        const largestWidth = Math.max(...images.map((i) => i.naturalWidth)) / 5;
+        const ratioSize = 1 / (this._form.resolution / 15);
+
+        const largestWidth =
+            Math.max(...images.map((i) => i.naturalWidth)) * ratioSize;
         const accumulativeHeight = images.reduce(
-            (acc, curr) => acc + curr.naturalHeight / 5,
+            (acc, curr) => acc + curr.naturalHeight * ratioSize,
             0
         );
 
@@ -1080,8 +1104,8 @@ export default class Pdf {
 
         images.forEach((img) => {
             const { naturalWidth, naturalHeight } = img;
-            const width = naturalWidth / 5;
-            const height = naturalHeight / 5;
+            const width = naturalWidth * ratioSize;
+            const height = naturalHeight * ratioSize;
             this._pdf.doc.addImage(
                 img,
                 x - paddingBack,
@@ -1092,6 +1116,17 @@ export default class Pdf {
             yPos -= height;
         });
     }
+}
+
+/**
+ * **_[interface]_**
+ * @protected
+ */
+interface IMargins {
+    top: number;
+    right: number;
+    bottom: number;
+    left: number;
 }
 
 /**

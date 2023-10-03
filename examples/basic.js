@@ -104,7 +104,7 @@
         view: new ol.View({
             projection: 'EPSG:3857',
             center: [-6721313, -4349376],
-            zoom: 8,
+            zoom: 13,
             rotation: 0.1
         })
     });
@@ -113,9 +113,14 @@
         showControlBtn: true,
         filename: 'Example export',
         language: 'en',
-        units: 'imperial',
+        units: 'metric',
         style: {
-            paperMargin: 10
+            paperMargin: {
+                left: 4,
+                top: 4,
+                right: 4,
+                bottom: 4
+            },
         },
         paperSizes: [
             { size: [594, 420], value: 'A2' },
@@ -124,7 +129,6 @@
             { size: [210, 148], value: 'A5' }
         ],
         dpi: [
-            { value: 72 },
             { value: 96 },
             { value: 150, selected: true },
             { value: 200 },

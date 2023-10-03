@@ -92,10 +92,17 @@
 * Removed babel deps
 * Added header to dist files
 
-## v1.3.0
+## v2.0.0
 * Addded Legends support
+* Allow printing without safe margins (by default no margin is added)
+* Improved `paperMargin` constructor option
+* Fixed wrong scale transformation on exporting to image formats (now respecting the DPI accordly)
+* Improved DPI accuracy
+* Improved download and processing status info
+* Removed `description` from inside mapElements option (_breaking change_)
 * Added `showControlBtn` configuration to allow disable the control button
 * Refactored using setMap method (and fixed error while using `createPdf` before the modal was displayed)
+* Removed default 72 DPI option
 * Added `createPdf` button to the example
 * Updated to Ol8
 * Updated dev dependencies

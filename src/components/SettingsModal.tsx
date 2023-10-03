@@ -28,6 +28,8 @@ export default class SettingsModal {
             ...options.modal
         });
 
+        this._modal.el.classList.add('print-modal');
+
         this._modal.on('dismiss', (modal: Modal, event: Event): void => {
             const print = (event.target as HTMLElement).dataset.print;
             if (!print) return;
@@ -46,6 +48,7 @@ export default class SettingsModal {
                 attributions: formData.get('printAttributions'),
                 scalebar: formData.get('printScalebar'),
                 legends: formData.get('printLegends'),
+                safeMargins: formData.get('safeMargins'),
                 typeExport: this._modal.el.querySelector(
                     'select[name="printTypeExport"]'
                 ).value
@@ -78,75 +81,80 @@ export default class SettingsModal {
      * @protected
      */
     Content(i18n: I18n, options: Options): HTMLElement {
-        const { scales, dpi, mapElements, paperSizes } = options;
+        const { scales, dpi, mapElements, description, paperSizes } = options;
 
         return (
             <form id="printMap">
-                <div>
-                    <div className="printFieldHalf">
-                        <label htmlFor="printFormat">{i18n.paperSize}</label>
-                        <select name="printFormat" id="printFormat">
-                            {paperSizes.map((paper) => (
-                                <option
-                                    value={paper.value}
-                                    {...(paper.selected
-                                        ? { selected: 'selected' }
-                                        : {})}
-                                >
-                                    {paper.value}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="printFieldHalf">
-                        <label htmlFor="printOrientation">
-                            {i18n.orientation}
-                        </label>
-                        <select name="printOrientation" id="printOrientation">
-                            <option value="landscape" selected>
-                                {i18n.landscape}
-                            </option>
-                            <option value="portrait">{i18n.portrait}</option>
-                        </select>
-                    </div>
-                </div>
-                <div>
-                    <div className="printFieldHalf">
-                        <label htmlFor="printResolution">
-                            {i18n.resolution}
-                        </label>
-                        <select name="printResolution" id="printResolution">
-                            {dpi.map((d) => (
-                                <option
-                                    value={d.value}
-                                    {...(d.selected
-                                        ? { selected: 'selected' }
-                                        : {})}
-                                >
-                                    {d.value} dpi
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="printFieldHalf">
-                        <label htmlFor="printScale">{i18n.scale}</label>
-                        <select name="printScale" id="printScale">
-                            <option
-                                className="actualScale"
-                                value=""
-                                selected
-                            ></option>
-                            {scales.map((scale) => (
-                                <option value={scale}>
-                                    1:{(scale * 1000).toLocaleString('de')}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                </div>
-                {mapElements && (
+                <section>
                     <div>
-                        {mapElements.description && (
+                        <div className="printFieldHalf">
+                            <label htmlFor="printFormat">
+                                {i18n.paperSize}
+                            </label>
+                            <select name="printFormat" id="printFormat">
+                                {paperSizes.map((paper) => (
+                                    <option
+                                        value={paper.value}
+                                        {...(paper.selected
+                                            ? { selected: 'selected' }
+                                            : {})}
+                                    >
+                                        {paper.value}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="printFieldHalf">
+                            <label htmlFor="printOrientation">
+                                {i18n.orientation}
+                            </label>
+                            <select
+                                name="printOrientation"
+                                id="printOrientation"
+                            >
+                                <option value="landscape" selected>
+                                    {i18n.landscape}
+                                </option>
+                                <option value="portrait">
+                                    {i18n.portrait}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <div className="printFieldHalf">
+                            <label htmlFor="printResolution">
+                                {i18n.resolution}
+                            </label>
+                            <select name="printResolution" id="printResolution">
+                                {dpi.map((d) => (
+                                    <option
+                                        value={d.value}
+                                        {...(d.selected
+                                            ? { selected: 'selected' }
+                                            : {})}
+                                    >
+                                        {d.value} dpi
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="printFieldHalf">
+                            <label htmlFor="printScale">{i18n.scale}</label>
+                            <select name="printScale" id="printScale">
+                                <option
+                                    className="actualScale"
+                                    value=""
+                                    selected
+                                ></option>
+                                {scales.map((scale) => (
+                                    <option value={scale}>
+                                        1:{(scale * 1000).toLocaleString('de')}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        {description && (
                             <div>
                                 <label htmlFor="printDescription">
                                     {i18n.addNote}
@@ -158,8 +166,22 @@ export default class SettingsModal {
                                 ></textarea>
                             </div>
                         )}
-                        <div>{i18n.mapElements}</div>
-                        <div className="printElements">
+                    </div>
+                    <div>
+                        <label htmlFor="safeMargins">
+                            <input
+                                type="checkbox"
+                                id="safeMargins"
+                                name="safeMargins"
+                            />
+                            {i18n.printerMargins}
+                        </label>
+                    </div>
+                </section>
+                {mapElements && (
+                    <fieldset className="mapElements">
+                        <legend>{i18n.mapElements}</legend>
+                        <div className="mapElements--checks">
                             {mapElements.compass && (
                                 <label htmlFor="printCompass">
                                     <input
@@ -205,7 +227,7 @@ export default class SettingsModal {
                                 </label>
                             )}
                         </div>
-                    </div>
+                    </fieldset>
                 )}
             </form>
         );

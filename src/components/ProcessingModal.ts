@@ -46,7 +46,7 @@ export default class ProcessingModal {
      * @param string
      * @protected
      */
-    _setContentModal(string: string): void {
+    _setContentModal(string: string | number): void {
         this._modal._html.body.innerHTML = string;
     }
 
@@ -65,9 +65,19 @@ export default class ProcessingModal {
      * @param footer
      * @protected
      */
-    show(string: string): void {
+    show(): void {
+        this._modal.show();
+    }
+
+    /**
+     *
+     * @param string
+     * @param footer
+     * @protected
+     */
+    set(string: string | number): void {
+        if (!this._modal._visible) return;
         this._setContentModal(string);
-        if (!this._modal._visible) this._modal.show();
     }
 
     /**

@@ -30,24 +30,51 @@
         fill: #ffffff;
     }
 }
-
-.printElements {
-    margin-top: 5px;
-    label {
-        margin-right: 14px;
-        cursor: pointer;
-        input {
-            margin-right: 4px;
-        }
+.print-modal {
+    .modal-body input[type='text'],
+    .modal-body input[type='number'],
+    .modal-body select,
+    .modal-body textarea {
+        width: 100%;
+        outline: 0;
+        padding: 9px 10px;
+        margin: 2px 0 20px;
     }
-}
 
-.printFieldHalf {
-    width: 50%;
-    display: inline-block;
-    &:nth-child(1) {
-        padding-right: 20px;
-        margin-right: -4px;
+    .modal-body textarea {
+        margin: 2px 0 10px;
+    }
+
+    form#printMap {
+        .mapElements {
+            margin-top: 20px;
+            background: #f2f2f2;
+            font-size: 12px;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid grey;
+
+            legend {
+                padding: 4px;
+            }
+        }
+
+        .printFieldHalf {
+            width: 50%;
+            display: inline-block;
+            &:nth-child(1) {
+                padding-right: 20px;
+                margin-right: -4px;
+            }
+        }
+        label {
+            margin-right: 14px;
+            cursor: pointer;
+            input {
+                margin-left: 0;
+                margin-right: 4px;
+            }
+        }
     }
 }
 
