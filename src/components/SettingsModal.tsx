@@ -28,7 +28,7 @@ export default class SettingsModal {
             ...options.modal
         });
 
-        this._modal.el.classList.add('print-modal');
+        this._modal.el.classList.add('settingsModal');
 
         this._modal.on('dismiss', (modal: Modal, event: Event): void => {
             const print = (event.target as HTMLElement).dataset.print;
@@ -48,6 +48,9 @@ export default class SettingsModal {
                 attributions: formData.get('printAttributions'),
                 scalebar: formData.get('printScalebar'),
                 legends: formData.get('printLegends'),
+                url: formData.get('printUrl'),
+                date: formData.get('printDate'),
+                specs: formData.get('printSpecs'),
                 safeMargins: formData.get('safeMargins'),
                 typeExport: this._modal.el.querySelector(
                     'select[name="printTypeExport"]'
@@ -81,7 +84,8 @@ export default class SettingsModal {
      * @protected
      */
     Content(i18n: I18n, options: Options): HTMLElement {
-        const { scales, dpi, mapElements, description, paperSizes } = options;
+        const { scales, dpi, mapElements, extraInfo, description, paperSizes } =
+            options;
 
         return (
             <form id="printMap">
@@ -179,9 +183,9 @@ export default class SettingsModal {
                     </div>
                 </section>
                 {mapElements && (
-                    <fieldset className="mapElements">
+                    <fieldset className="sectionChecks mapElements">
                         <legend>{i18n.mapElements}</legend>
-                        <div className="mapElements--checks">
+                        <div className="sectionChecksList">
                             {mapElements.compass && (
                                 <label htmlFor="printCompass">
                                     <input
@@ -224,6 +228,46 @@ export default class SettingsModal {
                                         checked
                                     />
                                     {i18n.layersAttributions}
+                                </label>
+                            )}
+                        </div>
+                    </fieldset>
+                )}
+                {extraInfo && (
+                    <fieldset className="sectionChecks extraInfo">
+                        <legend>{i18n.extraInfo}</legend>
+                        <div className="sectionChecksList">
+                            {extraInfo.url && (
+                                <label htmlFor="printUrl">
+                                    <input
+                                        type="checkbox"
+                                        id="printUrl"
+                                        name="printUrl"
+                                        checked
+                                    />
+                                    {i18n.url}
+                                </label>
+                            )}
+                            {extraInfo.date && (
+                                <label htmlFor="printDate">
+                                    <input
+                                        type="checkbox"
+                                        id="printDate"
+                                        name="printDate"
+                                        checked
+                                    />
+                                    {i18n.date}
+                                </label>
+                            )}
+                            {extraInfo.specs && (
+                                <label htmlFor="printSpecs">
+                                    <input
+                                        type="checkbox"
+                                        id="printSpecs"
+                                        name="printSpecs"
+                                        checked
+                                    />
+                                    {i18n.specs}
                                 </label>
                             )}
                         </div>

@@ -8,7 +8,7 @@ import ImageLayer from 'ol/layer/Image.js';
 import { appendParams } from 'ol/uri.js';
 import { Projection } from 'ol/proj.js';
 
-import { isWmsLayer } from '../Helpers.js';
+import { isWmsLayer } from '../Helpers';
 
 export const legendsDefaultConfig = {
     legendOptions: {

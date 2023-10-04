@@ -1,0 +1,35 @@
+.printMode {
+    transition: none !important;
+
+    /* Desactivamos todos los controles */
+    .ol-overlaycontainer-stopevent {
+        display: none !important;
+    }
+
+    &:before {
+        content: '';
+        right: 0;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        position: absolute;
+        background-color: #181818;
+        opacity: 0;
+    }
+
+    .ol-viewport {
+        opacity: 0 !important;
+        transition: opacity 0.1s !important;
+    }
+}
+
+.ol-print-btn-menu {
+    color: #fff;
+    background: $opp-color;
+
+    svg {
+        height: 1.3em;
+        width: auto;
+        fill: #ffffff;
+    }
+}

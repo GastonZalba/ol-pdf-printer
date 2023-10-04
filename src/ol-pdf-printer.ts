@@ -16,8 +16,9 @@ import { Locale } from 'locale-enum';
 import Pdf from './components/Pdf';
 import SettingsModal from './components/SettingsModal';
 import ProcessingModal from './components/ProcessingModal';
-import { LegendsOptions } from './components/MapElements/Legends.js';
-import { isWmsLayer } from './components/Helpers.js';
+import { LegendsOptions } from './components/MapElements/Legends';
+import { isWmsLayer } from './components/Helpers';
+/*eslint import/namespace: ['error', { allowComputed: true }]*/
 import * as i18n from './components/i18n';
 
 import compassIcon from './assets/images/compass.svg';
@@ -264,6 +265,7 @@ export default class PdfPrinter extends Control {
      */
     protected _prepareLoading(): void {
         this._processingModal.show();
+        this._processingModal.setLoading(true);
         this._processingModal.set(this._i18n.pleaseWait);
     }
 
@@ -272,6 +274,7 @@ export default class PdfPrinter extends Control {
      */
     protected _disableLoading(): void {
         this._processingModal.hide();
+        this._processingModal.setLoading(false);
     }
 
     /**
@@ -279,7 +282,7 @@ export default class PdfPrinter extends Control {
      * @param dpi
      * @protected
      */
-    protected _updateDPI(dpi: number = 90): void {
+    protected _updateDPI(dpi = 90): void {
         const pixelRatio = dpi / 90;
 
         // @ts-expect-error There is no public method to do this
@@ -443,12 +446,15 @@ export default class PdfPrinter extends Control {
                         (l as Layer<TileWMS>)
                             .getSource()
                             .on('tileloadend', () => {
-                                this._processingModal.set(
-                                    this._i18n.downloadingImages +
-                                        ': <b>' +
-                                        this._imageCount++ +
-                                        '</b>'
-                                );
+                                this._imageCount = this._imageCount + 1;
+                                if (this._imageCount % 10 == 0) {
+                                    this._processingModal.set(
+                                        this._i18n.downloadingImages +
+                                            ': <b>' +
+                                            this._imageCount +
+                                            '</b>'
+                                    );
+                                }
                             })
                     );
                 }
@@ -568,6 +574,18 @@ export interface IPrintOptions {
      *
      */
     typeExport?: IMimeTypeExport['value'];
+    /**
+     *
+     */
+    url?: boolean;
+    /**
+     *
+     */
+    date?: boolean;
+    /**
+     *
+     */
+    specs?: boolean;
 }
 
 /**
@@ -600,6 +618,10 @@ export interface I18n {
     close: string;
     print: string;
     mapElements: string;
+    extraInfo: string;
+    url: string;
+    date: string;
+    specs: string;
     compass: string;
     scale: string;
     legends: string;

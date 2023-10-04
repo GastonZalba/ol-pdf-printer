@@ -6,9 +6,9 @@ import { jsPDF, TextOptionsLight } from 'jspdf';
 import { getDocument, GlobalWorkerOptions, version } from 'pdfjs-dist';
 
 import { I18n, Options, IPrintOptions, IWatermark } from '../ol-pdf-printer';
+import Legends from './MapElements/Legends';
 
 import myPragma from '../myPragma';
-import Legends from './MapElements/Legends.js';
 
 /**
  * @private
@@ -153,15 +153,15 @@ export default class Pdf {
 
         if (extraInfo) {
             // Top info
-            if (extraInfo.specs) {
+            if (extraInfo.specs && this._form.specs) {
                 this._addSpecs();
             }
 
-            if (extraInfo.url) {
+            if (extraInfo.url && this._form.url) {
                 this._addUrl();
             }
 
-            if (extraInfo.date) {
+            if (extraInfo.date && this._form.date) {
                 this._addDate();
             }
         }

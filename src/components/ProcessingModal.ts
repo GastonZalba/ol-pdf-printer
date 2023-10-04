@@ -8,6 +8,8 @@ export default class ProcessingModal {
     protected _modal: Modal;
     protected _footer: string;
     protected _i18n: I18n;
+    protected _message: HTMLElement = document.createElement('div');
+    protected _loader: HTMLElement = document.createElement('span');
 
     /**
      *
@@ -36,6 +38,14 @@ export default class ProcessingModal {
             ...options.modal
         });
 
+        this._modal.el.classList.add('processingModal');
+
+        this._modal.once('shown', () => {
+            this._loader.className = 'printLoader';
+            this._modal._html.body.append(this._message);
+            this._modal._html.body.append(this._loader);
+        });
+
         this._modal.on('dismiss', () => {
             onEndPrint();
         });
@@ -47,7 +57,7 @@ export default class ProcessingModal {
      * @protected
      */
     _setContentModal(string: string | number): void {
-        this._modal._html.body.innerHTML = string;
+        this._message.innerHTML = String(string);
     }
 
     /**
@@ -78,6 +88,14 @@ export default class ProcessingModal {
     set(string: string | number): void {
         if (!this._modal._visible) return;
         this._setContentModal(string);
+    }
+
+    setLoading(bool = true): void {
+        if (bool) {
+            this._modal.el.classList.add('showLoader');
+        } else {
+            this._modal.el.classList.remove('showLoader');
+        }
     }
 
     /**
