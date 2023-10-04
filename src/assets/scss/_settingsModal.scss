@@ -33,7 +33,7 @@
     }
 
     .modal-body textarea {
-        margin: 2px 0 10px;
+        margin: 2px 0 0;
     }
 
     form#printMap {
@@ -66,9 +66,15 @@
             cursor: pointer;
 
             input {
+                vertical-align: middle;
                 margin-left: 0;
                 margin-right: 4px;
             }
+        }
+
+        .safeMarginsSection {
+            margin-top: 20px;
+            font-size: 12px;
         }
     }
 }

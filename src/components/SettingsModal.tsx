@@ -171,16 +171,6 @@ export default class SettingsModal {
                             </div>
                         )}
                     </div>
-                    <div>
-                        <label htmlFor="safeMargins">
-                            <input
-                                type="checkbox"
-                                id="safeMargins"
-                                name="safeMargins"
-                            />
-                            {i18n.printerMargins}
-                        </label>
-                    </div>
                 </section>
                 {mapElements && (
                     <fieldset className="sectionChecks mapElements">
@@ -273,6 +263,16 @@ export default class SettingsModal {
                         </div>
                     </fieldset>
                 )}
+                <div className="safeMarginsSection">
+                    <label htmlFor="safeMargins">
+                        <input
+                            type="checkbox"
+                            id="safeMargins"
+                            name="safeMargins"
+                        />
+                        {i18n.printerMargins}
+                    </label>
+                </div>
             </form>
         );
     }
