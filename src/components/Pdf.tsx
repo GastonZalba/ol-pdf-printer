@@ -5,7 +5,13 @@ import { getPointResolution } from 'ol/proj.js';
 import { jsPDF, TextOptionsLight } from 'jspdf';
 import { getDocument, GlobalWorkerOptions, version } from 'pdfjs-dist';
 
-import { I18n, Options, IPrintOptions, IWatermark, IExtraInfo } from '../ol-pdf-printer';
+import {
+    I18n,
+    Options,
+    IPrintOptions,
+    IWatermark,
+    IExtraInfo
+} from '../ol-pdf-printer';
 import Legends from './MapElements/Legends';
 
 import myPragma from '../myPragma';
@@ -43,11 +49,11 @@ export default class Pdf {
             this._printingMargins =
                 typeof config.style.paperMargin === 'number'
                     ? {
-                        top: config.style.paperMargin,
-                        left: config.style.paperMargin,
-                        right: config.style.paperMargin,
-                        bottom: config.style.paperMargin
-                    }
+                          top: config.style.paperMargin,
+                          left: config.style.paperMargin,
+                          right: config.style.paperMargin,
+                          bottom: config.style.paperMargin
+                      }
                     : config.style.paperMargin;
         } else {
             this._printingMargins = {
@@ -113,9 +119,9 @@ export default class Pdf {
             this._printingMargins.left, // Add margins
             this._printingMargins.top,
             this._pdf.width -
-            (this._printingMargins.left + this._printingMargins.right),
+                (this._printingMargins.left + this._printingMargins.right),
             this._pdf.height -
-            (this._printingMargins.top + this._printingMargins.bottom)
+                (this._printingMargins.top + this._printingMargins.bottom)
         );
     }
 
@@ -135,9 +141,9 @@ export default class Pdf {
         }
 
         if (extraInfo) {
-            this._addExtraInfo(extraInfo)
+            this._addExtraInfo(extraInfo);
         }
-        
+
         if (mapElements) {
             if (mapElements.compass && this._form.compass) {
                 await this._addCompass(mapElements.compass);
@@ -155,7 +161,6 @@ export default class Pdf {
                 await this._addLegends();
             }
         }
-
     };
 
     /**
@@ -210,7 +215,7 @@ export default class Pdf {
                                         `image/${this._form.typeExport}`
                                     ),
                                     this._config.filename +
-                                    `.${this._form.typeExport}`
+                                        `.${this._form.typeExport}`
                                 );
                                 canvas.remove();
                                 resolve();
@@ -291,8 +296,8 @@ export default class Pdf {
         const pixelsPerMapMillimeter = resolution / 25.4;
         return Math.round(
             1000 *
-            pixelsPerMapMillimeter *
-            this._getMeterPerPixel(scaleResolution)
+                pixelsPerMapMillimeter *
+                this._getMeterPerPixel(scaleResolution)
         );
     }
 
@@ -468,8 +473,8 @@ export default class Pdf {
         this._addRoundedBox(
             x,
             y - paddingBack,
-            w + (paddingBack * 2),
-            h + (paddingBack * 2),
+            w + paddingBack * 2,
+            h + paddingBack * 2,
             this._style.bkcolor,
             this._style.brcolor
         );
@@ -640,15 +645,17 @@ export default class Pdf {
      * @protected
      */
     protected _addExtraInfo = (extraInfo: IExtraInfo): void => {
-
         if (extraInfo.url && this._form.url) {
             this._addUrl();
         }
 
-        if ((extraInfo.specs && this._form.specs) || (extraInfo.date && this._form.date)) {
+        if (
+            (extraInfo.specs && this._form.specs) ||
+            (extraInfo.date && this._form.date)
+        ) {
             this._addSpecsAndDate();
         }
-    }
+    };
 
     /**
      * @protected
@@ -670,22 +677,33 @@ export default class Pdf {
 
         let str = '';
 
-        if (this._form.specs && this._config.extraInfo && this._config.extraInfo.specs) {
-            const scale = `${this._i18n.scale
-                } 1:${this._scaleDenominator.toLocaleString('de')}`;
-            const paper = `${this._i18n.paper} ${this._form.format.toUpperCase()}`;
+        if (
+            this._form.specs &&
+            this._config.extraInfo &&
+            this._config.extraInfo.specs
+        ) {
+            const scale = `${
+                this._i18n.scale
+            } 1:${this._scaleDenominator.toLocaleString('de')}`;
+            const paper = `${
+                this._i18n.paper
+            } ${this._form.format.toUpperCase()}`;
             const dpi = `${this._form.resolution} DPI`;
             const specs = [scale, dpi, paper];
             str = specs.join(' - ');
         }
 
-        if (this._form.date && this._config.extraInfo && this._config.extraInfo.date) {
+        if (
+            this._form.date &&
+            this._config.extraInfo &&
+            this._config.extraInfo.date
+        ) {
             const date = this._getDate();
 
             if (str) {
                 str += ` (${date})`;
             } else {
-                str = date
+                str = date;
             }
         }
 
@@ -721,13 +739,18 @@ export default class Pdf {
         const width = 250;
         const offset = {
             x: 1,
-            y: (this._config.extraInfo && ((this._config.extraInfo.specs && this._form.specs) || (this._config.extraInfo.date && this._form.date))) ? 4 : 1
+            y:
+                this._config.extraInfo &&
+                ((this._config.extraInfo.specs && this._form.specs) ||
+                    (this._config.extraInfo.date && this._form.date))
+                    ? 4
+                    : 1
         };
 
         this._accumulativeOffsetBottomLeft = offset.y;
 
         const fontSize = 6;
-        const txcolor ='#0077cc';
+        const txcolor = '#0077cc';
         const align = 'left';
 
         this._pdf.doc.setFont('helvetica', 'italic');
@@ -763,9 +786,9 @@ export default class Pdf {
      * @protected
      */
     protected _getDate = (): string => {
-        return String(new Date(Date.now()).toLocaleDateString(
-            this._config.dateFormat
-        ));
+        return String(
+            new Date(Date.now()).toLocaleDateString(this._config.dateFormat)
+        );
     };
 
     /**
@@ -855,7 +878,12 @@ export default class Pdf {
     protected _addScaleBar = (): void => {
         const offset = {
             x: 2,
-            y: (this._config.extraInfo && ((this._form.url && this._config.extraInfo.url) || (this._form.specs && this._config.extraInfo.specs))) ? 10 : 2
+            y:
+                this._config.extraInfo &&
+                ((this._form.url && this._config.extraInfo.url) ||
+                    (this._form.specs && this._config.extraInfo.specs))
+                    ? 10
+                    : 2
         };
 
         const maxWidth = 90; // in mm
@@ -930,8 +958,8 @@ export default class Pdf {
 
         const percentageMargin = this._style.paperMargin
             ? ((this._printingMargins.left + this._printingMargins.right) /
-                this._pdf.width) *
-            100
+                  this._pdf.width) *
+              100
             : null;
 
         // Reduce length acording to margins
@@ -1001,7 +1029,6 @@ export default class Pdf {
         );
 
         this._accumulativeOffsetBottomLeft = offset.y + height;
-
     };
 
     /**
@@ -1144,13 +1171,7 @@ export default class Pdf {
             const { naturalWidth, naturalHeight } = img;
             const width = naturalWidth * ratioSize;
             const height = naturalHeight * ratioSize;
-            this._pdf.doc.addImage(
-                img,
-                x,
-                yPos - height,
-                width,
-                height
-            );
+            this._pdf.doc.addImage(img, x, yPos - height, width, height);
             yPos -= height;
         });
     }
