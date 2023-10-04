@@ -98,6 +98,7 @@
 * Allow printing without safe margins (by default no margin is added)
 * Improved `paperMargin` constructor option
 * Improved DPI accuracy
+* Changed svg icon
 * Fixed wrong scale transformation on exporting to image formats (now respecting the DPI accordly)
 * Improved download and processing status info
 * Removed `description` from inside mapElements option (_breaking change_)

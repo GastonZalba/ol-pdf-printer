@@ -37,18 +37,20 @@
     }
 
     form#printMap {
-        .sectionChecks {
-            margin-top: 20px;
+        fieldset {
+            text-align: center;
             background: #f2f2f2;
-            font-size: 12px;
             padding: 10px;
             border-radius: 4px;
             border: 1px solid grey;
-            text-align: center;
-
             legend {
                 padding: 4px;
             }
+        }
+
+        .sectionChecks {
+            margin-top: 20px;
+            font-size: 12px;
         }
 
         .printFieldHalf {
@@ -61,10 +63,11 @@
             }
         }
 
-        label {
-            margin-right: 14px;
-            cursor: pointer;
-
+        .sectionChecks {
+            label {
+                margin-right: 14px;
+                cursor: pointer;
+            }
             input {
                 vertical-align: middle;
                 margin-left: 0;
@@ -72,8 +75,11 @@
             }
         }
 
+        label {
+            font-size: 13px;
+        }
+
         .safeMarginsSection {
-            margin-top: 20px;
             font-size: 12px;
         }
     }

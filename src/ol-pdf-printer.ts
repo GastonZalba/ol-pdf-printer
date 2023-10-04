@@ -769,7 +769,7 @@ export interface IWatermark {
 /**
  * **_[interface]_** - Print information at the bottom of the PDF
  */
-interface IExtraInfo {
+export interface IExtraInfo {
     /**
      * Print Date
      */

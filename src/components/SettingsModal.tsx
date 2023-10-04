@@ -263,7 +263,7 @@ export default class SettingsModal {
                         </div>
                     </fieldset>
                 )}
-                <div className="safeMarginsSection">
+                <div className="safeMarginsSection sectionChecks">
                     <label htmlFor="safeMargins">
                         <input
                             type="checkbox"

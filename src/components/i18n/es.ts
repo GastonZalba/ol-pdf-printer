@@ -12,7 +12,7 @@ export const es: I18n = {
     close: 'Cerrar',
     print: 'Exportar',
     mapElements: 'Elementos en el mapa',
-    extraInfo: 'Información complementaria',
+    extraInfo: 'Información adicional',
     url: 'URL',
     date: 'Fecha',
     specs: 'Especificaciones',
