@@ -127,8 +127,11 @@ export default class PdfPrinter extends Control {
                     bottom: 4
                 },
                 brcolor: '#000000',
-                bkcolor: '#273f50',
-                txcolor: '#ffffff'
+                bkcolor: '#ffffff',
+                txcolor: '#000000',
+                descbrcolor: '#333333',
+                descbkcolor: '#000000',
+                desctxcolor: '#ffffff'
             },
             extraInfo: {
                 date: true,
@@ -256,6 +259,7 @@ export default class PdfPrinter extends Control {
         this._removeListeners();
 
         clearTimeout(this._timeoutProcessing);
+        this._processingModal.setLoading(false);
 
         this._cancel();
     }
@@ -701,6 +705,21 @@ interface IStyle {
      *
      */
     txcolor?: string;
+
+    /**
+     * Description border color
+     */
+    descbrcolor?: string;
+
+    /**
+     * Description background color
+     */
+    descbkcolor?: string;
+
+    /**
+     * Description text color
+     */
+    desctxcolor?: string;
 }
 
 /**

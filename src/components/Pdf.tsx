@@ -161,6 +161,16 @@ export default class Pdf {
                 await this._addLegends();
             }
         }
+
+        // add white border to hide offset elements
+        this._pdf.doc.setFillColor('#ffffff');
+        this._pdf.doc.rect(
+            0,
+            0,
+            this._printingMargins.left,
+            this._pdf.height,
+            'F'
+        );
     };
 
     /**
@@ -453,8 +463,13 @@ export default class Pdf {
         const str = this._form.description.trim();
         const position = 'topleft';
         const offset = {
-            x: 2,
-            y: 2
+            x: -0.7,
+            y:
+                this._config.extraInfo &&
+                ((this._config.extraInfo.date && this._form.date) ||
+                    (this._config.extraInfo.specs && this._form.specs))
+                    ? 15
+                    : 2
         };
         const fontSize = 8;
         const maxWidth = 50;
@@ -463,23 +478,24 @@ export default class Pdf {
 
         const { x, y } = this._calculateOffsetByPosition(position, offset);
 
-        this._pdf.doc.setTextColor(this._style.txcolor);
+        this._pdf.doc.setTextColor(this._style.desctxcolor);
         this._pdf.doc.setFontSize(fontSize);
 
         const { w, h } = this._pdf.doc.getTextDimensions(str, {
-            maxWidth
+            maxWidth,
+            fontSize
         });
 
         this._addRoundedBox(
             x,
-            y - paddingBack,
+            y,
             w + paddingBack * 2,
             h + paddingBack * 2,
-            this._style.bkcolor,
-            this._style.brcolor
+            this._style.descbkcolor,
+            this._style.descbrcolor
         );
 
-        this._pdf.doc.text(str, x + paddingBack, y + paddingBack, {
+        this._pdf.doc.text(str, x + paddingBack, y + paddingBack * 2, {
             align: 'left',
             maxWidth
         });
@@ -532,7 +548,7 @@ export default class Pdf {
                 y - 4,
                 widthBack + acumulativeWidth,
                 height,
-                '#ffffff',
+                this._style.bkcolor,
                 '#ffffff'
             );
             back = true;
@@ -564,7 +580,7 @@ export default class Pdf {
                     y - 4,
                     widthBack + acumulativeWidth,
                     16,
-                    '#ffffff',
+                    this._style.bkcolor,
                     '#ffffff'
                 );
                 acumulativeWidth += widthBack;
@@ -603,7 +619,7 @@ export default class Pdf {
                 y - 4,
                 widthBack,
                 16,
-                '#ffffff',
+                this._style.bkcolor,
                 '#ffffff'
             );
         }
@@ -661,13 +677,13 @@ export default class Pdf {
      * @protected
      */
     protected _addSpecsAndDate = (): void => {
-        const position = 'bottomleft';
+        const position = 'topleft';
         const offset = {
             x: 1,
-            y: 1
+            y: 2.5
         };
         const fontSize = 6;
-        const txcolor = '#666666';
+        const txcolor = this._style.txcolor;
         const align = 'left';
 
         const { x, y } = this._calculateOffsetByPosition(position, offset);
@@ -707,17 +723,17 @@ export default class Pdf {
             }
         }
 
-        const { w, h } = this._pdf.doc.getTextDimensions(str);
+        const { w, h } = this._pdf.doc.getTextDimensions(str, { fontSize });
 
-        const paddingBack = 4;
+        const paddingBack = 2;
 
         this._addRoundedBox(
-            x - paddingBack - 2,
-            y - h,
-            w + paddingBack * 2,
-            h + paddingBack * 2,
-            '#ffffff',
-            '#ffffff'
+            x - paddingBack * 2,
+            y - h - paddingBack * 2,
+            w + paddingBack * 3,
+            h + paddingBack * 3,
+            this._style.bkcolor,
+            this._style.brcolor
         );
 
         this._addTextByOffset(
@@ -739,15 +755,8 @@ export default class Pdf {
         const width = 250;
         const offset = {
             x: 1,
-            y:
-                this._config.extraInfo &&
-                ((this._config.extraInfo.specs && this._form.specs) ||
-                    (this._config.extraInfo.date && this._form.date))
-                    ? 4
-                    : 1
+            y: 1
         };
-
-        this._accumulativeOffsetBottomLeft = offset.y;
 
         const fontSize = 6;
         const txcolor = '#0077cc';
@@ -758,17 +767,19 @@ export default class Pdf {
 
         const { x, y } = this._calculateOffsetByPosition(position, offset);
 
-        const { w, h } = this._pdf.doc.getTextDimensions(str);
+        const { w, h } = this._pdf.doc.getTextDimensions(str, {
+            fontSize
+        });
 
         const paddingBack = 2;
 
         this._addRoundedBox(
-            x - paddingBack - 2,
-            y - h,
-            w + paddingBack,
-            h + paddingBack,
-            '#ffffff',
-            '#ffffff'
+            x - paddingBack * 2,
+            y - h - 1,
+            w + paddingBack * 3,
+            h + paddingBack * 3,
+            this._style.bkcolor,
+            this._style.brcolor
         );
 
         this._addTextByOffset(
@@ -780,6 +791,8 @@ export default class Pdf {
             align,
             str
         );
+
+        this._accumulativeOffsetBottomLeft = offset.y + h + 1;
     };
 
     /**
@@ -813,13 +826,16 @@ export default class Pdf {
         let xPos = x;
 
         const { w, h } = this._pdf.doc.getTextDimensions(
-            attributionsUl.textContent
+            attributionsUl.textContent,
+            { fontSize }
         );
 
         const paddingBack = 4;
 
-        const whiteSpaceWidth =
-            this._pdf.doc.getTextDimensions(ATTRI_SEPATATOR).w;
+        const whiteSpaceWidth = this._pdf.doc.getTextDimensions(
+            ATTRI_SEPATATOR,
+            { fontSize }
+        ).w;
 
         const attributions = document.querySelectorAll('.ol-attribution li');
 
@@ -830,7 +846,7 @@ export default class Pdf {
             y - h,
             w + paddingBack + sumWhiteSpaceWidth + 2,
             h + paddingBack,
-            '#ffffff',
+            this._style.bkcolor,
             '#ffffff'
         );
 
@@ -877,12 +893,12 @@ export default class Pdf {
      */
     protected _addScaleBar = (): void => {
         const offset = {
-            x: 2,
+            x: -0.7,
             y:
                 this._config.extraInfo &&
                 ((this._form.url && this._config.extraInfo.url) ||
                     (this._form.specs && this._config.extraInfo.specs))
-                    ? 10
+                    ? this._accumulativeOffsetBottomLeft + 2
                     : 2
         };
 
@@ -1135,8 +1151,8 @@ export default class Pdf {
         const position = 'bottomleft';
 
         const offset = {
-            x: 3,
-            y: this._accumulativeOffsetBottomLeft + 4
+            x: 1,
+            y: this._accumulativeOffsetBottomLeft + 3
         };
 
         const { x, y } = this._calculateOffsetByPosition(position, offset);
@@ -1159,11 +1175,11 @@ export default class Pdf {
         const paddingBack = 1;
 
         this._addRoundedBox(
-            x - paddingBack,
+            x - paddingBack * 3,
             y - accumulativeHeight - paddingBack,
-            largestWidth + paddingBack * 2,
+            largestWidth + paddingBack * 2 * 3,
             accumulativeHeight + paddingBack * 2,
-            '#ffffff',
+            this._style.bkcolor,
             this._style.brcolor
         );
 
