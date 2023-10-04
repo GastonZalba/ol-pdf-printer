@@ -1090,8 +1090,8 @@ export default class Pdf {
             // Add back circle
             const xCircle = x - size;
             const yCircle = y;
-            this._pdf.doc.setDrawColor(this._style.brcolor);
-            this._pdf.doc.setFillColor(this._style.bkcolor);
+            this._pdf.doc.setDrawColor(this._style.compassbrcolor);
+            this._pdf.doc.setFillColor(this._style.compassbkcolor);
             this._pdf.doc.circle(xCircle, yCircle, size, 'FD');
 
             return canvas;

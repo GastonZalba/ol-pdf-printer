@@ -131,7 +131,9 @@ export default class PdfPrinter extends Control {
                 txcolor: '#000000',
                 descbrcolor: '#333333',
                 descbkcolor: '#000000',
-                desctxcolor: '#ffffff'
+                desctxcolor: '#ffffff',
+                compassbrcolor: '#000000',
+                compassbkcolor: '#333333'
             },
             extraInfo: {
                 date: true,
@@ -720,6 +722,16 @@ interface IStyle {
      * Description text color
      */
     desctxcolor?: string;
+
+    /**
+     * Compass border color
+     */
+    compassbrcolor?: string;
+
+    /**
+     * Compass background color
+     */
+    compassbkcolor?: string;
 }
 
 /**
