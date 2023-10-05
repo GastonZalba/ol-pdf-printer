@@ -183,7 +183,7 @@ export default class PdfPrinter extends Control {
                 animateClass: 'fade',
                 animateInClass: 'show',
                 transition: 150,
-                backdropTransition: 100,
+                backdropTransition: 0,
                 templates: {
                     dialog: '<div class="modal-dialog modal-dialog-centered"></div>',
                     headerClose: `<button type="button" class="btn-close" data-dismiss="modal" aria-label="${this._i18n.close}"><span aria-hidden="true">×</span></button>`

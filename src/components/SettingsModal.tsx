@@ -64,7 +64,7 @@ export default class SettingsModal {
             );
         });
 
-        this._modal.on('shown', (): void => {
+        this._modal.on('show', (): void => {
             const actualScaleVal = getMapScale(map);
             const actualScale = this._modal.el.querySelector('.actualScale');
             (actualScale as HTMLInputElement).value = String(
