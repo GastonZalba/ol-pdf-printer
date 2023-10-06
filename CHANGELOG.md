@@ -93,18 +93,18 @@
 * Added header to dist files
 
 ## v2.0.0
-* Addded Legends support
+* Addded WMS Legends support
 * Added extraInfo checkboxes
 * Allow printing without safe margins (by default no margin is added)
 * Improved `paperMargin` constructor option
 * Improved DPI accuracy
 * Changed svg icon
-* Fixed wrong scale transformation on exporting to image formats (now respecting the DPI accordly)
-* Improved download and processing status info
-* Removed `description` from inside mapElements option (_breaking change_)
+* Fixed wrong scale transformation on exporting to image formats (now respecting the DPI)
+* Improved downloading and processing status info
+* Removed `description` attribute from inside `mapElements` option (_breaking change_)
 * Added `showControlBtn` configuration to allow disable the control button
 * Refactored using setMap method (and fixed error while using `createPdf` before the modal was displayed)
-* Removed default 72 DPI option
+* Removed 72 DPI as a default option
 * Added `createPdf` button to the example
 * Updated to Ol8
 * Updated dev dependencies

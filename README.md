@@ -172,6 +172,9 @@ TypeScript types are shipped with the project in the dist directory and should b
     -   [legends](#legends)
     -   [safeMargins](#safemargins)
     -   [typeExport](#typeexport)
+    -   [url](#url)
+    -   [date](#date)
+    -   [specs](#specs)
 -   [IValues](#ivalues)
 -   [I18n](#i18n)
 -   [IPaperSize](#ipapersize)
@@ -187,6 +190,11 @@ TypeScript types are shipped with the project in the dist directory and should b
     -   [brcolor](#brcolor)
     -   [bkcolor](#bkcolor)
     -   [txcolor](#txcolor)
+    -   [descbrcolor](#descbrcolor)
+    -   [descbkcolor](#descbkcolor)
+    -   [desctxcolor](#desctxcolor)
+    -   [compassbrcolor](#compassbrcolor)
+    -   [compassbkcolor](#compassbkcolor)
 -   [IMimeTypeExport](#imimetypeexport)
 -   [IModal](#imodal)
     -   [animateClass](#animateclass)
@@ -201,9 +209,9 @@ TypeScript types are shipped with the project in the dist directory and should b
     -   [subtitleColor](#subtitlecolor)
     -   [logo](#logo)
 -   [IExtraInfo](#iextrainfo)
-    -   [date](#date)
-    -   [url](#url)
-    -   [specs](#specs)
+    -   [date](#date-1)
+    -   [url](#url-1)
+    -   [specs](#specs-1)
 -   [IMapElements](#imapelements)
     -   [attributions](#attributions-1)
     -   [scalebar](#scalebar-1)
@@ -307,6 +315,18 @@ Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Glob
 
 Type: any
 
+#### url
+
+Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)
+
+#### date
+
+Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)
+
+#### specs
+
+Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)
+
 ### IValues
 
 **_\[interface]_** - Custom translations specified when creating an instance
@@ -366,6 +386,36 @@ Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Globa
 Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
 
 #### txcolor
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+#### descbrcolor
+
+Description border color
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+#### descbkcolor
+
+Description background color
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+#### desctxcolor
+
+Description text color
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+#### compassbrcolor
+
+Compass border color
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+#### compassbkcolor
+
+Compass background color
 
 Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
 
