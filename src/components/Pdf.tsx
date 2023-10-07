@@ -258,8 +258,9 @@ export default class Pdf {
             };
 
             const getSvgUrl = (svg: SVGElement) => {
+                const data = new XMLSerializer().serializeToString(svg);
                 return URL.createObjectURL(
-                    new Blob([svg.outerHTML], { type: 'image/svg+xml' })
+                    new Blob([data], { type: 'image/svg+xml' })
                 );
             };
 
@@ -279,7 +280,9 @@ export default class Pdf {
                         canvas.height = svgImage.clientHeight;
                         const canvasCtx = canvas.getContext('2d');
                         canvasCtx.drawImage(svgImage, 0, 0);
-                        const imgData = canvas.toDataURL('image/png');
+                        const imgData = canvas
+                            .toDataURL('image/png')
+                            .replace('image/png', 'octet/stream');
                         callback(imgData);
                         document.body.removeChild(svgImage);
                     } catch (err) {
@@ -1125,7 +1128,9 @@ export default class Pdf {
             if (typeof imgSrc === 'string') {
                 imgData = imgSrc;
             } else if (imgSrc instanceof SVGElement) {
+                console.log(imgSrc);
                 imgData = await this._processSvgImage(imgSrc);
+                console.log(imgData);
             } else {
                 throw this._i18n.errorImage;
             }
