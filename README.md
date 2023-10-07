@@ -20,9 +20,8 @@ Tested with OpenLayers version 5, 6, 7 and 8.
 
 WMS sources and Icons that use external urls must be setted to `crossOrigin: 'anonymous'`. Otherwise, it will ocurr a `DOMException: Failed to execute 'toDataURL' on 'HTMLCanvasElement': Tainted canvases may not be exported`.
 
-<img src="screenshots/example-1.jpg" style="width:50%; float:left;">
-<img src="screenshots/example-2.jpg" style="width:50%; float:left;">
-<img src="screenshots/example-3.jpg" style="width:50%;">
+<img src="screenshots/example-1.jpg" style="width:50%; float:left;"/>
+<img src="screenshots/example-2.jpg" style="width:50%;"/>
 
 ## Examples
 
@@ -37,7 +36,7 @@ var opt_options = {
     i18n: {...}, // Custom translations. Default is according to selected language
     showControlBtn: true,
     filename: 'Ol Pdf Printer',
-    units: 'metric',  
+    units: 'metric',
     extraInfo: {
         date: true,
         url: true,
@@ -185,7 +184,9 @@ import PdfPrinter from 'ol-pdf-printer';
 
 ```js
 import 'ol-pdf-printer/dist/css/ol-pdf-printer.min.css';
-import 'ol-pdf-printer/dist/css/bootstrap.min.css'; // Bootstrap bundle
+import 'ol-pdf-printer/dist/css/bootstrap.min.css'; // Personalized bootstrap bundle
+//or scss (needs bootstrap installed)
+import 'ol-street-view/lib/style/scss/ol-street-view.scss';
 ```
 
 ##### TypeScript type definition
@@ -230,16 +231,33 @@ TypeScript types are shipped with the project in the dist directory and should b
 -   [IDpi](#idpi)
     -   [value](#value-1)
     -   [selected](#selected-1)
+-   [brcolor](#brcolor)
+-   [bkcolor](#bkcolor)
+-   [txcolortitle](#txcolortitle)
+-   [txcolorsubtitle](#txcolorsubtitle)
+-   [brcolor](#brcolor-1)
+-   [bkcolor](#bkcolor-1)
+-   [txcolor](#txcolor)
+-   [brcolor](#brcolor-2)
+-   [bkcolor](#bkcolor-2)
+-   [txcolor](#txcolor-1)
+-   [txcolorlink](#txcolorlink)
+-   [brcolor](#brcolor-3)
+-   [bkcolor](#bkcolor-3)
+-   [txcolor](#txcolor-2)
+-   [brcolor](#brcolor-4)
+-   [bkcolor](#bkcolor-4)
+-   [txcolor](#txcolor-3)
+-   [brcolor](#brcolor-5)
+-   [bkcolor](#bkcolor-5)
+-   [txcolor](#txcolor-4)
+-   [brcolor](#brcolor-6)
+-   [bkcolor](#bkcolor-6)
+-   [txcolor](#txcolor-5)
+-   [brcolor](#brcolor-7)
+-   [bkcolor](#bkcolor-7)
 -   [IStyle](#istyle)
     -   [paperMargin](#papermargin)
-    -   [brcolor](#brcolor)
-    -   [bkcolor](#bkcolor)
-    -   [txcolor](#txcolor)
-    -   [descbrcolor](#descbrcolor)
-    -   [descbkcolor](#descbkcolor)
-    -   [desctxcolor](#desctxcolor)
-    -   [compassbrcolor](#compassbrcolor)
-    -   [compassbkcolor](#compassbkcolor)
 -   [IMimeTypeExport](#imimetypeexport)
 -   [IModal](#imodal)
     -   [animateClass](#animateclass)
@@ -249,9 +267,7 @@ TypeScript types are shipped with the project in the dist directory and should b
     -   [templates](#templates)
 -   [IWatermark](#iwatermark)
     -   [title](#title)
-    -   [titleColor](#titlecolor)
     -   [subtitle](#subtitle)
-    -   [subtitleColor](#subtitlecolor)
     -   [logo](#logo)
 -   [IExtraInfo](#iextrainfo)
     -   [date](#date-1)
@@ -419,55 +435,165 @@ Type: [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Globa
 
 Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)
 
+### brcolor
+
+Watermark border color
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+### bkcolor
+
+Watermark background color
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+### txcolortitle
+
+Watermark title color
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+### txcolorsubtitle
+
+Watermark subtitle color
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+### brcolor
+
+Url border color
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+### bkcolor
+
+Url background color
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+### txcolor
+
+Url text color
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+### brcolor
+
+Attributions border color
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+### bkcolor
+
+Attributions background color
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+### txcolor
+
+Attributions text color
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+### txcolorlink
+
+Attributions links color
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+### brcolor
+
+Scalebar border color
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+### bkcolor
+
+Scalebar background color
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+### txcolor
+
+Scalebar text and graph color
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+### brcolor
+
+Specs border color
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+### bkcolor
+
+Specs background color
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+### txcolor
+
+Specs text color
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+### brcolor
+
+Legends border color
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+### bkcolor
+
+Legends background color
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+### txcolor
+
+Legends text color
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+### brcolor
+
+Description border color
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+### bkcolor
+
+Description background color
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+### txcolor
+
+Description text color
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+### brcolor
+
+Compass border color
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+### bkcolor
+
+Compass background color
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
 ### IStyle
 
 **_\[interface]_**
 
 #### paperMargin
 
+Only added if `Add printer margins` is checked
+
 Type: ([number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | {top: [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number), right: [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number), bottom: [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number), left: [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)})
-
-#### brcolor
-
-Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
-
-#### bkcolor
-
-Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
-
-#### txcolor
-
-Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
-
-#### descbrcolor
-
-Description border color
-
-Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
-
-#### descbkcolor
-
-Description background color
-
-Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
-
-#### desctxcolor
-
-Description text color
-
-Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
-
-#### compassbrcolor
-
-Compass border color
-
-Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
-
-#### compassbkcolor
-
-Compass background color
-
-Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
 
 ### IMimeTypeExport
 
@@ -503,21 +629,19 @@ Type: {dialog: ([string](https://developer.mozilla.org/docs/Web/JavaScript/Refer
 
 #### title
 
-Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
-
-#### titleColor
+Check style section to change the color
 
 Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
 
 #### subtitle
 
-Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
-
-#### subtitleColor
+Check style section to change the color
 
 Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
 
 #### logo
+
+Display a small logo next to the title
 
 Type: (`false` | [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [HTMLImageElement](https://developer.mozilla.org/docs/Web/API/HTMLImageElement) | [SVGElement](https://developer.mozilla.org/docs/Web/SVG/Element/animate))
 
@@ -696,5 +820,6 @@ Type: [I18n](#i18n)
 -   \~~Legends support~~
 -   \~~Imperial units option for scalebar~~
 -   \~~Customizable date format~~
+-   Add option to reframe the area before be captured
 -   Events
 -   Tests!
