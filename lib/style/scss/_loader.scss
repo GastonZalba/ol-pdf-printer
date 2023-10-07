@@ -1,0 +1,55 @@
+.showLoader {
+    .printLoader-container {
+        display: block;
+    }
+}
+
+.printLoader-container {
+    display: none;
+}
+
+// https://cssloaders.github.io/
+.printLoader {
+    display: block;
+    margin: 20px auto;
+    position: relative;
+    width: 36px;
+    height: 36px;
+    background: rgba($opp-color, 0.8);
+    transform: rotateX(65deg) rotate(45deg);
+    // remove bellows command for perspective change
+    //transform: perspective(200px) rotateX(65deg) rotate(45deg);
+    color: $opp-color;
+    animation: layers1 1s linear infinite alternate;
+    will-change: transform, box-shadow;
+
+    &:after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba($opp-color, 0.5);
+        animation: layerTr 1s linear infinite alternate;
+        will-change: transform;
+    }
+}
+
+@keyframes layers1 {
+    0% {
+        box-shadow: 0px 0px 0 0px;
+    }
+
+    90%,
+    100% {
+        box-shadow: 20px 20px 0 -4px;
+    }
+}
+
+@keyframes layerTr {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    100% {
+        transform: translate(-20px, -20px) scale(1);
+    }
+}

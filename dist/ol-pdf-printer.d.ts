@@ -6,7 +6,14 @@ import { Locale } from 'locale-enum';
 import Pdf from './components/Pdf';
 import SettingsModal from './components/SettingsModal';
 import ProcessingModal from './components/ProcessingModal';
-import './assets/css/ol-pdf-printer.css';
+import { LegendsOptions } from './components/MapElements/Legends';
+import './assets/scss/-ol-pdf-printer.bootstrap5.scss';
+import './assets/scss/ol-pdf-printer.scss';
+/**
+ * @constructor
+ * @extends {ol/control/Control~Control}
+ * @params options
+ */
 export default class PdfPrinter extends Control {
     protected _i18n: I18n;
     protected _map: Map;
@@ -21,33 +28,37 @@ export default class PdfPrinter extends Control {
     protected _options: Options;
     protected _renderCompleteKey: EventsKey | EventsKey[];
     protected _isCanceled: boolean;
+    protected _eventsKey: EventsKey[];
+    protected _imageCount: number;
     constructor(opt_options?: Options);
+    setMap(map: Map): void;
     /**
      * @protected
      */
-    _init(): void;
+    protected _init(): void;
     /**
      * @protected
      */
-    _setMapSizForPrint(width: number, height: number, resolution: number): number[];
+    protected _getMapSizForPrint(width: number, height: number, resolution: number): number[];
     /**
      * Restore inital view, remove classes, disable loading
      * @protected
      */
-    _onEndPrint(): void;
+    protected _onEndPrint(): void;
     /**
      * @protected
      */
-    _prepareLoading(): void;
+    protected _prepareLoading(): void;
     /**
      * @protected
      */
-    _disableLoading(): void;
+    protected _disableLoading(): void;
     /**
-     * This could be used to increment the DPI before printing
+     *
+     * @param dpi
      * @protected
      */
-    _setFormatOptions(string?: string): void;
+    protected _updateDPI(dpi?: number): void;
     /**
      *
      * @param form
@@ -55,11 +66,19 @@ export default class PdfPrinter extends Control {
      * @param delay Delay to prevent glitching with modals animation
      * @protected
      */
-    _printMap(form: IPrintOptions, showLoading?: boolean, delay?: number): void;
+    protected _printMap(form: IPrintOptions, showLoading?: boolean, delay?: number): void;
+    /**
+     * Add tile listener to show downloaded images count
+     */
+    protected _addListeners(): void;
+    /**
+     * Remove WMS listeners
+     */
+    protected _removeListeners(): void;
     /**
      * @protected
      */
-    _cancel(): void;
+    protected _cancel(): void;
     /**
      * Show the Settings Modal
      * @public
@@ -76,6 +95,13 @@ export default class PdfPrinter extends Control {
      * @public
      */
     createPdf(options: IPrintOptions, showLoading: boolean): void;
+}
+/**
+ * **_[enum]_**
+ */
+export declare enum UnitsSystem {
+    Metric = "metric",
+    Imperial = "imperial"
 }
 /**
  * **_[interface]_**
@@ -116,7 +142,27 @@ export interface IPrintOptions {
     /**
      *
      */
+    legends?: LegendsOptions | boolean;
+    /**
+     *
+     */
+    safeMargins?: boolean;
+    /**
+     *
+     */
     typeExport?: IMimeTypeExport['value'];
+    /**
+     *
+     */
+    url?: boolean;
+    /**
+     *
+     */
+    date?: boolean;
+    /**
+     *
+     */
+    specs?: boolean;
 }
 /**
  * **_[interface]_** - Custom translations specified when creating an instance
@@ -138,7 +184,8 @@ export interface IValues {
 export interface I18n {
     printPdf: string;
     pleaseWait: string;
-    almostThere: string;
+    downloadFinished: string;
+    downloadingImages: string;
     error: string;
     errorImage: string;
     printing: string;
@@ -146,8 +193,13 @@ export interface I18n {
     close: string;
     print: string;
     mapElements: string;
+    extraInfo: string;
+    url: string;
+    date: string;
+    specs: string;
     compass: string;
     scale: string;
+    legends: string;
     layersAttributions: string;
     addNote: string;
     resolution: string;
@@ -157,6 +209,7 @@ export interface I18n {
     portrait: string;
     current: string;
     paper: string;
+    printerMargins: string;
 }
 /**
  * **_[interface]_**
@@ -197,21 +250,130 @@ interface IDpi {
  */
 interface IStyle {
     /**
-     *
+     * Only added if `Add printer margins` is checked
      */
-    paperMargin?: number;
-    /**
-     *
-     */
-    brcolor?: string;
-    /**
-     *
-     */
-    bkcolor?: string;
-    /**
-     *
-     */
-    txcolor?: string;
+    paperMargin?: number | {
+        top: number;
+        right: number;
+        bottom: number;
+        left: number;
+    };
+    watermark?: {
+        /**
+         * Watermark border color
+         */
+        brcolor?: string;
+        /**
+         * Watermark background color
+         */
+        bkcolor?: string;
+        /**
+         * Watermark title color
+         */
+        txcolortitle?: string;
+        /**
+         * Watermark subtitle color
+         */
+        txcolorsubtitle?: string;
+    };
+    url?: {
+        /**
+         * Url border color
+         */
+        brcolor?: string;
+        /**
+         * Url background color
+         */
+        bkcolor?: string;
+        /**
+         * Url text color
+         */
+        txcolor?: string;
+    };
+    attributions?: {
+        /**
+         * Attributions border color
+         */
+        brcolor?: string;
+        /**
+         * Attributions background color
+         */
+        bkcolor?: string;
+        /**
+         * Attributions text color
+         */
+        txcolor?: string;
+        /**
+         * Attributions links color
+         */
+        txcolorlink?: string;
+    };
+    scalebar?: {
+        /**
+         * Scalebar border color
+         */
+        brcolor?: string;
+        /**
+         * Scalebar background color
+         */
+        bkcolor?: string;
+        /**
+         * Scalebar text and graph color
+         */
+        txcolor?: string;
+    };
+    specs?: {
+        /**
+         * Specs border color
+         */
+        brcolor?: string;
+        /**
+         * Specs background color
+         */
+        bkcolor?: string;
+        /**
+         * Specs text color
+         */
+        txcolor?: string;
+    };
+    legends?: {
+        /**
+         * Legends border color
+         */
+        brcolor?: string;
+        /**
+         * Legends background color
+         */
+        bkcolor?: string;
+        /**
+         * Legends text color
+         */
+        txcolor?: string;
+    };
+    description?: {
+        /**
+         * Description border color
+         */
+        brcolor?: string;
+        /**
+         * Description background color
+         */
+        bkcolor?: string;
+        /**
+         * Description text color
+         */
+        txcolor?: string;
+    };
+    compass?: {
+        /**
+         * Compass border color
+         */
+        brcolor?: string;
+        /**
+         * Compass background color
+         */
+        bkcolor?: string;
+    };
 }
 /**
  * **_[interface]_**
@@ -253,30 +415,22 @@ interface IModal {
  */
 export interface IWatermark {
     /**
-     *
+     * Check style section to change the color
      */
     title?: string;
     /**
-     *
-     */
-    titleColor?: string;
-    /**
-     *
+     * Check style section to change the color
      */
     subtitle?: string;
     /**
-     *
-     */
-    subtitleColor?: string;
-    /**
-     *
+     * Display a small logo next to the title
      */
     logo?: false | string | HTMLImageElement | SVGElement;
 }
 /**
  * **_[interface]_** - Print information at the bottom of the PDF
  */
-interface IExtraInfo {
+export interface IExtraInfo {
     /**
      * Print Date
      */
@@ -296,10 +450,6 @@ interface IExtraInfo {
  */
 export interface IMapElements {
     /**
-     * Print description
-     */
-    description?: boolean;
-    /**
      * Layers attributions
      */
     attributions?: boolean;
@@ -311,6 +461,10 @@ export interface IMapElements {
      * Compass image. North must be pointing to the top
      */
     compass?: false | string | HTMLImageElement | SVGElement;
+    /**
+     * Display WMS legends
+     */
+    legends?: LegendsOptions | boolean;
 }
 /**
  * **_[interface]_** - Options specified when creating an instance
@@ -323,7 +477,7 @@ export interface Options extends ControlOptions {
     /**
      * Map unit mode
      */
-    units?: 'metric' | 'imperial';
+    units?: UnitsSystem;
     /**
      * Some basic PDF style configuration
      */
@@ -333,6 +487,11 @@ export interface Options extends ControlOptions {
      * False to disable
      */
     extraInfo?: false | IExtraInfo;
+    /**
+     * Allow add extra description to the print
+     * False to disable
+     */
+    description?: boolean;
     /**
      * Elements to be showed on the PDF and in the Settings Modal.
      * False to disable
@@ -365,6 +524,10 @@ export interface Options extends ControlOptions {
      */
     dateFormat?: Locale;
     /**
+     * Show the Btn toggler on the map
+     */
+    showControlBtn?: boolean;
+    /**
      * ClassName to add to the Btn Control
      */
     ctrlBtnClass?: string;
@@ -372,6 +535,10 @@ export interface Options extends ControlOptions {
      * Modal configuration
      */
     modal?: IModal;
+    /**
+     * Element to be displayed while processing in the modal
+     */
+    loader?: HTMLElement | string | false;
     /**
      * Language support
      */

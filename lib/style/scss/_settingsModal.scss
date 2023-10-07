@@ -1,0 +1,86 @@
+.settingsModal {
+    .modal-body input[type='text'],
+    .modal-body input[type='number'],
+    .modal-body select,
+    .modal-body textarea {
+        width: 100%;
+        outline: 0;
+        padding: 9px 10px;
+        margin: 2px 0 20px;
+    }
+
+    .modal-footer {
+        .typeExportContainer {
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        .typeExportContainer button {
+            border-radius: 4px 0 0 4px;
+        }
+
+        select.typeExport {
+            height: 31px;
+            font-size: 0.675rem;
+            line-height: 1.5;
+            border-radius: 0 4px 4px 0;
+            vertical-align: middle;
+            border-left: 0;
+            border-color: #b0b0b0;
+            background: #e9e9e9;
+            text-transform: uppercase;
+        }
+    }
+
+    .modal-body textarea {
+        margin: 2px 0 0;
+    }
+
+    form#printMap {
+        fieldset {
+            text-align: center;
+            background: #f2f2f2;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid grey;
+            legend {
+                padding: 4px;
+            }
+        }
+
+        .sectionChecks {
+            margin-top: 20px;
+            font-size: 12px;
+        }
+
+        .printFieldHalf {
+            width: 50%;
+            display: inline-block;
+
+            &:nth-child(1) {
+                padding-right: 20px;
+                margin-right: -4px;
+            }
+        }
+
+        .sectionChecks {
+            label {
+                margin-right: 14px;
+                cursor: pointer;
+            }
+            input {
+                vertical-align: middle;
+                margin-left: 0;
+                margin-right: 4px;
+            }
+        }
+
+        label {
+            font-size: 13px;
+        }
+
+        .safeMarginsSection {
+            font-size: 12px;
+        }
+    }
+}

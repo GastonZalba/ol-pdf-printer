@@ -21,7 +21,7 @@ Tested with OpenLayers version 5, 6, 7 and 8.
 WMS sources and Icons that use external urls must be setted to `crossOrigin: 'anonymous'`. Otherwise, it will ocurr a `DOMException: Failed to execute 'toDataURL' on 'HTMLCanvasElement': Tainted canvases may not be exported`.
 
 <img src="screenshots/example-1.jpg" style="width:50%; float:left;"/>
-<img src="screenshots/example-2.jpg" style="width:50%;"/>
+<img src="screenshots/example-2.jpg" style="width:50%; float:left;"/>
 
 ## Examples
 
@@ -51,9 +51,7 @@ var opt_options = {
     },
     watermark: {
         title: 'Ol Pdf Printer',
-        titleColor: '#d65959',
         subtitle: 'https://github.com/GastonZalba/ol-pdf-printer',
-        subtitleColor: '#444444',
         logo: false
     },
     paperSizes: [
