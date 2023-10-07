@@ -13,14 +13,47 @@ export const defaultOptions = (i18n: I18n): Options => ({
             right: 4,
             bottom: 4
         },
-        brcolor: '#000000',
-        bkcolor: '#ffffff',
-        txcolor: '#000000',
-        descbrcolor: '#333333',
-        descbkcolor: '#000000',
-        desctxcolor: '#ffffff',
-        compassbrcolor: '#000000',
-        compassbkcolor: '#333333'
+        watermark: {
+            brcolor: '#000000',
+            bkcolor: '#ffffff',
+            txcolortitle: '#d54b4b',
+            txcolorsubtitle: '#444444'
+        },
+        url: {
+            brcolor: '#000000',
+            bkcolor: '#ffffff',
+            txcolor: '#0077cc'
+        },
+        specs: {
+            brcolor: '#000000',
+            bkcolor: '#ffffff',
+            txcolor: '#000000'
+        },
+        scalebar: {
+            brcolor: '#000000',
+            bkcolor: '#ffffff',
+            txcolor: '#000000'
+        },
+        attributions: {
+            brcolor: '#ffffff',
+            bkcolor: '#ffffff',
+            txcolor: '#666666',
+            txcolorlink: '#0077cc'
+        },
+        legends: {
+            brcolor: '#000000',
+            bkcolor: '#ffffff',
+            txcolor: '#000000'
+        },
+        description: {
+            brcolor: '#333333',
+            bkcolor: '#333333',
+            txcolor: '#ffffff'
+        },
+        compass: {
+            brcolor: '#000000',
+            bkcolor: '#333333'
+        }
     },
     extraInfo: {
         date: true,
@@ -36,9 +69,7 @@ export const defaultOptions = (i18n: I18n): Options => ({
     },
     watermark: {
         title: 'Ol Pdf Printer',
-        titleColor: '#d54b4b',
         subtitle: 'https://github.com/GastonZalba/ol-pdf-printer',
-        subtitleColor: '#444444',
         logo: false
     },
     paperSizes: [

@@ -471,7 +471,7 @@ export default class Pdf {
                 this._config.extraInfo &&
                 ((this._config.extraInfo.date && this._form.date) ||
                     (this._config.extraInfo.specs && this._form.specs))
-                    ? 15
+                    ? 10
                     : 2
         };
         const fontSize = 8;
@@ -481,7 +481,7 @@ export default class Pdf {
 
         const { x, y } = this._calculateOffsetByPosition(position, offset);
 
-        this._pdf.doc.setTextColor(this._style.desctxcolor);
+        this._pdf.doc.setTextColor(this._style.description.txcolor);
         this._pdf.doc.setFontSize(fontSize);
 
         const { w, h } = this._pdf.doc.getTextDimensions(str, {
@@ -494,8 +494,8 @@ export default class Pdf {
             y,
             w + paddingBack * 2,
             h + paddingBack * 2,
-            this._style.descbkcolor,
-            this._style.descbrcolor
+            this._style.description.bkcolor,
+            this._style.description.brcolor
         );
 
         this._pdf.doc.text(str, x + paddingBack, y + paddingBack * 2, {
@@ -524,7 +524,7 @@ export default class Pdf {
         let acumulativeWidth = watermark.logo ? imageSize + 0.5 : 0;
 
         if (watermark.title) {
-            this._pdf.doc.setTextColor(watermark.titleColor);
+            this._pdf.doc.setTextColor(this._style.watermark.txcolortitle);
             this._pdf.doc.setFontSize(fontSize);
             this._pdf.doc.setFont('helvetica', 'bold');
 
@@ -551,8 +551,8 @@ export default class Pdf {
                 y - 4,
                 widthBack + acumulativeWidth,
                 height,
-                this._style.bkcolor,
-                '#ffffff'
+                this._style.watermark.bkcolor,
+                this._style.watermark.brcolor
             );
             back = true;
 
@@ -569,7 +569,7 @@ export default class Pdf {
         }
 
         if (watermark.subtitle) {
-            this._pdf.doc.setTextColor(watermark.subtitleColor);
+            this._pdf.doc.setTextColor(this._style.watermark.txcolorsubtitle);
             this._pdf.doc.setFontSize(fontSizeSubtitle);
             this._pdf.doc.setFont('helvetica', 'normal');
 
@@ -583,7 +583,7 @@ export default class Pdf {
                     y - 4,
                     widthBack + acumulativeWidth,
                     16,
-                    this._style.bkcolor,
+                    this._style.watermark.bkcolor,
                     '#ffffff'
                 );
                 acumulativeWidth += widthBack;
@@ -622,7 +622,7 @@ export default class Pdf {
                 y - 4,
                 widthBack,
                 16,
-                this._style.bkcolor,
+                this._style.watermark.bkcolor,
                 '#ffffff'
             );
         }
@@ -686,7 +686,7 @@ export default class Pdf {
             y: 2.5
         };
         const fontSize = 6;
-        const txcolor = this._style.txcolor;
+        const txcolor = this._style.specs.txcolor;
         const align = 'left';
 
         const { x, y } = this._calculateOffsetByPosition(position, offset);
@@ -735,8 +735,8 @@ export default class Pdf {
             y - h - paddingBack * 2,
             w + paddingBack * 3,
             h + paddingBack * 3,
-            this._style.bkcolor,
-            this._style.brcolor
+            this._style.specs.bkcolor,
+            this._style.specs.brcolor
         );
 
         this._addTextByOffset(
@@ -762,7 +762,7 @@ export default class Pdf {
         };
 
         const fontSize = 6;
-        const txcolor = '#0077cc';
+        const txcolor = this._style.url.txcolor;
         const align = 'left';
 
         this._pdf.doc.setFont('helvetica', 'italic');
@@ -781,8 +781,8 @@ export default class Pdf {
             y - h - 1,
             w + paddingBack * 3,
             h + paddingBack * 3,
-            this._style.bkcolor,
-            this._style.brcolor
+            this._style.url.bkcolor,
+            this._style.url.brcolor
         );
 
         this._addTextByOffset(
@@ -849,8 +849,8 @@ export default class Pdf {
             y - h,
             w + paddingBack + sumWhiteSpaceWidth + 2,
             h + paddingBack,
-            this._style.bkcolor,
-            '#ffffff'
+            this._style.attributions.bkcolor,
+            this._style.attributions.brcolor
         );
 
         Array.from(attributions)
@@ -862,13 +862,17 @@ export default class Pdf {
                         const content = node.textContent;
 
                         if ('href' in node) {
-                            this._pdf.doc.setTextColor('#0077cc');
+                            this._pdf.doc.setTextColor(
+                                this._style.attributions.txcolorlink
+                            );
                             this._pdf.doc.textWithLink(content, xPos, y, {
                                 align: 'right',
                                 url: (node as HTMLAnchorElement).href
                             });
                         } else {
-                            this._pdf.doc.setTextColor('#666666');
+                            this._pdf.doc.setTextColor(
+                                this._style.attributions.txcolor
+                            );
                             this._pdf.doc.text(content, xPos, y, {
                                 align: 'right'
                             });
@@ -1007,27 +1011,27 @@ export default class Pdf {
             y,
             width,
             10,
-            this._style.bkcolor,
-            this._style.brcolor
+            this._style.scalebar.bkcolor,
+            this._style.scalebar.brcolor
         );
 
         // draw first part of scalebar
-        this._pdf.doc.setDrawColor(this._style.brcolor);
-        this._pdf.doc.setFillColor(0, 0, 0);
+        this._pdf.doc.setDrawColor(this._style.scalebar.txcolor);
+        this._pdf.doc.setFillColor(this._style.scalebar.txcolor);
         this._pdf.doc.rect(scaleBarX, scaleBarY, size, 1, 'FD');
 
         // draw second part of scalebar
-        this._pdf.doc.setDrawColor(this._style.brcolor);
-        this._pdf.doc.setFillColor(255, 255, 255);
+        this._pdf.doc.setDrawColor(this._style.scalebar.txcolor);
+        this._pdf.doc.setFillColor(this._style.scalebar.bkcolor);
         this._pdf.doc.rect(scaleBarX + size, scaleBarY, size, 1, 'FD');
 
         // draw third part of scalebar
-        this._pdf.doc.setDrawColor(this._style.brcolor);
-        this._pdf.doc.setFillColor(0, 0, 0);
+        this._pdf.doc.setDrawColor(this._style.scalebar.txcolor);
+        this._pdf.doc.setFillColor(this._style.scalebar.txcolor);
         this._pdf.doc.rect(scaleBarX + size * 2, scaleBarY, size * 2, 1, 'FD');
 
         // draw numeric labels above scalebar
-        this._pdf.doc.setTextColor(this._style.txcolor);
+        this._pdf.doc.setTextColor(this._style.scalebar.txcolor);
         this._pdf.doc.setFontSize(6);
         this._pdf.doc.text('0', scaleBarX, scaleBarY - 1);
         // /4 and could give 2.5. We still round, because of floating point arith
@@ -1093,8 +1097,8 @@ export default class Pdf {
             // Add back circle
             const xCircle = x - size;
             const yCircle = y;
-            this._pdf.doc.setDrawColor(this._style.compassbrcolor);
-            this._pdf.doc.setFillColor(this._style.compassbkcolor);
+            this._pdf.doc.setDrawColor(this._style.compass.brcolor);
+            this._pdf.doc.setFillColor(this._style.compass.bkcolor);
             this._pdf.doc.circle(xCircle, yCircle, size, 'FD');
 
             return canvas;
@@ -1165,7 +1169,9 @@ export default class Pdf {
         let yPos = y;
 
         const images: HTMLImageElement[] = await this._legends.getImages(
-            this._form.resolution * 1.5
+            this._form.resolution * 1.5,
+            this._style.legends.txcolor,
+            this._style.legends.bkcolor
         );
 
         const ratioSize = 1 / (this._form.resolution / 15);
@@ -1184,8 +1190,8 @@ export default class Pdf {
             y - accumulativeHeight - paddingBack,
             largestWidth + paddingBack * 2 * 3,
             accumulativeHeight + paddingBack * 2,
-            this._style.bkcolor,
-            this._style.brcolor
+            this._style.legends.bkcolor,
+            this._style.legends.brcolor
         );
 
         images.forEach((img) => {

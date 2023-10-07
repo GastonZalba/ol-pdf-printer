@@ -615,7 +615,7 @@ interface IDpi {
  */
 interface IStyle {
     /**
-     *
+     * Only added if `Add printer margins` is checked
      */
     paperMargin?:
         | number
@@ -625,43 +625,147 @@ interface IStyle {
               bottom: number;
               left: number;
           };
-    /**
-     *
-     */
-    brcolor?: string;
-    /**
-     *
-     */
-    bkcolor?: string;
-    /**
-     *
-     */
-    txcolor?: string;
 
-    /**
-     * Description border color
-     */
-    descbrcolor?: string;
+    watermark?: {
+        /**
+         * Watermark border color
+         */
+        brcolor?: string;
 
-    /**
-     * Description background color
-     */
-    descbkcolor?: string;
+        /**
+         * Watermark background color
+         */
+        bkcolor?: string;
 
-    /**
-     * Description text color
-     */
-    desctxcolor?: string;
+        /**
+         * Watermark title color
+         */
+        txcolortitle?: string;
 
-    /**
-     * Compass border color
-     */
-    compassbrcolor?: string;
+        /**
+         * Watermark subtitle color
+         */
+        txcolorsubtitle?: string;
+    };
 
-    /**
-     * Compass background color
-     */
-    compassbkcolor?: string;
+    url?: {
+        /**
+         * Url border color
+         */
+        brcolor?: string;
+
+        /**
+         * Url background color
+         */
+        bkcolor?: string;
+
+        /**
+         * Url text color
+         */
+        txcolor?: string;
+    };
+
+    attributions?: {
+        /**
+         * Attributions border color
+         */
+        brcolor?: string;
+
+        /**
+         * Attributions background color
+         */
+        bkcolor?: string;
+
+        /**
+         * Attributions text color
+         */
+        txcolor?: string;
+
+        /**
+         * Attributions links color
+         */
+        txcolorlink?: string;
+    };
+
+    scalebar?: {
+        /**
+         * Scalebar border color
+         */
+        brcolor?: string;
+
+        /**
+         * Scalebar background color
+         */
+        bkcolor?: string;
+
+        /**
+         * Scalebar text and graph color
+         */
+        txcolor?: string;
+    };
+
+    specs?: {
+        /**
+         * Specs border color
+         */
+        brcolor?: string;
+
+        /**
+         * Specs background color
+         */
+        bkcolor?: string;
+
+        /**
+         * Specs text color
+         */
+        txcolor?: string;
+    };
+
+    legends?: {
+        /**
+         * Legends border color
+         */
+        brcolor?: string;
+
+        /**
+         * Legends background color
+         */
+        bkcolor?: string;
+
+        /**
+         * Legends text color
+         */
+        txcolor?: string;
+    };
+
+    description?: {
+        /**
+         * Description border color
+         */
+        brcolor?: string;
+
+        /**
+         * Description background color
+         */
+        bkcolor?: string;
+
+        /**
+         * Description text color
+         */
+        txcolor?: string;
+    };
+
+    compass?: {
+        /**
+         * Compass border color
+         */
+        brcolor?: string;
+
+        /**
+         * Compass background color
+         */
+        bkcolor?: string;
+    };
 }
 
 /**
@@ -706,23 +810,17 @@ interface IModal {
  */
 export interface IWatermark {
     /**
-     *
+     * Check style section to change the color
      */
     title?: string;
+
     /**
-     *
-     */
-    titleColor?: string;
-    /**
-     *
+     * Check style section to change the color
      */
     subtitle?: string;
+
     /**
-     *
-     */
-    subtitleColor?: string;
-    /**
-     *
+     * Display a small logo next to the title
      */
     logo?: false | string | HTMLImageElement | SVGElement;
 }
@@ -780,7 +878,7 @@ export interface Options extends ControlOptions {
     /**
      * Map unit mode
      */
-    units?: `${UnitsSystem}`;
+    units?: UnitsSystem;
 
     /**
      * Some basic PDF style configuration

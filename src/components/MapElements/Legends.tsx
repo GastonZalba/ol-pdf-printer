@@ -12,8 +12,8 @@ import { isWmsLayer } from '../Helpers';
 
 export const legendsDefaultConfig = {
     legendOptions: {
-        fontColor: '0x333333',
         fontAntiAliasing: 'true',
+        fontColor: '0x333333',
         bgColor: '0xffffff',
         forceLabels: 'on',
         forceTitles: 'on'
@@ -73,10 +73,19 @@ export default class Legends {
         }
     }
 
-    public async getImages(dpi: number): Promise<HTMLImageElement[]> {
+    public async getImages(
+        dpi: number,
+        txcolor: string,
+        bkcolor: string
+    ): Promise<HTMLImageElement[]> {
         const images: HTMLImageElement[] = [];
         const wmsLayers = this.getWmsLegendLayers();
-        this._legendOptions = { ...this._legendOptions, dpi };
+        this._legendOptions = {
+            ...this._legendOptions,
+            dpi,
+            fontColor: '0x' + txcolor.replace('#', ''),
+            bgColor: '0x' + bkcolor.replace('#', '')
+        };
 
         for (const wmsLayer of wmsLayers) {
             const image = await this._getLegends(wmsLayer);
@@ -156,7 +165,7 @@ export default class Legends {
         const proj = this.getMapProjection().getCode();
 
         const legend_options = {
-            fontColor: '0x333333',
+            fontColor: '0x000000',
             fontAntiAliasing: true,
             bgColor: '0xffffff',
             forceLabels: 'on',
@@ -191,17 +200,6 @@ export default class Legends {
         const layerNames = !Array.isArray(layersName)
             ? layersName.split(',')
             : layersName;
-
-        // For now disable, only return the first legend
-        // return layerNames.map((l: string) =>
-        //     this._getLegendUrl(
-        //         layer.getSource() as TileWMS,
-        //         {
-        //             ...params,
-        //             LAYER: l
-        //         }
-        //     )
-        // )
 
         return [
             this._getLegendUrl(layer.getSource() as TileWMS | ImageWMS, {

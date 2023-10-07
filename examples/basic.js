@@ -121,6 +121,41 @@
                 right: 4,
                 bottom: 4
             },
+            url: {
+                brcolor: '#000000',
+                bkcolor: '#ffffff',
+                txcolor: '#0077cc'
+            },
+            specs: {
+                brcolor: '#000000',
+                bkcolor: '#ffffff',
+                txcolor: '#000000'
+            },
+            scalebar: {
+                brcolor: '#000000',
+                bkcolor: '#ffffff',
+                txcolor: '#000000'
+            },
+            attributions: {
+                brcolor: '#ffffff',
+                bkcolor: '#ffffff',
+                txcolor: '#666666',
+                txcolorlink: '#0077cc'
+            },
+            legends: {
+                brcolor: '#000000',
+                bkcolor: '#ffffff',
+                txcolor: '#000000'
+            },
+            description: {
+                brcolor: '#333333',
+                bkcolor: '#333333',
+                txcolor: '#ffffff'
+            },
+            compass: {
+                brcolor: '#000000',
+                bkcolor: '#333333'
+            }
         },
         paperSizes: [
             { size: [594, 420], value: 'A2' },
