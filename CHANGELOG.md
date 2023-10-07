@@ -101,11 +101,14 @@
 * Changed svg icon
 * Fixed wrong scale transformation on exporting to image formats (now respecting the DPI)
 * Improved downloading and processing status info
+* Added customizable loader option
 * Removed `description` attribute from inside `mapElements` option (_breaking change_)
 * Added `showControlBtn` configuration to allow disable the control button
 * Refactored using setMap method (and fixed error while using `createPdf` before the modal was displayed)
 * Removed 72 DPI as a default option
 * Added `createPdf` button to the example
+* Replaced dependency `dom-to-image-improved` with `dom-to-image-more`
+* Fixed compass not showing on firefox because of missin width and height svg attributes
 * Updated to Ol8
 * Updated dev dependencies
 * Converted css to scss

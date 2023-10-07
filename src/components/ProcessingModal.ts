@@ -9,7 +9,7 @@ export default class ProcessingModal {
     protected _footer: string;
     protected _i18n: I18n;
     protected _message: HTMLElement = document.createElement('div');
-    protected _loader: HTMLElement = document.createElement('span');
+    protected _loaderContainer: HTMLElement = document.createElement('div');
 
     /**
      *
@@ -41,9 +41,17 @@ export default class ProcessingModal {
         this._modal.el.classList.add('processingModal');
 
         this._modal.once('shown', () => {
-            this._loader.className = 'printLoader';
+            if (options.loader) {
+                this._loaderContainer.className = 'printLoader-container';
+                if (typeof options.loader === 'string') {
+                    this._loaderContainer.innerHTML = options.loader;
+                } else {
+                    this._loaderContainer.appendChild(options.loader);
+                }
+            }
+
             this._modal._html.body.append(this._message);
-            this._modal._html.body.append(this._loader);
+            this._modal._html.body.append(this._loaderContainer);
         });
 
         this._modal.on('dismiss', () => {

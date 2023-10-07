@@ -9,7 +9,7 @@ import VectorLayer from 'ol/layer/Vector.js';
 import TileWMS from 'ol/source/TileWMS.js';
 import Layer from 'ol/layer/Layer.js';
 
-import domtoimage from 'dom-to-image-improved';
+import domtoimage from 'dom-to-image-more';
 
 import { Locale } from 'locale-enum';
 
@@ -18,20 +18,15 @@ import SettingsModal from './components/SettingsModal';
 import ProcessingModal from './components/ProcessingModal';
 import { LegendsOptions } from './components/MapElements/Legends';
 import { isWmsLayer } from './components/Helpers';
+import { defaultOptions, DEFAULT_LANGUAGE } from './defaults';
 /*eslint import/namespace: ['error', { allowComputed: true }]*/
 import * as i18n from './components/i18n';
 
-import compassIcon from './assets/images/compass.svg';
 import pdfIcon from './assets/images/pdf.svg';
 
 // Style
 import './assets/scss/-ol-pdf-printer.bootstrap5.scss';
 import './assets/scss/ol-pdf-printer.scss';
-
-/**
- * @protected
- */
-const DEFAULT_LANGUAGE = 'en';
 
 /**
  * @protected
@@ -116,80 +111,7 @@ export default class PdfPrinter extends Control {
         }
 
         // Default options
-        this._options = {
-            language: DEFAULT_LANGUAGE,
-            filename: 'Ol Pdf Printer',
-            style: {
-                paperMargin: {
-                    left: 4,
-                    top: 4,
-                    right: 4,
-                    bottom: 4
-                },
-                brcolor: '#000000',
-                bkcolor: '#ffffff',
-                txcolor: '#000000',
-                descbrcolor: '#333333',
-                descbkcolor: '#000000',
-                desctxcolor: '#ffffff',
-                compassbrcolor: '#000000',
-                compassbkcolor: '#333333'
-            },
-            extraInfo: {
-                date: true,
-                url: true,
-                specs: true
-            },
-            description: true,
-            mapElements: {
-                attributions: true,
-                scalebar: true,
-                legends: true,
-                compass: compassIcon() as SVGElement
-            },
-            watermark: {
-                title: 'Ol Pdf Printer',
-                titleColor: '#d65959',
-                subtitle: 'https://github.com/GastonZalba/ol-pdf-printer',
-                subtitleColor: '#444444',
-                logo: false
-            },
-            paperSizes: [
-                // { size: [1189, 841], value: 'A0' },
-                // { size: [841, 594], value: 'A1' },
-                { size: [594, 420], value: 'A2' },
-                { size: [420, 297], value: 'A3' },
-                { size: [297, 210], value: 'A4', selected: true },
-                { size: [210, 148], value: 'A5' }
-            ],
-            dpi: [
-                { value: 96 },
-                { value: 150, selected: true },
-                { value: 200 },
-                { value: 300 }
-            ],
-            scales: [10000, 5000, 1000, 500, 250, 100, 50, 25, 10],
-            mimeTypeExports: [
-                { value: 'pdf', selected: true },
-                { value: 'png' },
-                { value: 'jpeg' },
-                { value: 'webp' }
-            ],
-            units: 'metric',
-            dateFormat: undefined,
-            showControlBtn: true,
-            ctrlBtnClass: '',
-            modal: {
-                animateClass: 'fade',
-                animateInClass: 'show',
-                transition: 150,
-                backdropTransition: 0,
-                templates: {
-                    dialog: '<div class="modal-dialog modal-dialog-centered"></div>',
-                    headerClose: `<button type="button" class="btn-close" data-dismiss="modal" aria-label="${this._i18n.close}"><span aria-hidden="true">×</span></button>`
-                }
-            }
-        };
+        this._options = defaultOptions(this._i18n);
 
         // Merge options
         this._options = deepObjectAssign(this._options, opt_options);
@@ -533,6 +455,14 @@ export default class PdfPrinter extends Control {
 }
 
 /**
+ * **_[enum]_**
+ */
+export enum UnitsSystem {
+    Metric = 'metric',
+    Imperial = 'imperial'
+}
+
+/**
  * **_[interface]_**
  */
 export interface IPrintOptions {
@@ -850,7 +780,7 @@ export interface Options extends ControlOptions {
     /**
      * Map unit mode
      */
-    units?: 'metric' | 'imperial';
+    units?: `${UnitsSystem}`;
 
     /**
      * Some basic PDF style configuration
@@ -921,6 +851,11 @@ export interface Options extends ControlOptions {
      * Modal configuration
      */
     modal?: IModal;
+
+    /**
+     * Element to be displayed while processing in the modal
+     */
+    loader?: HTMLElement | string | false;
 
     /**
      * Language support

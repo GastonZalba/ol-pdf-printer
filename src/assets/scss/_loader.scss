@@ -1,13 +1,17 @@
 .showLoader {
-    .printLoader {
+    .printLoader-container {
         display: block;
     }
 }
 
+.printLoader-container {
+    display: none;
+}
+
 // https://cssloaders.github.io/
 .printLoader {
+    display: block;
     margin: 20px auto;
-    display: none;
     position: relative;
     width: 36px;
     height: 36px;
@@ -17,7 +21,7 @@
     //transform: perspective(200px) rotateX(65deg) rotate(45deg);
     color: $opp-color;
     animation: layers1 1s linear infinite alternate;
-    will-change: transform;
+    will-change: transform, box-shadow;
 
     &:after {
         content: '';
