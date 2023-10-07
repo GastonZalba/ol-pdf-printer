@@ -50,6 +50,7 @@
     "@rollup/plugin-node-resolve": "^15.0.2",
     "@rollup/plugin-terser": "^0.4.1",
     "@rollup/plugin-typescript": "11.1.1",
+    "@types/dom-to-image": "^2.6.5",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "bootstrap": "^5.3.2",
@@ -78,7 +79,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "dom-to-image-improved": "^2.8.0",
+    "dom-to-image-more": "^3.2.0",
     "jspdf": "^2.3.1",
     "locale-enum": "^1.1.1",
     "pdfjs-dist": "^3.5.141"

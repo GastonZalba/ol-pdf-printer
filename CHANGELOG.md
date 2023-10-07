@@ -96,13 +96,15 @@
 * Addded WMS Legends support
 * Added extraInfo checkboxes
 * Allow printing without safe margins (by default no margin is added)
-* Improved `paperMargin` constructor option
+* Improved `paperMargin` option (added customazable per margin size)
 * Improved DPI accuracy
 * Changed svg icon
 * Fixed wrong scale transformation on exporting to image formats (now respecting the DPI)
 * Improved downloading and processing status info
 * Added customizable loader option
 * Removed `description` attribute from inside `mapElements` option (_breaking change_)
+* Removed some styles attributes from inside `watermark` option (_breaking change_)
+* Added multiples customization options inside `style` attribute
 * Added `showControlBtn` configuration to allow disable the control button
 * Refactored using setMap method (and fixed error while using `createPdf` before the modal was displayed)
 * Removed 72 DPI as a default option

@@ -12,7 +12,7 @@
     </a>
 </p>
 
-Basic Pdf Printer for Open Layers.
+Customizable Pdf Printer Open Layers controñ. It prints the current view of the map, mantaining existing raster and vector layers and allowing to customize the paper size, DPI, map elements to be displayed (compass, cale, legends, etc) and more. It can be used to export to image formats too, like png, jpeg and webp.
 
 Tested with OpenLayers version 5, 6, 7 and 8.
 
@@ -26,7 +26,7 @@ WMS sources and Icons that use external urls must be setted to `crossOrigin: 'an
 
 ## Examples
 
--   [Basic usage](https://raw.githack.com/GastonZalba/ol-pdf-printer/v1.3.0/examples/basic.html)
+-   [Basic usage](https://raw.githack.com/GastonZalba/ol-pdf-printer/v2.0.0/examples/basic.html)
 
 ## Usage
 
@@ -37,13 +37,7 @@ var opt_options = {
     i18n: {...}, // Custom translations. Default is according to selected language
     showControlBtn: true,
     filename: 'Ol Pdf Printer',
-    units: 'metric',
-    style: {
-        paperMargin: 10,
-        brcolor: '#000000',
-        bkcolor: '#273f50',
-        txcolor: '#ffffff'
-    },
+    units: 'metric',  
     extraInfo: {
         date: true,
         url: true,
@@ -82,13 +76,63 @@ var opt_options = {
         { value: 'jpeg' },
         { value: 'webp' }
     ],
+    style: {
+        paperMargin: {
+            left: 4,
+            top: 4,
+            right: 4,
+            bottom: 4
+        },
+          watermark: {
+            brcolor: '#000000',
+            bkcolor: '#ffffff',
+            txcolortitle: '#d54b4b',
+            txcolorsubtitle: '#444444'
+        },
+        url: {
+            brcolor: '#000000',
+            bkcolor: '#ffffff',
+            txcolor: '#0077cc'
+        },
+        specs: {
+            brcolor: '#000000',
+            bkcolor: '#ffffff',
+            txcolor: '#000000'
+        },
+        scalebar: {
+            brcolor: '#000000',
+            bkcolor: '#ffffff',
+            txcolor: '#000000'
+        },
+        attributions: {
+            brcolor: '#ffffff',
+            bkcolor: '#ffffff',
+            txcolor: '#666666',
+            txcolorlink: '#0077cc'
+        },
+        legends: {
+            brcolor: '#000000',
+            bkcolor: '#ffffff',
+            txcolor: '#000000'
+        },
+        description: {
+            brcolor: '#333333',
+            bkcolor: '#333333',
+            txcolor: '#ffffff'
+        },
+        compass: {
+            brcolor: '#000000',
+            bkcolor: '#333333'
+        }
+    },
     dateFormat: undefined, // Use browser default
     ctrlBtnClass: '',
+    loader: '<span class="printLoader"></span>',
     modal: {
         animateClass: 'fade',
         animateInClass: 'show',
         transition: 300,
-        backdropTransition: 150,
+        backdropTransition: 0,
         templates: {
             dialog: '<div class="modal-dialog modal-dialog-centered"></div>',
             headerClose: `<button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>`
@@ -114,14 +158,14 @@ See [CHANGELOG](./CHANGELOG.md) for details of changes in each release.
 Load `ol-pdf-printer.js` after [OpenLayers](https://www.npmjs.com/package/ol), [jspdf](https://www.npmjs.com/package/jspdf) and PDF.js\[https://www.npmjs.com/package/pdfjs-dist]. Ol Pdf Printer is available as `PdfPrinter`.
 
 ```HTML
-<script src="https://unpkg.com/ol-pdf-printer@1.3.0"></script>
+<script src="https://unpkg.com/ol-pdf-printer@2.0.0"></script>
 ```
 
 #### CSS
 
 ```HTML
-<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.3.0/dist/css/ol-pdf-printer.css" />
-<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@1.3.0/dist/css/bootstrap.min.css" /> <!-- Bootstrap bundle -->
+<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@2.0.0/dist/css/ol-pdf-printer.css" />
+<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@2.0.0/dist/css/bootstrap.min.css" /> <!-- Bootstrap bundle -->
 ```
 
 ### Parcel, Webpack, etc.
@@ -160,6 +204,7 @@ TypeScript types are shipped with the project in the dist directory and should b
     -   [hidePrintSettingsModal](#hideprintsettingsmodal)
     -   [createPdf](#createpdf)
         -   [Parameters](#parameters-1)
+-   [UnitsSystem](#unitssystem)
 -   [IPrintOptions](#iprintoptions)
     -   [format](#format)
     -   [orientation](#orientation)
@@ -233,6 +278,7 @@ TypeScript types are shipped with the project in the dist directory and should b
     -   [showControlBtn](#showcontrolbtn)
     -   [ctrlBtnClass](#ctrlbtnclass)
     -   [modal](#modal)
+    -   [loader](#loader)
     -   [language](#language)
     -   [i18n](#i18n-1)
 
@@ -266,6 +312,10 @@ Create PDF programatically without displaying the Settings Modal
 -   `showLoading` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**&#x20;
 
 Returns **void**&#x20;
+
+### UnitsSystem
+
+**_\[enum]_**
 
 ### IPrintOptions
 
@@ -537,7 +587,7 @@ Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Globa
 
 Map unit mode
 
-Type: (`"metric"` | `"imperial"`)
+Type: [UnitsSystem](#unitssystem)
 
 #### style
 
@@ -621,6 +671,12 @@ Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Globa
 Modal configuration
 
 Type: [IModal](#imodal)
+
+#### loader
+
+Element to be displayed while processing in the modal
+
+Type: ([HTMLElement](https://developer.mozilla.org/docs/Web/HTML/Element) | [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | `false`)
 
 #### language
 

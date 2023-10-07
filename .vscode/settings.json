@@ -6,7 +6,7 @@
     "files.autoSave": "afterDelay",
     "files.autoSaveDelay": 1000,
     "javascript.preferences.importModuleSpecifierEnding": "js",
-    "typescript.preferences.importModuleSpecifierEnding": "js",
+    "typescript.preferences.importModuleSpecifierEnding": "auto",
     "typescript.preferences.importModuleSpecifier": "relative",
     "javascript.preferences.importModuleSpecifier": "relative"
 }
