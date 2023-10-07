@@ -162,15 +162,7 @@ export default class Pdf {
             }
         }
 
-        // add white border to hide offset elements
-        this._pdf.doc.setFillColor('#ffffff');
-        this._pdf.doc.rect(
-            0,
-            0,
-            this._printingMargins.left,
-            this._pdf.height,
-            'F'
-        );
+        this._fllWhite();
     };
 
     /**
@@ -239,6 +231,41 @@ export default class Pdf {
                 );
             }
         });
+    }
+
+    /**
+     * Add white rectangles to hide elements outside the map
+     */
+    protected _fllWhite(): void {
+        this._pdf.doc.setFillColor('#ffffff');
+        this._pdf.doc.rect(
+            0,
+            0,
+            this._printingMargins.left,
+            this._pdf.height,
+            'F'
+        );
+        this._pdf.doc.rect(
+            this._pdf.width - this._printingMargins.right,
+            0,
+            this._printingMargins.right,
+            this._pdf.height,
+            'F'
+        );
+        this._pdf.doc.rect(
+            0,
+            0,
+            this._pdf.width,
+            this._printingMargins.top,
+            'F'
+        );
+        this._pdf.doc.rect(
+            0,
+            this._pdf.height - this._printingMargins.bottom,
+            this._pdf.width,
+            this._printingMargins.bottom,
+            'F'
+        );
     }
 
     /**
