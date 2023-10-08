@@ -36,6 +36,7 @@ var opt_options = {
     i18n: {...}, // Custom translations. Default is according to selected language
     showControlBtn: true,
     filename: 'Ol Pdf Printer',
+    allowReframeRegionOfInterest: true,
     units: 'metric',
     extraInfo: {
         date: true,
@@ -66,7 +67,6 @@ var opt_options = {
         { value: 200 },
         { value: 300 }
     ],
-    scales: [10000, 5000, 1000, 500, 250, 100, 50, 25, 10],
     mimeTypeExport: [
         { value: 'pdf', selected: true},
         { value: 'png' },
@@ -818,6 +818,7 @@ Type: [I18n](#i18n)
 -   \~~Legends support~~
 -   \~~Imperial units option for scalebar~~
 -   \~~Customizable date format~~
--   Add option to reframe the area before be captured
+-   ~~Add option to reframe the area before be captured~~
+-   Improve the DrawROI functionality (with some helpers and a ui button to trigger it)
 -   Events
 -   Tests!

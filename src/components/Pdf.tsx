@@ -162,7 +162,7 @@ export default class Pdf {
             }
         }
 
-        this._fllWhite();
+        if (this._form.safeMargins) this._fllWhite();
     };
 
     /**
@@ -1159,9 +1159,7 @@ export default class Pdf {
             if (typeof imgSrc === 'string') {
                 imgData = imgSrc;
             } else if (imgSrc instanceof SVGElement) {
-                console.log(imgSrc);
                 imgData = await this._processSvgImage(imgSrc);
-                console.log(imgData);
             } else {
                 throw this._i18n.errorImage;
             }

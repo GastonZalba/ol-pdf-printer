@@ -8,6 +8,8 @@ import Cluster from 'ol/source/Cluster.js';
 import VectorLayer from 'ol/layer/Vector.js';
 import TileWMS from 'ol/source/TileWMS.js';
 import Layer from 'ol/layer/Layer.js';
+import { Extent } from 'ol/extent';
+import { Coordinate } from 'ol/coordinate.js';
 
 import domtoimage from 'dom-to-image-more';
 
@@ -17,7 +19,7 @@ import Pdf from './components/Pdf';
 import SettingsModal from './components/SettingsModal';
 import ProcessingModal from './components/ProcessingModal';
 import { LegendsOptions } from './components/MapElements/Legends';
-import { isWmsLayer } from './components/Helpers';
+import { getMapScale, isWmsLayer } from './components/Helpers';
 import { defaultOptions, DEFAULT_LANGUAGE } from './defaults';
 /*eslint import/namespace: ['error', { allowComputed: true }]*/
 import * as i18n from './components/i18n';
@@ -27,11 +29,9 @@ import pdfIcon from './assets/images/pdf.svg';
 // Style
 import './assets/scss/-ol-pdf-printer.bootstrap5.scss';
 import './assets/scss/ol-pdf-printer.scss';
-
-/**
- * @protected
- */
-const CLASS_PRINT_MODE = 'printMode';
+import { Polygon } from 'ol/geom';
+import { CLASS_HIDE_CONTROLS, CLASS_PRINT_MODE } from './classnames';
+import { Feature } from 'ol';
 
 /**
  * @protected
@@ -76,6 +76,8 @@ export default class PdfPrinter extends Control {
     protected _timeoutProcessing: ReturnType<typeof setTimeout>;
 
     protected _initialViewResolution: number;
+    protected _initialViewCoords: Coordinate;
+    protected _initialConstrain: boolean;
 
     protected _options: Options;
 
@@ -153,21 +155,6 @@ export default class PdfPrinter extends Control {
     }
 
     /**
-     * @protected
-     */
-    protected _getMapSizForPrint(
-        width: number,
-        height: number,
-        resolution: number
-    ): number[] {
-        const pixelsPerMapMillimeter = resolution / 25.4;
-        return [
-            Math.round(width * pixelsPerMapMillimeter),
-            Math.round(height * pixelsPerMapMillimeter)
-        ];
-    }
-
-    /**
      * Restore inital view, remove classes, disable loading
      * @protected
      */
@@ -176,9 +163,10 @@ export default class PdfPrinter extends Control {
         this._mapTarget.style.height = '';
         this._map.updateSize();
         this._view.setResolution(this._initialViewResolution);
-        this._mapTarget.classList.remove(CLASS_PRINT_MODE);
+        this._view.setCenter(this._initialViewCoords);
+        this._view.setConstrainResolution(this._initialConstrain);
+        this._mapTarget.classList.remove(CLASS_PRINT_MODE, CLASS_HIDE_CONTROLS);
 
-        this._view.setConstrainResolution(true);
         this._updateDPI(90);
         this._removeListeners();
 
@@ -255,7 +243,10 @@ export default class PdfPrinter extends Control {
         delay = 0
     ): void {
         if (showLoading) {
-            this._mapTarget.classList.add(CLASS_PRINT_MODE);
+            this._mapTarget.classList.add(
+                CLASS_PRINT_MODE,
+                CLASS_HIDE_CONTROLS
+            );
         }
 
         setTimeout(() => {
@@ -264,6 +255,13 @@ export default class PdfPrinter extends Control {
             }
 
             this._isCanceled = false;
+
+            this._addDownloadCountListener();
+
+            // Save current resolution to restore it later
+            this._initialViewResolution = this._view.getResolution();
+            this._initialViewCoords = this._view.getCenter();
+            this._initialConstrain = this._view.getConstrainResolution();
 
             // To allow intermediate zoom levels
             this._view.setConstrainResolution(false);
@@ -280,23 +278,20 @@ export default class PdfPrinter extends Control {
             const widthPaper = dim[0];
             const heightPaper = dim[1];
 
-            this._addListeners();
             this._updateDPI(form.resolution);
-
-            const mapSizeForPrint = this._getMapSizForPrint(
-                widthPaper,
-                heightPaper,
-                form.resolution
-            );
-            const [width, height] = mapSizeForPrint;
-
-            // Save current resolution to restore it later
-            this._initialViewResolution = this._view.getResolution();
 
             const pixelsPerMapMillimeter = form.resolution / 25.4;
 
+            const width = Math.round(widthPaper * pixelsPerMapMillimeter);
+            const height = Math.round(heightPaper * pixelsPerMapMillimeter);
+
+            const scale =
+                form.scale && !form.regionOfInterest
+                    ? form.scale
+                    : getMapScale(this._map) / 1000;
+
             const scaleResolution =
-                form.scale /
+                scale /
                 getPointResolution(
                     this._view.getProjection(),
                     pixelsPerMapMillimeter,
@@ -316,17 +311,17 @@ export default class PdfPrinter extends Control {
                             height
                         }
                     )
-                    .then(async (dataUrl) => {
+                    .then(async (dataUrl: string) => {
                         if (this._isCanceled) return;
 
                         this._pdf = new Pdf({
+                            form,
+                            scaleResolution,
                             map: this._map,
                             i18n: this._i18n,
                             config: this._options,
-                            form: form,
                             height: heightPaper,
-                            width: widthPaper,
-                            scaleResolution
+                            width: widthPaper
                         });
 
                         this._pdf.addMapImage(dataUrl);
@@ -350,18 +345,26 @@ export default class PdfPrinter extends Control {
                     });
             });
 
-            // Set print size
+            // Adjust the size of the map target
             this._mapTarget.style.width = width + 'px';
             this._mapTarget.style.height = height + 'px';
-            this._map.updateSize();
+
             this._map.getView().setResolution(scaleResolution);
+            this._map.updateSize();
+
+            if (form.regionOfInterest) {
+                this._view.fit(form.regionOfInterest, {
+                    size: this._map.getSize(),
+                    nearest: false
+                });
+            }
         }, delay);
     }
 
     /**
      * Add tile listener to show downloaded images count
      */
-    protected _addListeners() {
+    protected _addDownloadCountListener() {
         this._eventsKey = [];
         this._imageCount = 0;
 
@@ -445,7 +448,7 @@ export default class PdfPrinter extends Control {
                 attributions: true,
                 scalebar: true,
                 legends: true,
-                scale: 1000,
+                regionOfInterest: null,
                 typeExport: 'pdf',
                 ...options
             },
@@ -481,7 +484,14 @@ export interface IPrintOptions {
     /**
      *
      */
-    scale?: IScale;
+    scale?: number;
+
+    /**
+     * Area of interest. If this is provided,
+     * the scale value is not used
+     */
+    regionOfInterest?: Extent | Polygon;
+
     /**
      *
      */
@@ -527,21 +537,6 @@ export interface IPrintOptions {
 /**
  * **_[interface]_** - Custom translations specified when creating an instance
  */
-export interface IValues {
-    format: FormDataEntryValue;
-    orientation: FormDataEntryValue;
-    resolution: FormDataEntryValue;
-    scale: FormDataEntryValue;
-    description: FormDataEntryValue;
-    compass: FormDataEntryValue;
-    attributions: FormDataEntryValue;
-    scalebar: FormDataEntryValue;
-    typeExport: FormDataEntryValue;
-}
-
-/**
- * **_[interface]_** - Custom translations specified when creating an instance
- */
 export interface I18n {
     printPdf: string;
     pleaseWait: string;
@@ -571,6 +566,9 @@ export interface I18n {
     current: string;
     paper: string;
     printerMargins: string;
+    escapeHint: string;
+    reframeHint: string;
+    process?: string;
 }
 
 /**
@@ -590,11 +588,6 @@ interface IPaperSize {
      */
     selected?: boolean;
 }
-
-/**
- * **_[type]_**
- */
-type IScale = number;
 
 /**
  * **_[interface]_**
@@ -881,6 +874,16 @@ export interface Options extends ControlOptions {
     units?: UnitsSystem;
 
     /**
+     * Allow to draw a Region of Interest before exporting
+     */
+    drawRegionOfInterest?: boolean;
+
+    /**
+     * Allow to reframe a precise Region of Interest before exporting
+     */
+    allowReframeRegionOfInterest?: boolean;
+
+    /**
      * Some basic PDF style configuration
      */
     style?: IStyle;
@@ -918,11 +921,6 @@ export interface Options extends ControlOptions {
      * DPI resolutions options to be shown in the settings modal
      */
     dpi?: IDpi[];
-
-    /**
-     * Map scales options to be shown in the settings modal
-     */
-    scales?: IScale[];
 
     /**
      * Export format

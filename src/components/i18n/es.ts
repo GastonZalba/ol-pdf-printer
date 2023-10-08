@@ -28,5 +28,8 @@ export const es: I18n = {
     portrait: 'Retrato',
     current: 'Actual',
     paper: 'Hoja',
-    printerMargins: 'Añadir márgenes de impresión'
+    printerMargins: 'Añadir márgenes de impresión',
+    escapeHint: 'Presioná aquí o Escape para cancelar',
+    reframeHint: 'Ajustá la región de interés paneando y zoomeando',
+    process: 'Procesar'
 };

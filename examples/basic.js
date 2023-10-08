@@ -112,6 +112,7 @@
     var opt_options = {
         showControlBtn: true,
         filename: 'Example export',
+        allowReframeRegionOfInterest: true,
         language: 'en',
         units: 'metric',
         style: {
@@ -169,7 +170,6 @@
             { value: 200 },
             { value: 300 }
         ],
-        scales: [10000, 5000, 1000, 500, 250, 100, 50, 25, 10],
         mimeTypeExports: [
             { value: 'pdf', selected: true },
             { value: 'png' },

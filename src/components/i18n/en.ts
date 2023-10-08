@@ -28,5 +28,8 @@ export const en: I18n = {
     portrait: 'Portrait',
     current: 'Current',
     paper: 'Paper',
-    printerMargins: 'Add printer margins'
+    printerMargins: 'Add printer margins',
+    escapeHint: 'Press here or Escape to cancel',
+    reframeHint: 'Adjust the region of interest panning and zooming',
+    process: 'Process'
 };

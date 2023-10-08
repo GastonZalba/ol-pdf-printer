@@ -1,22 +1,33 @@
 import Map from 'ol/Map.js';
+import { Extent } from 'ol/extent';
 
 import Modal from 'modal-vanilla';
 
-import { I18n, IValues, Options } from '../ol-pdf-printer';
-import { getMapScale } from './Helpers';
+import { I18n, IPrintOptions, Options } from '../ol-pdf-printer';
+
+import DrawROI from './DrawROI';
+
 import myPragma from '../myPragma';
+import ReframeROI from './ReframeROI';
+import { Polygon } from 'ol/geom';
 
 /**
  * @private
  */
 export default class SettingsModal {
-    _modal: Modal;
+    protected _modal: Modal;
+    protected _drawRoi: DrawROI;
+    protected _reframeROI: ReframeROI;
 
     constructor(
         map: Map,
         options: Options,
         i18n: I18n,
-        printMap: (values: IValues, showLoading: boolean, delay: number) => void
+        printMap: (
+            values: IPrintOptions,
+            showLoading: boolean,
+            delay: number
+        ) => void
     ) {
         this._modal = new Modal({
             headerClose: true,
@@ -28,6 +39,14 @@ export default class SettingsModal {
             ...options.modal
         });
 
+        if (options.drawRegionOfInterest) {
+            this._drawRoi = new DrawROI(map);
+        }
+
+        if (options.allowReframeRegionOfInterest) {
+            this._reframeROI = new ReframeROI(map, i18n);
+        }
+
         this._modal.el.classList.add('settingsModal');
 
         this._modal.on('dismiss', (modal: Modal, event: Event): void => {
@@ -38,41 +57,54 @@ export default class SettingsModal {
 
             const formData = new FormData(form);
 
-            const values = {
-                format: formData.get('printFormat'),
-                orientation: formData.get('printOrientation'),
-                resolution: formData.get('printResolution'),
-                scale: formData.get('printScale'),
-                description: formData.get('printDescription'),
-                compass: formData.get('printCompass'),
-                attributions: formData.get('printAttributions'),
-                scalebar: formData.get('printScalebar'),
-                legends: formData.get('printLegends'),
-                url: formData.get('printUrl'),
-                date: formData.get('printDate'),
-                specs: formData.get('printSpecs'),
-                safeMargins: formData.get('safeMargins'),
-                typeExport: this._modal.el.querySelector(
+            const values: IPrintOptions = {
+                format: formData.get('printFormat') as string,
+                orientation: formData.get(
+                    'printOrientation'
+                ) as IPrintOptions['orientation'],
+                resolution: Number(formData.get('printResolution')),
+                description: formData.get('printDescription') as string,
+                compass: formData.get('printCompass') as unknown as boolean,
+                attributions: formData.get(
+                    'printAttributions'
+                ) as unknown as boolean,
+                scalebar: formData.get('printScalebar') as unknown as boolean,
+                legends: formData.get('printLegends') as unknown as boolean,
+                url: formData.get('printUrl') as unknown as boolean,
+                date: formData.get('printDate') as unknown as boolean,
+                specs: formData.get('printSpecs') as unknown as boolean,
+                safeMargins: formData.get('safeMargins') as unknown as boolean,
+                typeExport: this._modal.el.querySelector<HTMLSelectElement>(
                     'select[name="printTypeExport"]'
                 ).value
             };
 
-            printMap(
-                values,
-                /* showLoading */ true,
-                /* delay */ options.modal.transition
-            );
-        });
+            if (this._drawRoi) {
+                const callback = (extent: Extent) => {
+                    printMap(
+                        { regionOfInterest: extent, ...values },
+                        /* showLoading */ true,
+                        /* delay */ options.modal.transition
+                    );
+                };
 
-        this._modal.on('show', (): void => {
-            const actualScaleVal = getMapScale(map);
-            const actualScale = this._modal.el.querySelector('.actualScale');
-            (actualScale as HTMLInputElement).value = String(
-                actualScaleVal / 1000
-            );
-            actualScale.innerHTML = `${
-                i18n.current
-            } (1:${actualScaleVal.toLocaleString('de')})`;
+                this._drawRoi.drawRegion(callback);
+            } else if (this._reframeROI) {
+                const callback = (extent: Extent | Polygon) => {
+                    printMap(
+                        { regionOfInterest: extent, ...values },
+                        /* showLoading */ true,
+                        /* delay */ options.modal.transition
+                    );
+                };
+                this._reframeROI.showOverlay(values.orientation, callback);
+            } else {
+                printMap(
+                    values,
+                    /* showLoading */ true,
+                    /* delay */ options.modal.transition
+                );
+            }
         });
     }
 
@@ -84,14 +116,14 @@ export default class SettingsModal {
      * @protected
      */
     Content(i18n: I18n, options: Options): HTMLElement {
-        const { scales, dpi, mapElements, extraInfo, description, paperSizes } =
+        const { dpi, mapElements, extraInfo, description, paperSizes } =
             options;
 
         return (
             <form id="printMap">
                 <section>
                     <div>
-                        <div className="printFieldHalf">
+                        <div className="printField">
                             <label htmlFor="printFormat">
                                 {i18n.paperSize}
                             </label>
@@ -108,7 +140,7 @@ export default class SettingsModal {
                                 ))}
                             </select>
                         </div>
-                        <div className="printFieldHalf">
+                        <div className="printField">
                             <label htmlFor="printOrientation">
                                 {i18n.orientation}
                             </label>
@@ -124,9 +156,7 @@ export default class SettingsModal {
                                 </option>
                             </select>
                         </div>
-                    </div>
-                    <div>
-                        <div className="printFieldHalf">
+                        <div className="printField">
                             <label htmlFor="printResolution">
                                 {i18n.resolution}
                             </label>
@@ -143,21 +173,8 @@ export default class SettingsModal {
                                 ))}
                             </select>
                         </div>
-                        <div className="printFieldHalf">
-                            <label htmlFor="printScale">{i18n.scale}</label>
-                            <select name="printScale" id="printScale">
-                                <option
-                                    className="actualScale"
-                                    value=""
-                                    selected
-                                ></option>
-                                {scales.map((scale) => (
-                                    <option value={scale}>
-                                        1:{(scale * 1000).toLocaleString('de')}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+                    </div>
+                    <div>
                         {description && (
                             <div>
                                 <label htmlFor="printDescription">

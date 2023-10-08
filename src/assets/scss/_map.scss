@@ -1,11 +1,12 @@
-.printMode {
-    transition: none !important;
-
+.hideControls {
     /* Desactivamos todos los controles */
     .ol-overlaycontainer-stopevent {
         display: none !important;
     }
+}
 
+.printMode {
+    transition: none !important;
     &:before {
         content: '';
         right: 0;

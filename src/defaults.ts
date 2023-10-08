@@ -6,6 +6,8 @@ export const DEFAULT_LANGUAGE = 'en';
 export const defaultOptions = (i18n: I18n): Options => ({
     language: DEFAULT_LANGUAGE,
     filename: 'Ol Pdf Printer',
+    drawRegionOfInterest: false,
+    allowReframeRegionOfInterest: true,
     style: {
         paperMargin: {
             left: 4,
@@ -86,7 +88,6 @@ export const defaultOptions = (i18n: I18n): Options => ({
         { value: 200 },
         { value: 300 }
     ],
-    scales: [10000, 5000, 1000, 500, 250, 100, 50, 25, 10],
     mimeTypeExports: [
         { value: 'pdf', selected: true },
         { value: 'png' },
