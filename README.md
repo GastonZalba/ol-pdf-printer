@@ -25,7 +25,7 @@ WMS sources and Icons that use external urls must be setted to `crossOrigin: 'an
 
 ## Examples
 
--   [Basic usage](https://raw.githack.com/GastonZalba/ol-pdf-printer/v2.0.0/examples/basic.html)
+-   [Basic usage](https://raw.githack.com/GastonZalba/ol-pdf-printer/v2.0.1/examples/basic.html)
 
 ## Usage
 
@@ -155,14 +155,14 @@ See [CHANGELOG](./CHANGELOG.md) for details of changes in each release.
 Load `ol-pdf-printer.js` after [OpenLayers](https://www.npmjs.com/package/ol), [jspdf](https://www.npmjs.com/package/jspdf) and PDF.js\[https://www.npmjs.com/package/pdfjs-dist]. Ol Pdf Printer is available as `PdfPrinter`.
 
 ```HTML
-<script src="https://unpkg.com/ol-pdf-printer@2.0.0"></script>
+<script src="https://unpkg.com/ol-pdf-printer@2.0.1"></script>
 ```
 
 #### CSS
 
 ```HTML
-<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@2.0.0/dist/css/ol-pdf-printer.css" />
-<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@2.0.0/dist/css/bootstrap.min.css" /> <!-- Bootstrap bundle -->
+<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@2.0.1/dist/css/ol-pdf-printer.css" />
+<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@2.0.1/dist/css/bootstrap.min.css" /> <!-- Bootstrap bundle -->
 ```
 
 ### Parcel, Webpack, etc.
@@ -209,6 +209,7 @@ TypeScript types are shipped with the project in the dist directory and should b
     -   [orientation](#orientation)
     -   [resolution](#resolution)
     -   [scale](#scale)
+    -   [regionOfInterest](#regionofinterest)
     -   [description](#description)
     -   [compass](#compass)
     -   [attributions](#attributions)
@@ -219,13 +220,11 @@ TypeScript types are shipped with the project in the dist directory and should b
     -   [url](#url)
     -   [date](#date)
     -   [specs](#specs)
--   [IValues](#ivalues)
 -   [I18n](#i18n)
 -   [IPaperSize](#ipapersize)
     -   [size](#size)
     -   [value](#value)
     -   [selected](#selected)
--   [IScale](#iscale)
 -   [IDpi](#idpi)
     -   [value](#value-1)
     -   [selected](#selected-1)
@@ -279,6 +278,7 @@ TypeScript types are shipped with the project in the dist directory and should b
 -   [Options](#options)
     -   [filename](#filename)
     -   [units](#units)
+    -   [allowReframeRegionOfInterest](#allowreframeregionofinterest)
     -   [style](#style)
     -   [extraInfo](#extrainfo)
     -   [description](#description-1)
@@ -286,7 +286,6 @@ TypeScript types are shipped with the project in the dist directory and should b
     -   [watermark](#watermark)
     -   [paperSizes](#papersizes)
     -   [dpi](#dpi)
-    -   [scales](#scales)
     -   [mimeTypeExports](#mimetypeexports)
     -   [dateFormat](#dateformat)
     -   [showControlBtn](#showcontrolbtn)
@@ -349,7 +348,14 @@ Type: any
 
 #### scale
 
-Type: [IScale](#iscale)
+Type: [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)
+
+#### regionOfInterest
+
+Area of interest. If this is provided,
+the scale value is not used
+
+Type: (Extent | Polygon)
 
 #### description
 
@@ -391,10 +397,6 @@ Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Glob
 
 Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)
 
-### IValues
-
-**_\[interface]_** - Custom translations specified when creating an instance
-
 ### I18n
 
 **_\[interface]_** - Custom translations specified when creating an instance
@@ -414,12 +416,6 @@ Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Globa
 #### selected
 
 Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)
-
-### IScale
-
-**_\[type]_**
-
-Type: [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)
 
 ### IDpi
 
@@ -711,6 +707,12 @@ Map unit mode
 
 Type: [UnitsSystem](#unitssystem)
 
+#### allowReframeRegionOfInterest
+
+Allow to reframe a precise Region of Interest before exporting
+
+Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)
+
 #### style
 
 Some basic PDF style configuration
@@ -756,12 +758,6 @@ Type: [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global
 DPI resolutions options to be shown in the settings modal
 
 Type: [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[IDpi](#idpi)>
-
-#### scales
-
-Map scales options to be shown in the settings modal
-
-Type: [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[IScale](#iscale)>
 
 #### mimeTypeExports
 
@@ -818,7 +814,6 @@ Type: [I18n](#i18n)
 -   \~~Legends support~~
 -   \~~Imperial units option for scalebar~~
 -   \~~Customizable date format~~
--   ~~Add option to reframe the area before be captured~~
--   Improve the DrawROI functionality (with some helpers and a ui button to trigger it)
+-   \~~Add option to reframe the area before be captured~~
 -   Events
 -   Tests!

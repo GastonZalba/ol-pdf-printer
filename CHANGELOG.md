@@ -116,6 +116,6 @@
 * Converted css to scss
 
 ## v2.0.1
-* Added reframe and draw ROI functionality to improve the control of the region of interest
+* Added reframe ROI functionality to improve the control of the region of interest
 * Removed scale parameter from the constructor and the settings modal
 * Removed some forgotten console.log

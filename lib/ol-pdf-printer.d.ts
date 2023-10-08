@@ -2,6 +2,8 @@ import Map from 'ol/Map.js';
 import View from 'ol/View.js';
 import Control, { Options as ControlOptions } from 'ol/control/Control.js';
 import { EventsKey } from 'ol/events.js';
+import { Extent } from 'ol/extent';
+import { Coordinate } from 'ol/coordinate.js';
 import { Locale } from 'locale-enum';
 import Pdf from './components/Pdf';
 import SettingsModal from './components/SettingsModal';
@@ -9,6 +11,7 @@ import ProcessingModal from './components/ProcessingModal';
 import { LegendsOptions } from './components/MapElements/Legends';
 import './assets/scss/-ol-pdf-printer.bootstrap5.scss';
 import './assets/scss/ol-pdf-printer.scss';
+import { Polygon } from 'ol/geom';
 /**
  * @constructor
  * @extends {ol/control/Control~Control}
@@ -25,6 +28,8 @@ export default class PdfPrinter extends Control {
     protected _initialized: boolean;
     protected _timeoutProcessing: ReturnType<typeof setTimeout>;
     protected _initialViewResolution: number;
+    protected _initialViewCoords: Coordinate;
+    protected _initialConstrain: boolean;
     protected _options: Options;
     protected _renderCompleteKey: EventsKey | EventsKey[];
     protected _isCanceled: boolean;
@@ -36,10 +41,6 @@ export default class PdfPrinter extends Control {
      * @protected
      */
     protected _init(): void;
-    /**
-     * @protected
-     */
-    protected _getMapSizForPrint(width: number, height: number, resolution: number): number[];
     /**
      * Restore inital view, remove classes, disable loading
      * @protected
@@ -70,7 +71,7 @@ export default class PdfPrinter extends Control {
     /**
      * Add tile listener to show downloaded images count
      */
-    protected _addListeners(): void;
+    protected _addDownloadCountListener(): void;
     /**
      * Remove WMS listeners
      */
@@ -122,7 +123,12 @@ export interface IPrintOptions {
     /**
      *
      */
-    scale?: IScale;
+    scale?: number;
+    /**
+     * Area of interest. If this is provided,
+     * the scale value is not used
+     */
+    regionOfInterest?: Extent | Polygon;
     /**
      *
      */
@@ -167,20 +173,6 @@ export interface IPrintOptions {
 /**
  * **_[interface]_** - Custom translations specified when creating an instance
  */
-export interface IValues {
-    format: FormDataEntryValue;
-    orientation: FormDataEntryValue;
-    resolution: FormDataEntryValue;
-    scale: FormDataEntryValue;
-    description: FormDataEntryValue;
-    compass: FormDataEntryValue;
-    attributions: FormDataEntryValue;
-    scalebar: FormDataEntryValue;
-    typeExport: FormDataEntryValue;
-}
-/**
- * **_[interface]_** - Custom translations specified when creating an instance
- */
 export interface I18n {
     printPdf: string;
     pleaseWait: string;
@@ -210,6 +202,9 @@ export interface I18n {
     current: string;
     paper: string;
     printerMargins: string;
+    escapeHint: string;
+    reframeHint: string;
+    process?: string;
 }
 /**
  * **_[interface]_**
@@ -228,10 +223,6 @@ interface IPaperSize {
      */
     selected?: boolean;
 }
-/**
- * **_[type]_**
- */
-type IScale = number;
 /**
  * **_[interface]_**
  */
@@ -479,6 +470,10 @@ export interface Options extends ControlOptions {
      */
     units?: UnitsSystem;
     /**
+     * Allow to reframe a precise Region of Interest before exporting
+     */
+    allowReframeRegionOfInterest?: boolean;
+    /**
      * Some basic PDF style configuration
      */
     style?: IStyle;
@@ -510,10 +505,6 @@ export interface Options extends ControlOptions {
      * DPI resolutions options to be shown in the settings modal
      */
     dpi?: IDpi[];
-    /**
-     * Map scales options to be shown in the settings modal
-     */
-    scales?: IScale[];
     /**
      * Export format
      */

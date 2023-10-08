@@ -1,12 +1,14 @@
 import Map from 'ol/Map.js';
 import Modal from 'modal-vanilla';
-import { I18n, IValues, Options } from '../ol-pdf-printer';
+import { I18n, IPrintOptions, Options } from '../ol-pdf-printer';
+import ReframeROI from './ReframeROI';
 /**
  * @private
  */
 export default class SettingsModal {
-    _modal: Modal;
-    constructor(map: Map, options: Options, i18n: I18n, printMap: (values: IValues, showLoading: boolean, delay: number) => void);
+    protected _modal: Modal;
+    protected _reframeROI: ReframeROI;
+    constructor(map: Map, options: Options, i18n: I18n, printMap: (values: IPrintOptions, showLoading: boolean, delay: number) => void);
     /**
      *
      * @param i18n

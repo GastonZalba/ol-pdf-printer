@@ -1,0 +1,78 @@
+.overlay-frame {
+    overflow: hidden;
+    border: black 2px solid;
+    min-width: 50px;
+    min-height: 50px;
+    width: 100%;
+    height: 100%;
+    container-type: size;
+    container-name: resize-box;
+    align-items: center;
+    justify-content: center;
+    display: grid !important;
+    position: absolute;
+    z-index: 9;
+    pointer-events: none;
+
+    .overlay-frame-reframe-hint {
+        color: #fff;
+        text-align: center;
+        margin-top: 20px;
+        text-shadow: 1px 1px 2px #000000bf;
+    }
+
+    .overlay-frame-rectangle {
+        position: absolute;
+        right: 0;
+        left: 0;
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+        z-index: 2;
+        border: 2px dashed #d0d0d0;
+        width: calc(100% - $opp-overlayPadding);
+        object-fit: contain;
+        overflow: hidden;
+        box-sizing: border-box;
+        margin: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: $opp-overlayRadius;
+        flex-direction: column;
+
+        .overlay-frame-save-btn {
+            box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.692);
+        }
+
+        .overlay-frame-cancel-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+
+        > div {
+            text-align: center;
+        }
+    }
+
+    &.landscape-mode .overlay-frame-rectangle {
+        aspect-ratio: 1.4143;
+    }
+    &.portrait-mode .overlay-frame-rectangle {
+        aspect-ratio: 0.707;
+    }
+}
+
+@container resize-box (aspect-ratio > 1.4143) {
+    .landscape-mode .overlay-frame-rectangle {
+        width: auto;
+        height: calc(100% - $opp-overlayPadding);
+    }
+}
+
+@container resize-box (aspect-ratio > 0.7075) {
+    .portrait-mode .overlay-frame-rectangle {
+        width: auto;
+        height: calc(100% - $opp-overlayPadding);
+    }
+}
