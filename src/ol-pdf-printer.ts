@@ -874,11 +874,6 @@ export interface Options extends ControlOptions {
     units?: UnitsSystem;
 
     /**
-     * Allow to draw a Region of Interest before exporting
-     */
-    drawRegionOfInterest?: boolean;
-
-    /**
      * Allow to reframe a precise Region of Interest before exporting
      */
     allowReframeRegionOfInterest?: boolean;

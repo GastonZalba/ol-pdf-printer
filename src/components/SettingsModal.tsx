@@ -5,8 +5,6 @@ import Modal from 'modal-vanilla';
 
 import { I18n, IPrintOptions, Options } from '../ol-pdf-printer';
 
-import DrawROI from './DrawROI';
-
 import myPragma from '../myPragma';
 import ReframeROI from './ReframeROI';
 import { Polygon } from 'ol/geom';
@@ -16,7 +14,6 @@ import { Polygon } from 'ol/geom';
  */
 export default class SettingsModal {
     protected _modal: Modal;
-    protected _drawRoi: DrawROI;
     protected _reframeROI: ReframeROI;
 
     constructor(
@@ -38,10 +35,6 @@ export default class SettingsModal {
             footer: this.Footer(i18n, options),
             ...options.modal
         });
-
-        if (options.drawRegionOfInterest) {
-            this._drawRoi = new DrawROI(map);
-        }
 
         if (options.allowReframeRegionOfInterest) {
             this._reframeROI = new ReframeROI(map, i18n);
@@ -79,17 +72,7 @@ export default class SettingsModal {
                 ).value
             };
 
-            if (this._drawRoi) {
-                const callback = (extent: Extent) => {
-                    printMap(
-                        { regionOfInterest: extent, ...values },
-                        /* showLoading */ true,
-                        /* delay */ options.modal.transition
-                    );
-                };
-
-                this._drawRoi.drawRegion(callback);
-            } else if (this._reframeROI) {
+            if (this._reframeROI) {
                 const callback = (extent: Extent | Polygon) => {
                     printMap(
                         { regionOfInterest: extent, ...values },

@@ -6,7 +6,6 @@ export const DEFAULT_LANGUAGE = 'en';
 export const defaultOptions = (i18n: I18n): Options => ({
     language: DEFAULT_LANGUAGE,
     filename: 'Ol Pdf Printer',
-    drawRegionOfInterest: false,
     allowReframeRegionOfInterest: true,
     style: {
         paperMargin: {
