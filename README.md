@@ -25,7 +25,7 @@ WMS sources and Icons that use external urls must be setted to `crossOrigin: 'an
 
 ## Examples
 
--   [Basic usage](https://raw.githack.com/GastonZalba/ol-pdf-printer/v2.0.1/examples/basic.html)
+-   [Basic usage](https://raw.githack.com/GastonZalba/ol-pdf-printer/v2.0.2/examples/basic.html)
 
 ## Usage
 
@@ -155,14 +155,14 @@ See [CHANGELOG](./CHANGELOG.md) for details of changes in each release.
 Load `ol-pdf-printer.js` after [OpenLayers](https://www.npmjs.com/package/ol), [jspdf](https://www.npmjs.com/package/jspdf) and PDF.js\[https://www.npmjs.com/package/pdfjs-dist]. Ol Pdf Printer is available as `PdfPrinter`.
 
 ```HTML
-<script src="https://unpkg.com/ol-pdf-printer@2.0.1"></script>
+<script src="https://unpkg.com/ol-pdf-printer@2.0.2"></script>
 ```
 
 #### CSS
 
 ```HTML
-<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@2.0.1/dist/css/ol-pdf-printer.css" />
-<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@2.0.1/dist/css/bootstrap.min.css" /> <!-- Bootstrap bundle -->
+<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@2.0.2/dist/css/ol-pdf-printer.css" />
+<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@2.0.2/dist/css/bootstrap.min.css" /> <!-- Bootstrap bundle -->
 ```
 
 ### Parcel, Webpack, etc.
@@ -184,7 +184,7 @@ import PdfPrinter from 'ol-pdf-printer';
 import 'ol-pdf-printer/dist/css/ol-pdf-printer.min.css';
 import 'ol-pdf-printer/dist/css/bootstrap.min.css'; // Personalized bootstrap bundle
 //or scss (needs bootstrap installed)
-import 'ol-street-view/lib/style/scss/ol-street-view.scss';
+import 'ol-pdf-printer/lib/style/scss/ol-pdf-printer.scss';
 ```
 
 ##### TypeScript type definition
