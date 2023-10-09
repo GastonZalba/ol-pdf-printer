@@ -19,7 +19,7 @@ import Pdf from './components/Pdf';
 import SettingsModal from './components/SettingsModal';
 import ProcessingModal from './components/ProcessingModal';
 import { LegendsOptions } from './components/MapElements/Legends';
-import { getMapScale, isWmsLayer } from './components/Helpers';
+import { getMapScale } from './components/Helpers';
 import { defaultOptions, DEFAULT_LANGUAGE } from './defaults';
 /*eslint import/namespace: ['error', { allowComputed: true }]*/
 import * as i18n from './components/i18n';
@@ -365,6 +365,18 @@ export default class PdfPrinter extends Control {
      * Add tile listener to show downloaded images count
      */
     protected _addDownloadCountListener() {
+        const increaseCount = () => {
+            this._imageCount = this._imageCount + 1;
+            if (this._imageCount % 10 == 0) {
+                this._processingModal.set(
+                    this._i18n.downloadingImages +
+                        ': <b>' +
+                        this._imageCount +
+                        '</b>'
+                );
+            }
+        };
+
         this._eventsKey = [];
         this._imageCount = 0;
 
@@ -372,21 +384,12 @@ export default class PdfPrinter extends Control {
             .getLayers()
             .getArray()
             .forEach((l) => {
-                if (isWmsLayer(l)) {
+                if ('getSource' in l && typeof l.getSource === 'function') {
                     this._eventsKey.push(
-                        (l as Layer<TileWMS>)
-                            .getSource()
-                            .on('tileloadend', () => {
-                                this._imageCount = this._imageCount + 1;
-                                if (this._imageCount % 10 == 0) {
-                                    this._processingModal.set(
-                                        this._i18n.downloadingImages +
-                                            ': <b>' +
-                                            this._imageCount +
-                                            '</b>'
-                                    );
-                                }
-                            })
+                        l.getSource().on('tileloadend', () => increaseCount())
+                    );
+                    this._eventsKey.push(
+                        l.getSource().on('imageloadend', () => increaseCount())
                     );
                 }
             });

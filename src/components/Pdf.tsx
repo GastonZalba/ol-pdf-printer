@@ -1,6 +1,7 @@
 import Map from 'ol/Map';
 import View from 'ol/View.js';
 import { getPointResolution } from 'ol/proj.js';
+import { AttributionLike } from 'ol/source/Source';
 
 import { jsPDF, TextOptionsLight } from 'jspdf';
 import { getDocument, GlobalWorkerOptions, version } from 'pdfjs-dist';
@@ -548,7 +549,7 @@ export default class Pdf {
 
         const paddingBack = 2;
 
-        let acumulativeWidth = watermark.logo ? imageSize + 0.5 : 0;
+        let logoWidth = watermark.logo ? imageSize + 0.5 : 0;
 
         if (watermark.title) {
             this._pdf.doc.setTextColor(this._style.watermark.txcolortitle);
@@ -560,29 +561,28 @@ export default class Pdf {
 
             if (watermark.subtitle) {
                 this._pdf.doc.setFontSize(fontSizeSubtitle);
+                this._pdf.doc.setFont('helvetica', 'normal');
                 const wSub = this._pdf.doc.getTextDimensions(
                     watermark.subtitle
                 ).w;
-                w = wSub - 4 > w ? wSub + paddingBack : w + 4; // weird fix needed
+                w = wSub > w ? wSub : w;
                 this._pdf.doc.setFontSize(fontSize);
-            } else {
-                w += 4;
             }
 
             // Adaptable width, fixed height
             const height = 16;
-            const widthBack = w + paddingBack;
+            const widthBack = w + paddingBack * 2;
 
             this._addRoundedBox(
-                x - widthBack + 4 - acumulativeWidth,
+                x - widthBack + 2 - logoWidth,
                 y - 4,
-                widthBack + acumulativeWidth,
+                widthBack + paddingBack + logoWidth,
                 height,
                 this._style.watermark.bkcolor,
                 this._style.watermark.brcolor
             );
             back = true;
-
+            this._pdf.doc.setFont('helvetica', 'bold');
             this._pdf.doc.text(
                 watermark.title,
                 x,
@@ -592,9 +592,10 @@ export default class Pdf {
                 }
             );
 
-            acumulativeWidth += w;
+            logoWidth += w;
         }
 
+        // only subtitle
         if (watermark.subtitle) {
             this._pdf.doc.setTextColor(this._style.watermark.txcolorsubtitle);
             this._pdf.doc.setFontSize(fontSizeSubtitle);
@@ -606,14 +607,14 @@ export default class Pdf {
                 );
                 const widthBack = paddingBack * 2 + w;
                 this._addRoundedBox(
-                    x - widthBack + 3 - acumulativeWidth,
+                    x - widthBack + 2 - logoWidth,
                     y - 4,
-                    widthBack + acumulativeWidth,
+                    widthBack + paddingBack + logoWidth,
                     16,
                     this._style.watermark.bkcolor,
-                    '#ffffff'
+                    this._style.watermark.brcolor
                 );
-                acumulativeWidth += widthBack;
+                logoWidth += widthBack;
                 back = true;
             }
 
@@ -635,7 +636,7 @@ export default class Pdf {
             this._pdf.doc.addImage(
                 image,
                 'PNG',
-                x - acumulativeWidth + paddingBack * 2 - 1,
+                x - logoWidth + paddingBack * 2 - 1,
                 y - 1,
                 imageSize,
                 imageSize
@@ -643,7 +644,7 @@ export default class Pdf {
         };
 
         if (!back) {
-            const widthBack = acumulativeWidth + paddingBack;
+            const widthBack = logoWidth + paddingBack;
             this._addRoundedBox(
                 x - widthBack + 4,
                 y - 4,
@@ -839,9 +840,38 @@ export default class Pdf {
      * @protected
      */
     protected _addAttributions = (): void => {
-        const attributionsUl = document.querySelector('.ol-attribution ul');
+        const createNode = (content: string): HTMLElement => {
+            return <span>{content}</span>;
+        };
 
-        if (!attributionsUl) return;
+        const attributions: string[] = this._map
+            .getLayers()
+            .getArray()
+            .flatMap((l) => {
+                if ('getSource' in l && typeof l.getSource === 'function') {
+                    const attr = l
+                        .getSource()
+                        .getAttributions() as AttributionLike;
+                    if (attr) {
+                        if (typeof attr === 'function') {
+                            try {
+                                return attr(null);
+                            } catch (err) {
+                                console.error(err);
+                            }
+                        }
+                        return attr as string | string[];
+                    }
+                }
+                return [];
+            });
+
+        if (!attributions.length) return;
+
+        // remove duplicates and create nodes
+        const attributionsList = [...new Set(attributions)].map((a) => {
+            return createNode(a);
+        });
 
         const ATTRI_SEPATATOR = ' · ';
 
@@ -855,10 +885,13 @@ export default class Pdf {
 
         let xPos = x;
 
-        const { w, h } = this._pdf.doc.getTextDimensions(
-            attributionsUl.textContent,
-            { fontSize }
-        );
+        const attributionsText = attributionsList
+            .map((a) => a.textContent)
+            .join(ATTRI_SEPATATOR);
+
+        const { w, h } = this._pdf.doc.getTextDimensions(attributionsText, {
+            fontSize
+        });
 
         const paddingBack = 4;
 
@@ -867,20 +900,16 @@ export default class Pdf {
             { fontSize }
         ).w;
 
-        const attributions = document.querySelectorAll('.ol-attribution li');
-
-        const sumWhiteSpaceWidth = whiteSpaceWidth * (attributions.length - 1);
-
         this._addRoundedBox(
-            x - w - sumWhiteSpaceWidth - 2,
+            x - w - 2,
             y - h,
-            w + paddingBack + sumWhiteSpaceWidth + 2,
+            w + paddingBack + 2,
             h + paddingBack,
             this._style.attributions.bkcolor,
             this._style.attributions.brcolor
         );
 
-        Array.from(attributions)
+        Array.from(attributionsList)
             .reverse()
             .forEach((attribution, index) => {
                 Array.from(attribution.childNodes)
@@ -910,7 +939,7 @@ export default class Pdf {
                     });
 
                 // Excldue last element
-                if (index !== attributions.length - 1) {
+                if (index !== attributionsList.length - 1) {
                     // To add separation between diferents attributtions
                     this._pdf.doc.text(ATTRI_SEPATATOR, xPos, y, {
                         align: 'right'

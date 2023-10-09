@@ -115,6 +115,10 @@
         allowReframeRegionOfInterest: true,
         language: 'en',
         units: 'metric',
+        watermark: {
+            title: 'Ol PDF printer', 
+            subtitle: 'https://www.hidraulicavisual.minfra.gba.gob.ar/'
+        },
         style: {
             paperMargin: {
                 left: 4,
