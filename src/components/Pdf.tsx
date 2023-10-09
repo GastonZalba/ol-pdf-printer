@@ -563,7 +563,7 @@ export default class Pdf {
                 const wSub = this._pdf.doc.getTextDimensions(
                     watermark.subtitle
                 ).w;
-                w = wSub - 4 > w ? wSub : w + 4; // weird fix needed
+                w = wSub - 4 > w ? wSub + paddingBack : w + 4; // weird fix needed
                 this._pdf.doc.setFontSize(fontSize);
             } else {
                 w += 4;
@@ -1198,6 +1198,10 @@ export default class Pdf {
             this._style.legends.txcolor,
             this._style.legends.bkcolor
         );
+
+        if (!images.length) {
+            return;
+        }
 
         const ratioSize = 1 / (this._form.resolution / 15);
 

@@ -119,3 +119,7 @@
 * Added reframe ROI functionality to improve the control of the region of interest
 * Removed scale parameter from the constructor and the settings modal
 * Removed some forgotten console.log
+
+## v2.0.2
+* Fixed bug when legends is activated and no wms is on the map
+* Fixed padding when watermark subtitle is largen than title
