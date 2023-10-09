@@ -817,6 +817,7 @@ export interface IWatermark {
 
     /**
      * Display a small logo next to the title
+     * Uns PNG format if you provide a base64 string
      */
     logo?: false | string | HTMLImageElement | SVGElement;
 }

@@ -105,7 +105,7 @@ export default class SettingsModal {
         return (
             <form id="printMap">
                 <section>
-                    <div>
+                    <div className="printFields-container">
                         <div className="printField">
                             <label htmlFor="printFormat">
                                 {i18n.paperSize}

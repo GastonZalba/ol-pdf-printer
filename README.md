@@ -811,9 +811,10 @@ Type: [I18n](#i18n)
 ## TODO
 
 -   Interface comments
--   \~~Legends support~~
--   \~~Imperial units option for scalebar~~
--   \~~Customizable date format~~
--   \~~Add option to reframe the area before be captured~~
+-   Add some hooks to presonalize the data before print
+-   ~~Legends support~~
+-   ~~Imperial units option for scalebar~~
+-   ~~Customizable date format~~
+-   ~~Add option to reframe the area before be captured~~
 -   Events
 -   Tests!

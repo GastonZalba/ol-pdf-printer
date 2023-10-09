@@ -533,30 +533,114 @@ export default class Pdf {
     };
 
     /**
-     * This functions is a mess
+     * This function is a mess
      * @returns
      * @protected
      */
     _addWatermark = async (watermark: IWatermark): Promise<void> => {
+        const getImageElement = async (
+            image: string | SVGElement
+        ): Promise<HTMLImageElement> => {
+            let imgData: string;
+
+            if (typeof image === 'string') {
+                imgData = image;
+            } else if (image instanceof SVGElement) {
+                imgData = await this._processSvgImage(image);
+            } else {
+                throw this._i18n.errorImage;
+            }
+
+            return new Promise((resolve, reject) => {
+                const image = new Image();
+                image.onload = () => {
+                    try {
+                        resolve(image);
+                    } catch (err) {
+                        return reject(err);
+                    }
+                };
+                image.onerror = () => {
+                    return reject(this._i18n.errorImage);
+                };
+                image.src = imgData;
+            });
+        };
+
+        let logoImage: HTMLImageElement;
+
         const position = 'topright';
-        const offset = { x: 2, y: 0 };
+        const offset = { x: 2, y: 2 };
         const fontSize = 14;
-        const imageSize = 12;
+
+        const logoSizeHeight = 12;
+        let logoSizeWidth: number;
+
         const fontSizeSubtitle = fontSize / 1.8;
+
         let back = false;
 
         const { x, y } = this._calculateOffsetByPosition(position, offset);
 
         const paddingBack = 2;
 
-        let logoWidth = watermark.logo ? imageSize + 0.5 : 0;
+        let marginRight = 0;
+
+        let backBoxHeight = paddingBack * 2;
+
+        let titleYPosition = y + paddingBack + 1.5;
+
+        let subtitleYPosition = y + paddingBack;
+
+        let logoSpace = 0;
+
+        if (watermark.logo) {
+            if (watermark.logo instanceof Image) {
+                logoImage = watermark.logo;
+            } else {
+                logoImage = await getImageElement(watermark.logo);
+            }
+
+            const aspectRatio = logoImage.width / logoImage.height;
+
+            logoSizeWidth = logoSizeHeight * aspectRatio;
+
+            // space between text and logo
+            logoSpace = 3;
+
+            marginRight = logoSizeWidth + logoSpace;
+
+            backBoxHeight += 14;
+
+            if (watermark.title) {
+                titleYPosition += 4;
+                subtitleYPosition += 2;
+            }
+
+            if (watermark.subtitle) {
+                subtitleYPosition += 5;
+                titleYPosition -= 2.5;
+            }
+        } else {
+            if (watermark.title) {
+                backBoxHeight += 5;
+                subtitleYPosition += 5;
+            }
+
+            if (watermark.subtitle) {
+                backBoxHeight += 3;
+            }
+
+            if (watermark.title && watermark.subtitle) {
+                backBoxHeight += 1;
+            }
+        }
 
         if (watermark.title) {
             this._pdf.doc.setTextColor(this._style.watermark.txcolortitle);
             this._pdf.doc.setFontSize(fontSize);
             this._pdf.doc.setFont('helvetica', 'bold');
 
-            // This function works bad
             let { w } = this._pdf.doc.getTextDimensions(watermark.title);
 
             if (watermark.subtitle) {
@@ -570,14 +654,13 @@ export default class Pdf {
             }
 
             // Adaptable width, fixed height
-            const height = 16;
             const widthBack = w + paddingBack * 2;
 
             this._addRoundedBox(
-                x - widthBack + 2 - logoWidth,
+                x - widthBack + 2 - marginRight,
                 y - 4,
-                widthBack + paddingBack + logoWidth,
-                height,
+                widthBack + paddingBack + marginRight + logoSpace,
+                backBoxHeight,
                 this._style.watermark.bkcolor,
                 this._style.watermark.brcolor
             );
@@ -585,45 +668,40 @@ export default class Pdf {
             this._pdf.doc.setFont('helvetica', 'bold');
             this._pdf.doc.text(
                 watermark.title,
-                x,
-                y + paddingBack + 3 + (!watermark.subtitle ? 2 : 0),
+                x - marginRight,
+                titleYPosition,
                 {
                     align: 'right'
                 }
             );
-
-            logoWidth += w;
         }
 
-        // only subtitle
         if (watermark.subtitle) {
             this._pdf.doc.setTextColor(this._style.watermark.txcolorsubtitle);
             this._pdf.doc.setFontSize(fontSizeSubtitle);
             this._pdf.doc.setFont('helvetica', 'normal');
 
+            // only subtitle, no title
             if (!back) {
                 const { w } = this._pdf.doc.getTextDimensions(
                     watermark.subtitle
                 );
                 const widthBack = paddingBack * 2 + w;
                 this._addRoundedBox(
-                    x - widthBack + 2 - logoWidth,
+                    x - widthBack + 2 - marginRight,
                     y - 4,
-                    widthBack + paddingBack + logoWidth,
-                    16,
+                    widthBack + paddingBack + marginRight,
+                    backBoxHeight,
                     this._style.watermark.bkcolor,
                     this._style.watermark.brcolor
                 );
-                logoWidth += widthBack;
                 back = true;
             }
 
-            const marginTop = watermark.title ? fontSize / 2 : 4;
-
             this._pdf.doc.text(
                 watermark.subtitle,
-                x,
-                y + paddingBack + marginTop,
+                x - marginRight,
+                subtitleYPosition,
                 {
                     align: 'right'
                 }
@@ -632,59 +710,26 @@ export default class Pdf {
 
         if (!watermark.logo) return;
 
-        const addImage = (image: HTMLImageElement): void => {
-            this._pdf.doc.addImage(
-                image,
-                'PNG',
-                x - logoWidth + paddingBack * 2 - 1,
-                y - 1,
-                imageSize,
-                imageSize
-            );
-        };
-
         if (!back) {
-            const widthBack = logoWidth + paddingBack;
+            const widthBack = marginRight + paddingBack;
             this._addRoundedBox(
-                x - widthBack + 4,
+                x,
                 y - 4,
                 widthBack,
                 16,
                 this._style.watermark.bkcolor,
-                '#ffffff'
+                this._style.watermark.brcolor
             );
         }
 
-        if (watermark.logo instanceof Image) {
-            addImage(watermark.logo);
-            return;
-        } else {
-            let imgData: string;
-
-            if (typeof watermark.logo === 'string') {
-                imgData = watermark.logo;
-            } else if (watermark.logo instanceof SVGElement) {
-                imgData = await this._processSvgImage(watermark.logo);
-            } else {
-                throw this._i18n.errorImage;
-            }
-
-            return new Promise((resolve, reject) => {
-                const image = new Image(imageSize, imageSize);
-                image.onload = () => {
-                    try {
-                        addImage(image);
-                        resolve();
-                    } catch (err) {
-                        return reject(err);
-                    }
-                };
-                image.onerror = () => {
-                    return reject(this._i18n.errorImage);
-                };
-                image.src = imgData;
-            });
-        }
+        this._pdf.doc.addImage(
+            logoImage,
+            'PNG',
+            x - logoSizeWidth,
+            y,
+            logoSizeWidth,
+            logoSizeHeight
+        );
     };
 
     /**

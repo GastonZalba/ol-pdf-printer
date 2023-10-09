@@ -127,3 +127,5 @@
 ## v2.0.3
 * Improved attributions functionality. Now extracts the data from the layers and not form the ui control
 * Count loaded tiles and images in all layers (not only wms)
+* Watermark logo now accepts non square images
+* Improved css style in prinFields using flex

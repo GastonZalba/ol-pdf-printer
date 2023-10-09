@@ -18,7 +18,9 @@
         color: #fff;
         text-align: center;
         margin-top: 20px;
-        text-shadow: 1px 2px 2px #000000cc;
+        text-shadow:
+            1px 1px 1px rgba(0, 0, 0, 1),
+            1px 2px 8px rgba(0, 0, 0, 1);
     }
 
     .overlay-frame-rectangle {
@@ -48,6 +50,7 @@
             top: 10px;
             right: 10px;
             cursor: pointer;
+            opacity: 1;
         }
 
         > div {
