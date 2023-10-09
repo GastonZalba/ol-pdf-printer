@@ -1,7 +1,7 @@
 /*!
- * ol-pdf-printer - v2.0.1
+ * ol-pdf-printer - v2.0.2
  * https://github.com/GastonZalba/ol-pdf-printer#readme
- * Built: Sun Oct 08 2023 18:12:14 GMT-0300 (Argentina Standard Time)
+ * Built: Mon Oct 09 2023 11:44:31 GMT-0300 (hora estándar de Argentina)
 */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('ol/control/Control.js'), require('ol/proj.js'), require('ol/Observable.js'), require('ol/source/Cluster.js'), require('ol/layer/Vector.js'), require('jspdf'), require('pdfjs-dist'), require('ol/uri.js'), require('ol/proj/Units.js'), require('ol/source/ImageWMS.js'), require('ol/layer/Tile.js'), require('ol/layer/Image.js'), require('ol/source/TileWMS.js'), require('ol/geom/Polygon'), require('ol/Overlay')) :
@@ -479,7 +479,7 @@
 	                if (watermark.subtitle) {
 	                    this._pdf.doc.setFontSize(fontSizeSubtitle);
 	                    const wSub = this._pdf.doc.getTextDimensions(watermark.subtitle).w;
-	                    w = wSub - 4 > w ? wSub : w + 4; // weird fix needed
+	                    w = wSub - 4 > w ? wSub + paddingBack : w + 4; // weird fix needed
 	                    this._pdf.doc.setFontSize(fontSize);
 	                }
 	                else {
@@ -1026,6 +1026,9 @@
 	        const { x, y } = this._calculateOffsetByPosition(position, offset);
 	        let yPos = y;
 	        const images = await this._legends.getImages(this._form.resolution * 1.5, this._style.legends.txcolor, this._style.legends.bkcolor);
+	        if (!images.length) {
+	            return;
+	        }
 	        const ratioSize = 1 / (this._form.resolution / 15);
 	        const largestWidth = Math.max(...images.map((i) => i.naturalWidth)) * ratioSize;
 	        const accumulativeHeight = images.reduce((acc, curr) => acc + curr.naturalHeight * ratioSize, 0);
