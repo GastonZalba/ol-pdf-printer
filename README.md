@@ -20,13 +20,14 @@ Tested with OpenLayers version 5, 6, 7 and 8.
 
 WMS sources and Icons that use external urls must be setted to `crossOrigin: 'anonymous'`. Otherwise, it will ocurr a `DOMException: Failed to execute 'toDataURL' on 'HTMLCanvasElement': Tainted canvases may not be exported`.
 
-<img src="screenshots/example-1.jpg" style="width:50%; float:left;"/>
-<img src="screenshots/example-2.jpg" style="width:50%; float:left;"/>
-<img src="screenshots/example-3.jpg" style="width:50%;"/>
+<div>
+<img src="screenshots/example-1.jpg" style="width:100%; max-width: 650px"/>
+<img src="screenshots/example-2.jpg" style="width:100%; max-width: 650px"/>
+<img src="screenshots/example-3.jpg" style="width:100%; max-width: 650px"/>
 
 ## Examples
 
--   [Basic usage](https://raw.githack.com/GastonZalba/ol-pdf-printer/v2.0.3/examples/basic.html)
+-   [Basic usage](https://raw.githack.com/GastonZalba/ol-pdf-printer/v2.0.4/examples/basic.html)
 
 ## Usage
 
@@ -158,14 +159,14 @@ See [CHANGELOG](./CHANGELOG.md) for details of changes in each release.
 Load `ol-pdf-printer.js` after [OpenLayers](https://www.npmjs.com/package/ol), [jspdf](https://www.npmjs.com/package/jspdf) and PDF.js\[https://www.npmjs.com/package/pdfjs-dist]. Ol Pdf Printer is available as `PdfPrinter`.
 
 ```HTML
-<script src="https://unpkg.com/ol-pdf-printer@2.0.3"></script>
+<script src="https://unpkg.com/ol-pdf-printer@2.0.4"></script>
 ```
 
 #### CSS
 
 ```HTML
-<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@2.0.3/dist/css/ol-pdf-printer.css" />
-<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@2.0.3/dist/css/bootstrap.min.css" /> <!-- Bootstrap bundle -->
+<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@2.0.4/dist/css/ol-pdf-printer.css" />
+<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@2.0.4/dist/css/bootstrap.min.css" /> <!-- Bootstrap bundle -->
 ```
 
 ### Parcel, Webpack, etc.

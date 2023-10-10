@@ -132,3 +132,6 @@
 * Added controls (zoom and rotation) on the reframe instance
 * Improved css style in prinFields using flex
 * Updated screenshots
+
+## v2.0.4
+* Small css fixes
