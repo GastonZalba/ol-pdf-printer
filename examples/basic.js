@@ -113,6 +113,8 @@
         showControlBtn: true,
         filename: 'Example export',
         allowReframeRegionOfInterest: true,
+        zoomControlOnReframe: true,
+        rotationControlOnReframe: true,
         language: 'en',
         units: 'metric',
         watermark: {

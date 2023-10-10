@@ -71,11 +71,13 @@
             label {
                 margin-right: 14px;
                 cursor: pointer;
+                span {
+                    vertical-align: middle;
+                }
             }
             input {
                 vertical-align: middle;
-                margin-left: 0;
-                margin-right: 4px;
+                margin: 0 4px 0 0;
             }
         }
 

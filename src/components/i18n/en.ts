@@ -20,7 +20,7 @@ export const en: I18n = {
     scale: 'Scale',
     legends: 'Legends',
     layersAttributions: 'Layer attributions',
-    addNote: 'Add note (optional)',
+    addNote: 'Add note',
     resolution: 'Resolution',
     orientation: 'Orientation',
     paperSize: 'Paper size',
@@ -30,6 +30,10 @@ export const en: I18n = {
     paper: 'Paper',
     printerMargins: 'Add printer margins',
     escapeHint: 'Press here or Escape to cancel',
-    reframeHint: 'Adjust the region of interest panning and zooming',
-    process: 'Process'
+    reframeHint: 'Pan and zoom to adjust the print area',
+    process: 'Process',
+    zoomIn: 'Zoom in',
+    zoomOut: 'Zoom out',
+    rotateLeft: 'Rotate left',
+    rotateRight: 'Rotate right'
 };

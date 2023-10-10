@@ -7,9 +7,9 @@ import { unByKey } from 'ol/Observable.js';
 import Cluster from 'ol/source/Cluster.js';
 import VectorLayer from 'ol/layer/Vector.js';
 import TileWMS from 'ol/source/TileWMS.js';
-import Layer from 'ol/layer/Layer.js';
 import { Extent } from 'ol/extent';
 import { Coordinate } from 'ol/coordinate.js';
+import Polygon from 'ol/geom/Polygon';
 
 import domtoimage from 'dom-to-image-more';
 
@@ -21,6 +21,9 @@ import ProcessingModal from './components/ProcessingModal';
 import { LegendsOptions } from './components/MapElements/Legends';
 import { getMapScale } from './components/Helpers';
 import { defaultOptions, DEFAULT_LANGUAGE } from './defaults';
+
+import { CLASS_HIDE_CONTROLS, CLASS_PRINT_MODE } from './classnames';
+
 /*eslint import/namespace: ['error', { allowComputed: true }]*/
 import * as i18n from './components/i18n';
 
@@ -29,9 +32,6 @@ import pdfIcon from './assets/images/pdf.svg';
 // Style
 import './assets/scss/-ol-pdf-printer.bootstrap5.scss';
 import './assets/scss/ol-pdf-printer.scss';
-import { Polygon } from 'ol/geom';
-import { CLASS_HIDE_CONTROLS, CLASS_PRINT_MODE } from './classnames';
-import { Feature } from 'ol';
 
 /**
  * @protected
@@ -572,6 +572,10 @@ export interface I18n {
     escapeHint: string;
     reframeHint: string;
     process?: string;
+    zoomIn?: string;
+    zoomOut?: string;
+    rotateLeft?: string;
+    rotateRight?: string;
 }
 
 /**
@@ -881,6 +885,16 @@ export interface Options extends ControlOptions {
      * Allow to reframe a precise Region of Interest before exporting
      */
     allowReframeRegionOfInterest?: boolean;
+
+    /**
+     * Show zoom control when the reframe insatnce is active
+     */
+    zoomControlOnReframe?: boolean;
+
+    /**
+     * Show rotation control when the reframe insatnce is active
+     */
+    rotationControlOnReframe?: boolean;
 
     /**
      * Some basic PDF style configuration

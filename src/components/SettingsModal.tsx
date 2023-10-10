@@ -1,13 +1,14 @@
 import Map from 'ol/Map.js';
 import { Extent } from 'ol/extent';
+import { Polygon } from 'ol/geom';
 
 import Modal from 'modal-vanilla';
+
+import ReframeROI from './ReframeROI';
 
 import { I18n, IPrintOptions, Options } from '../ol-pdf-printer';
 
 import myPragma from '../myPragma';
-import ReframeROI from './ReframeROI';
-import { Polygon } from 'ol/geom';
 
 /**
  * @private
@@ -37,7 +38,7 @@ export default class SettingsModal {
         });
 
         if (options.allowReframeRegionOfInterest) {
-            this._reframeROI = new ReframeROI(map, i18n);
+            this._reframeROI = new ReframeROI(map, i18n, options);
         }
 
         this._modal.el.classList.add('settingsModal');
@@ -184,7 +185,7 @@ export default class SettingsModal {
                                         name="printCompass"
                                         checked
                                     />
-                                    {i18n.compass}
+                                    <span>{i18n.compass}</span>
                                 </label>
                             )}
                             {mapElements.scalebar && (
@@ -195,7 +196,7 @@ export default class SettingsModal {
                                         name="printScalebar"
                                         checked
                                     />
-                                    {i18n.scale}
+                                    <span>{i18n.scale}</span>
                                 </label>
                             )}
                             {mapElements.legends && (
@@ -206,7 +207,7 @@ export default class SettingsModal {
                                         name="printLegends"
                                         checked
                                     />
-                                    {i18n.legends}
+                                    <span>{i18n.legends}</span>
                                 </label>
                             )}
                             {mapElements.attributions && (
@@ -217,7 +218,7 @@ export default class SettingsModal {
                                         name="printAttributions"
                                         checked
                                     />
-                                    {i18n.layersAttributions}
+                                    <span>{i18n.layersAttributions}</span>
                                 </label>
                             )}
                         </div>
@@ -235,7 +236,7 @@ export default class SettingsModal {
                                         name="printUrl"
                                         checked
                                     />
-                                    {i18n.url}
+                                    <span>{i18n.url}</span>
                                 </label>
                             )}
                             {extraInfo.date && (
@@ -246,7 +247,7 @@ export default class SettingsModal {
                                         name="printDate"
                                         checked
                                     />
-                                    {i18n.date}
+                                    <span>{i18n.date}</span>
                                 </label>
                             )}
                             {extraInfo.specs && (
@@ -257,7 +258,7 @@ export default class SettingsModal {
                                         name="printSpecs"
                                         checked
                                     />
-                                    {i18n.specs}
+                                    <span>{i18n.specs}</span>
                                 </label>
                             )}
                         </div>
@@ -270,7 +271,7 @@ export default class SettingsModal {
                             id="safeMargins"
                             name="safeMargins"
                         />
-                        {i18n.printerMargins}
+                        <span> {i18n.printerMargins}</span>
                     </label>
                 </div>
             </form>

@@ -1,4 +1,4 @@
-.overlay-frame {
+.opp-overlay-frame {
     overflow: hidden;
     border: black 2px solid;
     min-width: 50px;
@@ -14,7 +14,7 @@
     z-index: 9;
     pointer-events: none;
 
-    .overlay-frame-reframe-hint {
+    .opp-overlay-frame-reframe-hint {
         color: #fff;
         text-align: center;
         margin-top: 20px;
@@ -23,7 +23,7 @@
             1px 2px 8px rgba(0, 0, 0, 1);
     }
 
-    .overlay-frame-rectangle {
+    .opp-overlay-frame-rectangle {
         position: absolute;
         right: 0;
         left: 0;
@@ -41,11 +41,11 @@
         border-radius: $opp-overlayRadius;
         flex-direction: column;
 
-        .overlay-frame-save-btn {
+        .opp-overlay-frame-save-btn {
             box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.692);
         }
 
-        .overlay-frame-cancel-btn {
+        .opp-overlay-frame-cancel-btn {
             position: absolute;
             top: 10px;
             right: 10px;
@@ -53,28 +53,72 @@
             opacity: 1;
         }
 
+        .opp-overlay-frame-controls {
+            padding-bottom: 20px;
+            display: flex;
+            align-items: center;
+
+            .ol-control {
+                position: relative;
+                background-color: transparent;
+                border-radius: 0;
+                border: 0;
+
+                button {
+                    cursor: pointer;
+                    display: inline-block;
+                    width: 40px;
+                    height: 40px;
+                    margin: 0 5px;
+                    border-radius: 50px;
+                    color: var(--ol-subtle-foreground-color);
+
+                    svg {
+                        fill: var(--ol-subtle-foreground-color);
+                        width: 15px;
+                        height: 15px;
+                    }
+
+                    &:hover,
+                    &:focus {
+                        color: var(--ol-foreground-color);
+                        svg {
+                            fill: var(--ol-foreground-color);
+                        }
+                    }
+                }
+            }
+        }
+
         > div {
             text-align: center;
         }
+
+        &.opp-overlay-frame-zoom-enabled {
+            > div {
+                margin-top: auto;
+            }
+        }
     }
 
-    &.landscape-mode .overlay-frame-rectangle {
+    &.landscape-mode .opp-overlay-frame-rectangle {
         aspect-ratio: 1.4143;
     }
-    &.portrait-mode .overlay-frame-rectangle {
+
+    &.portrait-mode .opp-overlay-frame-rectangle {
         aspect-ratio: 0.707;
     }
 }
 
 @container resize-box (aspect-ratio > 1.4143) {
-    .landscape-mode .overlay-frame-rectangle {
+    .landscape-mode .opp-overlay-frame-rectangle {
         width: auto;
         height: calc(100% - $opp-overlayPadding);
     }
 }
 
 @container resize-box (aspect-ratio > 0.7075) {
-    .portrait-mode .overlay-frame-rectangle {
+    .portrait-mode .opp-overlay-frame-rectangle {
         width: auto;
         height: calc(100% - $opp-overlayPadding);
     }
