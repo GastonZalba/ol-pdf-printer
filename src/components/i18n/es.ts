@@ -20,7 +20,7 @@ export const es: I18n = {
     scale: 'Escala',
     legends: 'Leyendas',
     layersAttributions: 'Atribuciones de capas',
-    addNote: 'Agregar nota (opcional)',
+    addNote: 'Agregar nota',
     resolution: 'Resolución',
     orientation: 'Orientación',
     paperSize: 'Tamaño de página',
@@ -30,6 +30,10 @@ export const es: I18n = {
     paper: 'Hoja',
     printerMargins: 'Añadir márgenes de impresión',
     escapeHint: 'Presioná aquí o Escape para cancelar',
-    reframeHint: 'Ajustá la región de interés paneando y zoomeando',
-    process: 'Procesar'
+    reframeHint: 'Paneá y zoomeá para ajustar el área de impresión',
+    process: 'Procesar',
+    zoomIn: 'Acercar',
+    zoomOut: ' Alejar',
+    rotateLeft: 'Rotatar a la izquierda',
+    rotateRight: 'Rotate a la derecha'
 };

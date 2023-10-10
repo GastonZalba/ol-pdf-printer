@@ -7,6 +7,8 @@ export const defaultOptions = (i18n: I18n): Options => ({
     language: DEFAULT_LANGUAGE,
     filename: 'Ol Pdf Printer',
     allowReframeRegionOfInterest: true,
+    zoomControlOnReframe: true,
+    rotationControlOnReframe: true,
     style: {
         paperMargin: {
             left: 4,

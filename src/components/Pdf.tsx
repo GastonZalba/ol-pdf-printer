@@ -1,6 +1,7 @@
 import Map from 'ol/Map';
 import View from 'ol/View.js';
 import { getPointResolution } from 'ol/proj.js';
+import { AttributionLike } from 'ol/source/Source';
 
 import { jsPDF, TextOptionsLight } from 'jspdf';
 import { getDocument, GlobalWorkerOptions, version } from 'pdfjs-dist';
@@ -532,148 +533,29 @@ export default class Pdf {
     };
 
     /**
-     * This functions is a mess
+     * This function is a mess
      * @returns
      * @protected
      */
     _addWatermark = async (watermark: IWatermark): Promise<void> => {
-        const position = 'topright';
-        const offset = { x: 2, y: 0 };
-        const fontSize = 14;
-        const imageSize = 12;
-        const fontSizeSubtitle = fontSize / 1.8;
-        let back = false;
-
-        const { x, y } = this._calculateOffsetByPosition(position, offset);
-
-        const paddingBack = 2;
-
-        let acumulativeWidth = watermark.logo ? imageSize + 0.5 : 0;
-
-        if (watermark.title) {
-            this._pdf.doc.setTextColor(this._style.watermark.txcolortitle);
-            this._pdf.doc.setFontSize(fontSize);
-            this._pdf.doc.setFont('helvetica', 'bold');
-
-            // This function works bad
-            let { w } = this._pdf.doc.getTextDimensions(watermark.title);
-
-            if (watermark.subtitle) {
-                this._pdf.doc.setFontSize(fontSizeSubtitle);
-                const wSub = this._pdf.doc.getTextDimensions(
-                    watermark.subtitle
-                ).w;
-                w = wSub - 4 > w ? wSub + paddingBack : w + 4; // weird fix needed
-                this._pdf.doc.setFontSize(fontSize);
-            } else {
-                w += 4;
-            }
-
-            // Adaptable width, fixed height
-            const height = 16;
-            const widthBack = w + paddingBack;
-
-            this._addRoundedBox(
-                x - widthBack + 4 - acumulativeWidth,
-                y - 4,
-                widthBack + acumulativeWidth,
-                height,
-                this._style.watermark.bkcolor,
-                this._style.watermark.brcolor
-            );
-            back = true;
-
-            this._pdf.doc.text(
-                watermark.title,
-                x,
-                y + paddingBack + 3 + (!watermark.subtitle ? 2 : 0),
-                {
-                    align: 'right'
-                }
-            );
-
-            acumulativeWidth += w;
-        }
-
-        if (watermark.subtitle) {
-            this._pdf.doc.setTextColor(this._style.watermark.txcolorsubtitle);
-            this._pdf.doc.setFontSize(fontSizeSubtitle);
-            this._pdf.doc.setFont('helvetica', 'normal');
-
-            if (!back) {
-                const { w } = this._pdf.doc.getTextDimensions(
-                    watermark.subtitle
-                );
-                const widthBack = paddingBack * 2 + w;
-                this._addRoundedBox(
-                    x - widthBack + 3 - acumulativeWidth,
-                    y - 4,
-                    widthBack + acumulativeWidth,
-                    16,
-                    this._style.watermark.bkcolor,
-                    '#ffffff'
-                );
-                acumulativeWidth += widthBack;
-                back = true;
-            }
-
-            const marginTop = watermark.title ? fontSize / 2 : 4;
-
-            this._pdf.doc.text(
-                watermark.subtitle,
-                x,
-                y + paddingBack + marginTop,
-                {
-                    align: 'right'
-                }
-            );
-        }
-
-        if (!watermark.logo) return;
-
-        const addImage = (image: HTMLImageElement): void => {
-            this._pdf.doc.addImage(
-                image,
-                'PNG',
-                x - acumulativeWidth + paddingBack * 2 - 1,
-                y - 1,
-                imageSize,
-                imageSize
-            );
-        };
-
-        if (!back) {
-            const widthBack = acumulativeWidth + paddingBack;
-            this._addRoundedBox(
-                x - widthBack + 4,
-                y - 4,
-                widthBack,
-                16,
-                this._style.watermark.bkcolor,
-                '#ffffff'
-            );
-        }
-
-        if (watermark.logo instanceof Image) {
-            addImage(watermark.logo);
-            return;
-        } else {
+        const getImageElement = async (
+            image: string | SVGElement
+        ): Promise<HTMLImageElement> => {
             let imgData: string;
 
-            if (typeof watermark.logo === 'string') {
-                imgData = watermark.logo;
-            } else if (watermark.logo instanceof SVGElement) {
-                imgData = await this._processSvgImage(watermark.logo);
+            if (typeof image === 'string') {
+                imgData = image;
+            } else if (image instanceof SVGElement) {
+                imgData = await this._processSvgImage(image);
             } else {
                 throw this._i18n.errorImage;
             }
 
             return new Promise((resolve, reject) => {
-                const image = new Image(imageSize, imageSize);
+                const image = new Image();
                 image.onload = () => {
                     try {
-                        addImage(image);
-                        resolve();
+                        resolve(image);
                     } catch (err) {
                         return reject(err);
                     }
@@ -683,7 +565,171 @@ export default class Pdf {
                 };
                 image.src = imgData;
             });
+        };
+
+        let logoImage: HTMLImageElement;
+
+        const position = 'topright';
+        const offset = { x: 2, y: 2 };
+        const fontSize = 14;
+
+        const logoSizeHeight = 12;
+        let logoSizeWidth: number;
+
+        const fontSizeSubtitle = fontSize / 1.8;
+
+        let back = false;
+
+        const { x, y } = this._calculateOffsetByPosition(position, offset);
+
+        const paddingBack = 2;
+
+        let marginRight = 0;
+
+        let backBoxHeight = paddingBack * 2;
+
+        let titleYPosition = y + paddingBack + 1.5;
+
+        let subtitleYPosition = y + paddingBack;
+
+        let logoSpace = 0;
+
+        if (watermark.logo) {
+            if (watermark.logo instanceof Image) {
+                logoImage = watermark.logo;
+            } else {
+                logoImage = await getImageElement(watermark.logo);
+            }
+
+            const aspectRatio = logoImage.width / logoImage.height;
+
+            logoSizeWidth = logoSizeHeight * aspectRatio;
+
+            // space between text and logo
+            logoSpace = 3;
+
+            marginRight = logoSizeWidth + logoSpace;
+
+            backBoxHeight += 14;
+
+            if (watermark.title) {
+                titleYPosition += 4;
+                subtitleYPosition += 2;
+            }
+
+            if (watermark.subtitle) {
+                subtitleYPosition += 5;
+                titleYPosition -= 2.5;
+            }
+        } else {
+            if (watermark.title) {
+                backBoxHeight += 5;
+                subtitleYPosition += 5;
+            }
+
+            if (watermark.subtitle) {
+                backBoxHeight += 3;
+            }
+
+            if (watermark.title && watermark.subtitle) {
+                backBoxHeight += 1;
+            }
         }
+
+        if (watermark.title) {
+            this._pdf.doc.setTextColor(this._style.watermark.txcolortitle);
+            this._pdf.doc.setFontSize(fontSize);
+            this._pdf.doc.setFont('helvetica', 'bold');
+
+            let { w } = this._pdf.doc.getTextDimensions(watermark.title);
+
+            if (watermark.subtitle) {
+                this._pdf.doc.setFontSize(fontSizeSubtitle);
+                this._pdf.doc.setFont('helvetica', 'normal');
+                const wSub = this._pdf.doc.getTextDimensions(
+                    watermark.subtitle
+                ).w;
+                w = wSub > w ? wSub : w;
+                this._pdf.doc.setFontSize(fontSize);
+            }
+
+            // Adaptable width, fixed height
+            const widthBack = w + paddingBack * 2;
+
+            this._addRoundedBox(
+                x - widthBack + 2 - marginRight,
+                y - 4,
+                widthBack + paddingBack + marginRight + logoSpace,
+                backBoxHeight,
+                this._style.watermark.bkcolor,
+                this._style.watermark.brcolor
+            );
+            back = true;
+            this._pdf.doc.setFont('helvetica', 'bold');
+            this._pdf.doc.text(
+                watermark.title,
+                x - marginRight,
+                titleYPosition,
+                {
+                    align: 'right'
+                }
+            );
+        }
+
+        if (watermark.subtitle) {
+            this._pdf.doc.setTextColor(this._style.watermark.txcolorsubtitle);
+            this._pdf.doc.setFontSize(fontSizeSubtitle);
+            this._pdf.doc.setFont('helvetica', 'normal');
+
+            // only subtitle, no title
+            if (!back) {
+                const { w } = this._pdf.doc.getTextDimensions(
+                    watermark.subtitle
+                );
+                const widthBack = paddingBack * 2 + w;
+                this._addRoundedBox(
+                    x - widthBack + 2 - marginRight,
+                    y - 4,
+                    widthBack + paddingBack + marginRight,
+                    backBoxHeight,
+                    this._style.watermark.bkcolor,
+                    this._style.watermark.brcolor
+                );
+                back = true;
+            }
+
+            this._pdf.doc.text(
+                watermark.subtitle,
+                x - marginRight,
+                subtitleYPosition,
+                {
+                    align: 'right'
+                }
+            );
+        }
+
+        if (!watermark.logo) return;
+
+        if (!back) {
+            const widthBack = marginRight + paddingBack;
+            this._addRoundedBox(
+                x,
+                y - 4,
+                widthBack,
+                16,
+                this._style.watermark.bkcolor,
+                this._style.watermark.brcolor
+            );
+        }
+
+        this._pdf.doc.addImage(
+            logoImage,
+            'PNG',
+            x - logoSizeWidth,
+            y,
+            logoSizeWidth,
+            logoSizeHeight
+        );
     };
 
     /**
@@ -839,9 +885,38 @@ export default class Pdf {
      * @protected
      */
     protected _addAttributions = (): void => {
-        const attributionsUl = document.querySelector('.ol-attribution ul');
+        const createNode = (content: string): HTMLElement => {
+            return <span>{content}</span>;
+        };
 
-        if (!attributionsUl) return;
+        const attributions: string[] = this._map
+            .getLayers()
+            .getArray()
+            .flatMap((l) => {
+                if ('getSource' in l && typeof l.getSource === 'function') {
+                    const attr = l
+                        .getSource()
+                        .getAttributions() as AttributionLike;
+                    if (attr) {
+                        if (typeof attr === 'function') {
+                            try {
+                                return attr(null);
+                            } catch (err) {
+                                console.error(err);
+                            }
+                        }
+                        return attr as string | string[];
+                    }
+                }
+                return [];
+            });
+
+        if (!attributions.length) return;
+
+        // remove duplicates and create nodes
+        const attributionsList = [...new Set(attributions)].map((a) => {
+            return createNode(a);
+        });
 
         const ATTRI_SEPATATOR = ' · ';
 
@@ -855,10 +930,13 @@ export default class Pdf {
 
         let xPos = x;
 
-        const { w, h } = this._pdf.doc.getTextDimensions(
-            attributionsUl.textContent,
-            { fontSize }
-        );
+        const attributionsText = attributionsList
+            .map((a) => a.textContent)
+            .join(ATTRI_SEPATATOR);
+
+        const { w, h } = this._pdf.doc.getTextDimensions(attributionsText, {
+            fontSize
+        });
 
         const paddingBack = 4;
 
@@ -867,20 +945,16 @@ export default class Pdf {
             { fontSize }
         ).w;
 
-        const attributions = document.querySelectorAll('.ol-attribution li');
-
-        const sumWhiteSpaceWidth = whiteSpaceWidth * (attributions.length - 1);
-
         this._addRoundedBox(
-            x - w - sumWhiteSpaceWidth - 2,
+            x - w - 2,
             y - h,
-            w + paddingBack + sumWhiteSpaceWidth + 2,
+            w + paddingBack + 2,
             h + paddingBack,
             this._style.attributions.bkcolor,
             this._style.attributions.brcolor
         );
 
-        Array.from(attributions)
+        Array.from(attributionsList)
             .reverse()
             .forEach((attribution, index) => {
                 Array.from(attribution.childNodes)
@@ -910,7 +984,7 @@ export default class Pdf {
                     });
 
                 // Excldue last element
-                if (index !== attributions.length - 1) {
+                if (index !== attributionsList.length - 1) {
                     // To add separation between diferents attributtions
                     this._pdf.doc.text(ATTRI_SEPATATOR, xPos, y, {
                         align: 'right'

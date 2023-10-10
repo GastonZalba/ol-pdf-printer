@@ -7,9 +7,9 @@ import { unByKey } from 'ol/Observable.js';
 import Cluster from 'ol/source/Cluster.js';
 import VectorLayer from 'ol/layer/Vector.js';
 import TileWMS from 'ol/source/TileWMS.js';
-import Layer from 'ol/layer/Layer.js';
 import { Extent } from 'ol/extent';
 import { Coordinate } from 'ol/coordinate.js';
+import Polygon from 'ol/geom/Polygon';
 
 import domtoimage from 'dom-to-image-more';
 
@@ -19,8 +19,11 @@ import Pdf from './components/Pdf';
 import SettingsModal from './components/SettingsModal';
 import ProcessingModal from './components/ProcessingModal';
 import { LegendsOptions } from './components/MapElements/Legends';
-import { getMapScale, isWmsLayer } from './components/Helpers';
+import { getMapScale } from './components/Helpers';
 import { defaultOptions, DEFAULT_LANGUAGE } from './defaults';
+
+import { CLASS_HIDE_CONTROLS, CLASS_PRINT_MODE } from './classnames';
+
 /*eslint import/namespace: ['error', { allowComputed: true }]*/
 import * as i18n from './components/i18n';
 
@@ -29,9 +32,6 @@ import pdfIcon from './assets/images/pdf.svg';
 // Style
 import './assets/scss/-ol-pdf-printer.bootstrap5.scss';
 import './assets/scss/ol-pdf-printer.scss';
-import { Polygon } from 'ol/geom';
-import { CLASS_HIDE_CONTROLS, CLASS_PRINT_MODE } from './classnames';
-import { Feature } from 'ol';
 
 /**
  * @protected
@@ -365,6 +365,18 @@ export default class PdfPrinter extends Control {
      * Add tile listener to show downloaded images count
      */
     protected _addDownloadCountListener() {
+        const increaseCount = () => {
+            this._imageCount = this._imageCount + 1;
+            if (this._imageCount % 10 == 0) {
+                this._processingModal.set(
+                    this._i18n.downloadingImages +
+                        ': <b>' +
+                        this._imageCount +
+                        '</b>'
+                );
+            }
+        };
+
         this._eventsKey = [];
         this._imageCount = 0;
 
@@ -372,21 +384,12 @@ export default class PdfPrinter extends Control {
             .getLayers()
             .getArray()
             .forEach((l) => {
-                if (isWmsLayer(l)) {
+                if ('getSource' in l && typeof l.getSource === 'function') {
                     this._eventsKey.push(
-                        (l as Layer<TileWMS>)
-                            .getSource()
-                            .on('tileloadend', () => {
-                                this._imageCount = this._imageCount + 1;
-                                if (this._imageCount % 10 == 0) {
-                                    this._processingModal.set(
-                                        this._i18n.downloadingImages +
-                                            ': <b>' +
-                                            this._imageCount +
-                                            '</b>'
-                                    );
-                                }
-                            })
+                        l.getSource().on('tileloadend', () => increaseCount())
+                    );
+                    this._eventsKey.push(
+                        l.getSource().on('imageloadend', () => increaseCount())
                     );
                 }
             });
@@ -569,6 +572,10 @@ export interface I18n {
     escapeHint: string;
     reframeHint: string;
     process?: string;
+    zoomIn?: string;
+    zoomOut?: string;
+    rotateLeft?: string;
+    rotateRight?: string;
 }
 
 /**
@@ -814,6 +821,7 @@ export interface IWatermark {
 
     /**
      * Display a small logo next to the title
+     * Uns PNG format if you provide a base64 string
      */
     logo?: false | string | HTMLImageElement | SVGElement;
 }
@@ -877,6 +885,16 @@ export interface Options extends ControlOptions {
      * Allow to reframe a precise Region of Interest before exporting
      */
     allowReframeRegionOfInterest?: boolean;
+
+    /**
+     * Show zoom control when the reframe insatnce is active
+     */
+    zoomControlOnReframe?: boolean;
+
+    /**
+     * Show rotation control when the reframe insatnce is active
+     */
+    rotationControlOnReframe?: boolean;
 
     /**
      * Some basic PDF style configuration
