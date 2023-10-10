@@ -8,7 +8,7 @@ import { I18n, IPrintOptions, Options } from '../ol-pdf-printer';
 export default class SettingsModal {
     protected _modal: Modal;
     protected _reframeROI: ReframeROI;
-    constructor(map: Map, options: Options, i18n: I18n, printMap: (values: IPrintOptions, showLoading: boolean, delay: number) => void);
+    constructor(map: Map, options: Options, i18n: I18n, printMap: (values: IPrintOptions | false, showLoading?: boolean, delay?: number) => void);
     /**
      *
      * @param i18n

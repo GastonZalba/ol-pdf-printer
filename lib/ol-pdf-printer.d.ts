@@ -29,7 +29,7 @@ export default class PdfPrinter extends Control {
     protected _timeoutProcessing: ReturnType<typeof setTimeout>;
     protected _initialViewResolution: number;
     protected _initialViewCoords: Coordinate;
-    protected _initialConstrain: boolean;
+    protected _initialConstrainRes: boolean;
     protected _options: Options;
     protected _renderCompleteKey: EventsKey | EventsKey[];
     protected _isCanceled: boolean;
@@ -41,6 +41,10 @@ export default class PdfPrinter extends Control {
      * @protected
      */
     protected _init(): void;
+    /**
+     *
+     */
+    protected _restoreConstrains(): void;
     /**
      * Restore inital view, remove classes, disable loading
      * @protected
@@ -67,7 +71,7 @@ export default class PdfPrinter extends Control {
      * @param delay Delay to prevent glitching with modals animation
      * @protected
      */
-    protected _printMap(form: IPrintOptions, showLoading?: boolean, delay?: number): void;
+    protected _printMap(form: IPrintOptions | false, showLoading?: boolean, delay?: number): void;
     /**
      * Add tile listener to show downloaded images count
      */

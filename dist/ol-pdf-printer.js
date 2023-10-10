@@ -1,7 +1,7 @@
 /*!
- * ol-pdf-printer - v2.0.4
+ * ol-pdf-printer - v2.0.5
  * https://github.com/GastonZalba/ol-pdf-printer#readme
- * Built: Tue Oct 10 2023 11:37:38 GMT-0300 (hora estándar de Argentina)
+ * Built: Tue Oct 10 2023 13:17:12 GMT-0300 (hora estándar de Argentina)
 */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('ol/control/Control.js'), require('ol/proj.js'), require('ol/Observable.js'), require('ol/source/Cluster.js'), require('ol/layer/Vector.js'), require('jspdf'), require('pdfjs-dist'), require('ol/uri.js'), require('ol/proj/Units.js'), require('ol/source/ImageWMS.js'), require('ol/layer/Tile.js'), require('ol/layer/Image.js'), require('ol/source/TileWMS.js'), require('ol/geom/Polygon'), require('ol/Overlay')) :
@@ -2260,7 +2260,9 @@
 	            stopEvent: false
 	        });
 	        this._map.addOverlay(this._overlay);
+	        this._view.setConstrainResolution(false);
 	        this._addEvents();
+	        this._callback = callback;
 	        this._saveButton.onclick = () => {
 	            callback(this._getExtent());
 	            setTimeout(() => {
@@ -2274,6 +2276,9 @@
 	        }
 	        this._removeEvents();
 	        this._map.getTargetElement().classList.remove(CLASS_HIDE_CONTROLS);
+	        if (this._callback) {
+	            this._callback(null);
+	        }
 	    }
 	    _zoom(direction, delta = 0.5) {
 	        const rotate = 0.261799 * delta;
@@ -2349,9 +2354,15 @@
 	            };
 	            if (this._reframeROI) {
 	                const callback = (extent) => {
-	                    printMap(Object.assign({ regionOfInterest: extent }, values), 
-	                    /* showLoading */ true, 
-	                    /* delay */ options.modal.transition);
+	                    if (extent) {
+	                        printMap(Object.assign({ regionOfInterest: extent }, values), 
+	                        /* showLoading */ true, 
+	                        /* delay */ options.modal.transition);
+	                    }
+	                    else {
+	                        //cancel
+	                        printMap(false);
+	                    }
 	                };
 	                this._reframeROI.showOverlay(values.orientation, callback);
 	            }
@@ -2805,6 +2816,7 @@
 	        super.setMap(map);
 	        if (!this._initialized && map)
 	            this._init();
+	        this._initialConstrainRes = this._view.getConstrainResolution();
 	    }
 	    /**
 	     * @protected
@@ -2818,6 +2830,12 @@
 	        this._initialized = true;
 	    }
 	    /**
+	     *
+	     */
+	    _restoreConstrains() {
+	        this._view.setConstrainResolution(this._initialConstrainRes);
+	    }
+	    /**
 	     * Restore inital view, remove classes, disable loading
 	     * @protected
 	     */
@@ -2827,7 +2845,7 @@
 	        this._map.updateSize();
 	        this._view.setResolution(this._initialViewResolution);
 	        this._view.setCenter(this._initialViewCoords);
-	        this._view.setConstrainResolution(this._initialConstrain);
+	        this._restoreConstrains();
 	        this._mapTarget.classList.remove(CLASS_PRINT_MODE, CLASS_HIDE_CONTROLS);
 	        this._updateDPI(90);
 	        this._removeListeners();
@@ -2892,6 +2910,10 @@
 	     * @protected
 	     */
 	    _printMap(form, showLoading = true, delay = 0) {
+	        // the print was canceled on the reframe instance
+	        if (!form) {
+	            return this._restoreConstrains();
+	        }
 	        if (showLoading) {
 	            this._mapTarget.classList.add(CLASS_PRINT_MODE, CLASS_HIDE_CONTROLS);
 	        }
@@ -2904,7 +2926,6 @@
 	            // Save current resolution to restore it later
 	            this._initialViewResolution = this._view.getResolution();
 	            this._initialViewCoords = this._view.getCenter();
-	            this._initialConstrain = this._view.getConstrainResolution();
 	            // To allow intermediate zoom levels
 	            this._view.setConstrainResolution(false);
 	            let dim = this._options.paperSizes.find((e) => e.value === form.format).size;
