@@ -22,10 +22,11 @@ WMS sources and Icons that use external urls must be setted to `crossOrigin: 'an
 
 <img src="screenshots/example-1.jpg" style="width:50%; float:left;"/>
 <img src="screenshots/example-2.jpg" style="width:50%; float:left;"/>
+<img src="screenshots/example-3.jpg" style="width:50%;"/>
 
 ## Examples
 
--   [Basic usage](https://raw.githack.com/GastonZalba/ol-pdf-printer/v2.0.2/examples/basic.html)
+-   [Basic usage](https://raw.githack.com/GastonZalba/ol-pdf-printer/v2.0.3/examples/basic.html)
 
 ## Usage
 
@@ -37,6 +38,8 @@ var opt_options = {
     showControlBtn: true,
     filename: 'Ol Pdf Printer',
     allowReframeRegionOfInterest: true,
+    zoomControlOnReframe: true,
+    rotationControlOnReframe: true,
     units: 'metric',
     extraInfo: {
         date: true,
@@ -155,14 +158,14 @@ See [CHANGELOG](./CHANGELOG.md) for details of changes in each release.
 Load `ol-pdf-printer.js` after [OpenLayers](https://www.npmjs.com/package/ol), [jspdf](https://www.npmjs.com/package/jspdf) and PDF.js\[https://www.npmjs.com/package/pdfjs-dist]. Ol Pdf Printer is available as `PdfPrinter`.
 
 ```HTML
-<script src="https://unpkg.com/ol-pdf-printer@2.0.2"></script>
+<script src="https://unpkg.com/ol-pdf-printer@2.0.3"></script>
 ```
 
 #### CSS
 
 ```HTML
-<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@2.0.2/dist/css/ol-pdf-printer.css" />
-<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@2.0.2/dist/css/bootstrap.min.css" /> <!-- Bootstrap bundle -->
+<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@2.0.3/dist/css/ol-pdf-printer.css" />
+<link rel="stylesheet" href="https://unpkg.com/ol-pdf-printer@2.0.3/dist/css/bootstrap.min.css" /> <!-- Bootstrap bundle -->
 ```
 
 ### Parcel, Webpack, etc.
@@ -279,6 +282,8 @@ TypeScript types are shipped with the project in the dist directory and should b
     -   [filename](#filename)
     -   [units](#units)
     -   [allowReframeRegionOfInterest](#allowreframeregionofinterest)
+    -   [zoomControlOnReframe](#zoomcontrolonreframe)
+    -   [rotationControlOnReframe](#rotationcontrolonreframe)
     -   [style](#style)
     -   [extraInfo](#extrainfo)
     -   [description](#description-1)
@@ -636,6 +641,7 @@ Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Globa
 #### logo
 
 Display a small logo next to the title
+Uns PNG format if you provide a base64 string
 
 Type: (`false` | [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | [HTMLImageElement](https://developer.mozilla.org/docs/Web/API/HTMLImageElement) | [SVGElement](https://developer.mozilla.org/docs/Web/SVG/Element/animate))
 
@@ -710,6 +716,18 @@ Type: [UnitsSystem](#unitssystem)
 #### allowReframeRegionOfInterest
 
 Allow to reframe a precise Region of Interest before exporting
+
+Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)
+
+#### zoomControlOnReframe
+
+Show zoom control when the reframe insatnce is active
+
+Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)
+
+#### rotationControlOnReframe
+
+Show rotation control when the reframe insatnce is active
 
 Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)
 
@@ -812,9 +830,9 @@ Type: [I18n](#i18n)
 
 -   Interface comments
 -   Add some hooks to presonalize the data before print
--   ~~Legends support~~
--   ~~Imperial units option for scalebar~~
--   ~~Customizable date format~~
--   ~~Add option to reframe the area before be captured~~
+-   \~~Legends support~~
+-   \~~Imperial units option for scalebar~~
+-   \~~Customizable date format~~
+-   \~~Add option to reframe the area before be captured~~
 -   Events
 -   Tests!
