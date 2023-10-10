@@ -4,6 +4,7 @@ import Control, { Options as ControlOptions } from 'ol/control/Control.js';
 import { EventsKey } from 'ol/events.js';
 import { Extent } from 'ol/extent';
 import { Coordinate } from 'ol/coordinate.js';
+import Polygon from 'ol/geom/Polygon';
 import { Locale } from 'locale-enum';
 import Pdf from './components/Pdf';
 import SettingsModal from './components/SettingsModal';
@@ -11,7 +12,6 @@ import ProcessingModal from './components/ProcessingModal';
 import { LegendsOptions } from './components/MapElements/Legends';
 import './assets/scss/-ol-pdf-printer.bootstrap5.scss';
 import './assets/scss/ol-pdf-printer.scss';
-import { Polygon } from 'ol/geom';
 /**
  * @constructor
  * @extends {ol/control/Control~Control}
@@ -205,6 +205,10 @@ export interface I18n {
     escapeHint: string;
     reframeHint: string;
     process?: string;
+    zoomIn?: string;
+    zoomOut?: string;
+    rotateLeft?: string;
+    rotateRight?: string;
 }
 /**
  * **_[interface]_**
@@ -415,6 +419,7 @@ export interface IWatermark {
     subtitle?: string;
     /**
      * Display a small logo next to the title
+     * Uns PNG format if you provide a base64 string
      */
     logo?: false | string | HTMLImageElement | SVGElement;
 }
@@ -473,6 +478,14 @@ export interface Options extends ControlOptions {
      * Allow to reframe a precise Region of Interest before exporting
      */
     allowReframeRegionOfInterest?: boolean;
+    /**
+     * Show zoom control when the reframe insatnce is active
+     */
+    zoomControlOnReframe?: boolean;
+    /**
+     * Show rotation control when the reframe insatnce is active
+     */
+    rotationControlOnReframe?: boolean;
     /**
      * Some basic PDF style configuration
      */

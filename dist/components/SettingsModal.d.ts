@@ -1,7 +1,7 @@
 import Map from 'ol/Map.js';
 import Modal from 'modal-vanilla';
-import { I18n, IPrintOptions, Options } from '../ol-pdf-printer';
 import ReframeROI from './ReframeROI';
+import { I18n, IPrintOptions, Options } from '../ol-pdf-printer';
 /**
  * @private
  */

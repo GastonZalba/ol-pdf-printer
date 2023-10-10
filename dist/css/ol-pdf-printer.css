@@ -42,20 +42,17 @@
   margin-top: 20px;
   font-size: 12px;
 }
-.settingsModal form#printMap .printField {
-  width: 33%;
-  display: inline-block;
+.settingsModal form#printMap .printFields-container {
+  display: -webkit-flex;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-.settingsModal form#printMap .printField:not(:last-child) {
-  padding-right: 20px;
-  margin-right: -4px;
-}
-@media (max-width: 767px) {
-  .settingsModal form#printMap .printField {
-    padding-right: 0 !important;
-    margin-right: 0 !important;
+@media (max-width: 575px) {
+  .settingsModal form#printMap .printFields-container {
+    flex-direction: column;
   }
-  .settingsModal form#printMap .printField {
+  .settingsModal form#printMap .printFields-container .printField {
     width: 100%;
   }
 }
@@ -63,10 +60,12 @@
   margin-right: 14px;
   cursor: pointer;
 }
+.settingsModal form#printMap .sectionChecks label span {
+  vertical-align: middle;
+}
 .settingsModal form#printMap .sectionChecks input {
   vertical-align: middle;
-  margin-left: 0;
-  margin-right: 4px;
+  margin: 0 4px 0 0;
 }
 .settingsModal form#printMap label {
   font-size: 13px;
@@ -82,11 +81,11 @@
   font-weight: 600;
 }
 
-.overlay-frame {
+.opp-overlay-frame {
   display: grid !important;
 }
 
-.overlay-frame {
+.opp-overlay-frame {
   overflow: hidden;
   border: black 2px solid;
   min-width: 50px;
@@ -101,13 +100,13 @@
   z-index: 9;
   pointer-events: none;
 }
-.overlay-frame .overlay-frame-reframe-hint {
+.opp-overlay-frame .opp-overlay-frame-reframe-hint {
   color: #fff;
   text-align: center;
   margin-top: 20px;
-  text-shadow: 1px 2px 2px rgba(0, 0, 0, 0.8);
+  text-shadow: 1px 1px 1px rgb(0, 0, 0), 1px 2px 8px rgb(0, 0, 0);
 }
-.overlay-frame .overlay-frame-rectangle {
+.opp-overlay-frame .opp-overlay-frame-rectangle {
   position: absolute;
   right: 0;
   left: 0;
@@ -127,33 +126,69 @@
   border-radius: 10px;
   flex-direction: column;
 }
-.overlay-frame .overlay-frame-rectangle .overlay-frame-save-btn {
+.opp-overlay-frame .opp-overlay-frame-rectangle .opp-overlay-frame-save-btn {
   box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.692);
 }
-.overlay-frame .overlay-frame-rectangle .overlay-frame-cancel-btn {
+.opp-overlay-frame .opp-overlay-frame-rectangle .opp-overlay-frame-cancel-btn {
   position: absolute;
   top: 10px;
   right: 10px;
   cursor: pointer;
+  opacity: 1;
 }
-.overlay-frame .overlay-frame-rectangle > div {
+.opp-overlay-frame .opp-overlay-frame-rectangle .opp-overlay-frame-controls {
+  padding-bottom: 20px;
+  display: -webkit-flex;
+  display: flex;
+  align-items: center;
+}
+.opp-overlay-frame .opp-overlay-frame-rectangle .opp-overlay-frame-controls .ol-control {
+  position: relative;
+  background-color: transparent;
+  border-radius: 0;
+  border: 0;
+}
+.opp-overlay-frame .opp-overlay-frame-rectangle .opp-overlay-frame-controls .ol-control button {
+  cursor: pointer;
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  margin: 0 5px;
+  border-radius: 50px;
+  color: var(--ol-subtle-foreground-color);
+}
+.opp-overlay-frame .opp-overlay-frame-rectangle .opp-overlay-frame-controls .ol-control button svg {
+  fill: var(--ol-subtle-foreground-color);
+  width: 15px;
+  height: 15px;
+}
+.opp-overlay-frame .opp-overlay-frame-rectangle .opp-overlay-frame-controls .ol-control button:hover, .opp-overlay-frame .opp-overlay-frame-rectangle .opp-overlay-frame-controls .ol-control button:focus {
+  color: var(--ol-foreground-color);
+}
+.opp-overlay-frame .opp-overlay-frame-rectangle .opp-overlay-frame-controls .ol-control button:hover svg, .opp-overlay-frame .opp-overlay-frame-rectangle .opp-overlay-frame-controls .ol-control button:focus svg {
+  fill: var(--ol-foreground-color);
+}
+.opp-overlay-frame .opp-overlay-frame-rectangle > div {
   text-align: center;
 }
-.overlay-frame.landscape-mode .overlay-frame-rectangle {
+.opp-overlay-frame .opp-overlay-frame-rectangle.opp-overlay-frame-zoom-enabled > div {
+  margin-top: auto;
+}
+.opp-overlay-frame.landscape-mode .opp-overlay-frame-rectangle {
   aspect-ratio: 1.4143;
 }
-.overlay-frame.portrait-mode .overlay-frame-rectangle {
+.opp-overlay-frame.portrait-mode .opp-overlay-frame-rectangle {
   aspect-ratio: 0.707;
 }
 
 @container resize-box (aspect-ratio > 1.4143) {
-  .landscape-mode .overlay-frame-rectangle {
+  .landscape-mode .opp-overlay-frame-rectangle {
     width: auto;
     height: calc(100% - 40px);
   }
 }
 @container resize-box (aspect-ratio > 0.7075) {
-  .portrait-mode .overlay-frame-rectangle {
+  .portrait-mode .opp-overlay-frame-rectangle {
     width: auto;
     height: calc(100% - 40px);
   }

@@ -121,7 +121,7 @@ export default class Pdf {
      */
     _addDescription: () => void;
     /**
-     * This functions is a mess
+     * This function is a mess
      * @returns
      * @protected
      */
