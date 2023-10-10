@@ -135,3 +135,6 @@
 
 ## v2.0.4
 * Small css fixes
+
+## v2.0.5
+* Restore contrain resolution view if reframe is cancelled

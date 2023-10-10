@@ -104,6 +104,7 @@
         view: new ol.View({
             projection: 'EPSG:3857',
             center: [-6721313, -4349376],
+            constrainResolution: true,
             zoom: 8,
             rotation: 0.1
         })

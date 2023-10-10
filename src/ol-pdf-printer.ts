@@ -77,7 +77,7 @@ export default class PdfPrinter extends Control {
 
     protected _initialViewResolution: number;
     protected _initialViewCoords: Coordinate;
-    protected _initialConstrain: boolean;
+    protected _initialConstrainRes: boolean;
 
     protected _options: Options;
 
@@ -129,6 +129,7 @@ export default class PdfPrinter extends Control {
     public setMap(map: Map) {
         super.setMap(map);
         if (!this._initialized && map) this._init();
+        this._initialConstrainRes = this._view.getConstrainResolution();
     }
 
     /**
@@ -155,6 +156,13 @@ export default class PdfPrinter extends Control {
     }
 
     /**
+     *
+     */
+    protected _restoreConstrains(): void {
+        this._view.setConstrainResolution(this._initialConstrainRes);
+    }
+
+    /**
      * Restore inital view, remove classes, disable loading
      * @protected
      */
@@ -164,7 +172,9 @@ export default class PdfPrinter extends Control {
         this._map.updateSize();
         this._view.setResolution(this._initialViewResolution);
         this._view.setCenter(this._initialViewCoords);
-        this._view.setConstrainResolution(this._initialConstrain);
+
+        this._restoreConstrains();
+
         this._mapTarget.classList.remove(CLASS_PRINT_MODE, CLASS_HIDE_CONTROLS);
 
         this._updateDPI(90);
@@ -238,10 +248,15 @@ export default class PdfPrinter extends Control {
      * @protected
      */
     protected _printMap(
-        form: IPrintOptions,
+        form: IPrintOptions | false,
         showLoading = true,
         delay = 0
     ): void {
+        // the print was canceled on the reframe instance
+        if (!form) {
+            return this._restoreConstrains();
+        }
+
         if (showLoading) {
             this._mapTarget.classList.add(
                 CLASS_PRINT_MODE,
@@ -261,7 +276,6 @@ export default class PdfPrinter extends Control {
             // Save current resolution to restore it later
             this._initialViewResolution = this._view.getResolution();
             this._initialViewCoords = this._view.getCenter();
-            this._initialConstrain = this._view.getConstrainResolution();
 
             // To allow intermediate zoom levels
             this._view.setConstrainResolution(false);

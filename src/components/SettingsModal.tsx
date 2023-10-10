@@ -22,9 +22,9 @@ export default class SettingsModal {
         options: Options,
         i18n: I18n,
         printMap: (
-            values: IPrintOptions,
-            showLoading: boolean,
-            delay: number
+            values: IPrintOptions | false,
+            showLoading?: boolean,
+            delay?: number
         ) => void
     ) {
         this._modal = new Modal({
@@ -74,12 +74,17 @@ export default class SettingsModal {
             };
 
             if (this._reframeROI) {
-                const callback = (extent: Extent | Polygon) => {
-                    printMap(
-                        { regionOfInterest: extent, ...values },
-                        /* showLoading */ true,
-                        /* delay */ options.modal.transition
-                    );
+                const callback = (extent: Extent | Polygon | false) => {
+                    if (extent) {
+                        printMap(
+                            { regionOfInterest: extent, ...values },
+                            /* showLoading */ true,
+                            /* delay */ options.modal.transition
+                        );
+                    } else {
+                        //cancel
+                        printMap(false);
+                    }
                 };
                 this._reframeROI.showOverlay(values.orientation, callback);
             } else {

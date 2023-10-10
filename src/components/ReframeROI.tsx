@@ -2,6 +2,7 @@ import Map from 'ol/Map.js';
 import View from 'ol/View.js';
 import Polygon from 'ol/geom/Polygon';
 import Overlay from 'ol/Overlay';
+import { Extent } from 'ol/extent';
 
 import { I18n, Options } from '../ol-pdf-printer';
 
@@ -25,6 +26,8 @@ const CLASS_OVERLAY_REFRAME_HINT = CLASS_OVERLAY + '-reframe-hint';
 export default class ReframeROI {
     private _map: Map;
     private _view: View;
+
+    private _callback: (extent: Extent | Polygon) => void;
 
     private _escapeKeyListener: EventListener;
     private _saveButton: HTMLButtonElement;
@@ -129,7 +132,7 @@ export default class ReframeROI {
 
     public showOverlay(
         mode: 'landscape' | 'portrait',
-        callback: (polygon: Polygon) => void
+        callback: (polygon: Extent | Polygon) => void
     ): void {
         this._map.getTargetElement().classList.add(CLASS_HIDE_CONTROLS);
 
@@ -141,7 +144,10 @@ export default class ReframeROI {
 
         this._map.addOverlay(this._overlay);
 
+        this._view.setConstrainResolution(false);
+
         this._addEvents();
+        this._callback = callback;
 
         this._saveButton.onclick = () => {
             callback(this._getExtent());
@@ -157,6 +163,10 @@ export default class ReframeROI {
         }
         this._removeEvents();
         this._map.getTargetElement().classList.remove(CLASS_HIDE_CONTROLS);
+
+        if (this._callback) {
+            this._callback(null);
+        }
     }
 
     private _zoom(direction: 'in' | 'out', delta = 0.5): void {
