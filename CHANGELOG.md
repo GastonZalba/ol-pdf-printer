@@ -138,3 +138,6 @@
 
 ## v2.0.5
 * Restore contrain resolution view if reframe is cancelled
+
+## v2.0.6
+* Improved pointer events and stop event overlay

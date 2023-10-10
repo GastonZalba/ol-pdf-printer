@@ -54,13 +54,13 @@
                 features: features
             })
         }),
-        new ol.layer.Tile({
+        // not tiled, only for testing
+        new ol.layer.Image({
             zIndex: 3,
-            source: new ol.source.TileWMS({
+            source: new ol.source.ImageWMS({
                 url: 'https://wms.ign.gob.ar/geoserver/geodesia-demarcacion/wms',
                 params: {
-                    LAYERS: 'nivelacion_alta_precision',
-                    TILED: true
+                    LAYERS: 'nivelacion_alta_precision'
                 },
                 serverType: 'geoserver',
                 attributions:

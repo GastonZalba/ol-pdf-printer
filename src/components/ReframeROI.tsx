@@ -139,7 +139,7 @@ export default class ReframeROI {
         this._overlay = new Overlay({
             className: `${CLASS_OVERLAY} ${mode}-mode`,
             element: this._rectangle,
-            stopEvent: false
+            stopEvent: true
         });
 
         this._map.addOverlay(this._overlay);

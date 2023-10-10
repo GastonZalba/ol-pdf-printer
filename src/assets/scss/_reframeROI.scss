@@ -12,7 +12,7 @@
     display: grid !important;
     position: absolute;
     z-index: 9;
-    pointer-events: none;
+    pointer-events: none !important;
 
     .opp-overlay-frame-reframe-hint {
         color: #fff;
@@ -40,6 +40,10 @@
         justify-content: center;
         border-radius: $opp-overlayRadius;
         flex-direction: column;
+        pointer-events: none;
+        > * {
+            pointer-events: all;
+        }
 
         .opp-overlay-frame-save-btn {
             box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.692);
