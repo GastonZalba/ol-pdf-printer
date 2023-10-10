@@ -1,12 +1,16 @@
 .settingsModal {
+    font-family: sans-serif;
     .modal-body input[type='text'],
-    .modal-body input[type='number'],
     .modal-body select,
-    .modal-body textarea {
+    .modal-body textarea,
+    .modal-body fieldset {
         width: 100%;
         outline: 0;
         padding: 9px 10px;
         margin: 2px 0 20px;
+        border: 1px solid #727272;
+        border-radius: 4px;
+        box-sizing: border-box;
     }
 
     .modal-footer {
@@ -40,9 +44,6 @@
         fieldset {
             text-align: center;
             background: #f2f2f2;
-            padding: 10px;
-            border-radius: 4px;
-            border: 1px solid grey;
             legend {
                 padding: 4px;
             }
@@ -56,11 +57,13 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 10px;
         }
 
         @media (max-width: 575px) {
             .printFields-container {
                 flex-direction: column;
+                gap: 0;
                 .printField {
                     width: 100%;
                 }

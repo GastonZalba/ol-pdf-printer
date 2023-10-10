@@ -1,7 +1,7 @@
 /*!
- * ol-pdf-printer - v2.0.2
+ * ol-pdf-printer - v2.0.4
  * https://github.com/GastonZalba/ol-pdf-printer#readme
- * Built: Tue Oct 10 2023 10:44:16 GMT-0300 (hora estándar de Argentina)
+ * Built: Tue Oct 10 2023 11:37:38 GMT-0300 (hora estándar de Argentina)
 */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('ol/control/Control.js'), require('ol/proj.js'), require('ol/Observable.js'), require('ol/source/Cluster.js'), require('ol/layer/Vector.js'), require('jspdf'), require('pdfjs-dist'), require('ol/uri.js'), require('ol/proj/Units.js'), require('ol/source/ImageWMS.js'), require('ol/layer/Tile.js'), require('ol/layer/Image.js'), require('ol/source/TileWMS.js'), require('ol/geom/Polygon'), require('ol/Overlay')) :

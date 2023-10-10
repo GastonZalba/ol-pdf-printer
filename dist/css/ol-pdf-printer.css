@@ -1,11 +1,17 @@
+.settingsModal {
+  font-family: sans-serif;
+}
 .settingsModal .modal-body input[type=text],
-.settingsModal .modal-body input[type=number],
 .settingsModal .modal-body select,
-.settingsModal .modal-body textarea {
+.settingsModal .modal-body textarea,
+.settingsModal .modal-body fieldset {
   width: 100%;
   outline: 0;
   padding: 9px 10px;
   margin: 2px 0 20px;
+  border: 1px solid #727272;
+  border-radius: 4px;
+  box-sizing: border-box;
 }
 .settingsModal .modal-footer .typeExportContainer {
   display: inline-block;
@@ -31,9 +37,6 @@
 .settingsModal form#printMap fieldset {
   text-align: center;
   background: #f2f2f2;
-  padding: 10px;
-  border-radius: 4px;
-  border: 1px solid grey;
 }
 .settingsModal form#printMap fieldset legend {
   padding: 4px;
@@ -47,10 +50,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
 }
 @media (max-width: 575px) {
   .settingsModal form#printMap .printFields-container {
     flex-direction: column;
+    gap: 0;
   }
   .settingsModal form#printMap .printFields-container .printField {
     width: 100%;
