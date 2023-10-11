@@ -89,6 +89,7 @@
 
 .opp-overlay-frame {
   display: grid !important;
+  pointer-events: none !important;
 }
 
 .opp-overlay-frame {
@@ -104,7 +105,6 @@
   justify-content: center;
   position: absolute;
   z-index: 9;
-  pointer-events: none;
 }
 .opp-overlay-frame .opp-overlay-frame-reframe-hint {
   color: #fff;
@@ -131,6 +131,10 @@
   justify-content: center;
   border-radius: 10px;
   flex-direction: column;
+  pointer-events: none;
+}
+.opp-overlay-frame .opp-overlay-frame-rectangle > * {
+  pointer-events: all;
 }
 .opp-overlay-frame .opp-overlay-frame-rectangle .opp-overlay-frame-save-btn {
   box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.692);
@@ -162,6 +166,8 @@
   margin: 0 5px;
   border-radius: 50px;
   color: var(--ol-subtle-foreground-color);
+  outline: 1px solid var(--ol-subtle-foreground-color);
+  opacity: 0.65;
 }
 .opp-overlay-frame .opp-overlay-frame-rectangle .opp-overlay-frame-controls .ol-control button svg {
   fill: var(--ol-subtle-foreground-color);
@@ -169,6 +175,7 @@
   height: 15px;
 }
 .opp-overlay-frame .opp-overlay-frame-rectangle .opp-overlay-frame-controls .ol-control button:hover, .opp-overlay-frame .opp-overlay-frame-rectangle .opp-overlay-frame-controls .ol-control button:focus {
+  opacity: 1;
   color: var(--ol-foreground-color);
 }
 .opp-overlay-frame .opp-overlay-frame-rectangle .opp-overlay-frame-controls .ol-control button:hover svg, .opp-overlay-frame .opp-overlay-frame-rectangle .opp-overlay-frame-controls .ol-control button:focus svg {
@@ -248,9 +255,10 @@
   }
 }
 .hideControls {
-  /* Desactivamos todos los controles */
+  /* Hide controls */
 }
-.hideControls .ol-overlaycontainer-stopevent {
+.hideControls .ol-overlaycontainer *,
+.hideControls .ol-overlaycontainer-stopevent > *:not(.opp-overlay-frame) {
   display: none !important;
 }
 

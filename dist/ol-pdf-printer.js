@@ -1,7 +1,7 @@
 /*!
- * ol-pdf-printer - v2.0.5
+ * ol-pdf-printer - v2.0.6
  * https://github.com/GastonZalba/ol-pdf-printer#readme
- * Built: Tue Oct 10 2023 13:17:12 GMT-0300 (hora estándar de Argentina)
+ * Built: Wed Oct 11 2023 09:56:04 GMT-0300 (hora estándar de Argentina)
 */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('ol/control/Control.js'), require('ol/proj.js'), require('ol/Observable.js'), require('ol/source/Cluster.js'), require('ol/layer/Vector.js'), require('jspdf'), require('pdfjs-dist'), require('ol/uri.js'), require('ol/proj/Units.js'), require('ol/source/ImageWMS.js'), require('ol/layer/Tile.js'), require('ol/layer/Image.js'), require('ol/source/TileWMS.js'), require('ol/geom/Polygon'), require('ol/Overlay')) :
@@ -96,7 +96,7 @@
 	                images.push(image);
 	            }
 	        }
-	        if (this._order) {
+	        if (this._order && images.length) {
 	            return this._orderImagesByIndex(images);
 	        }
 	        return images;
@@ -2257,7 +2257,7 @@
 	        this._overlay = new Overlay({
 	            className: `${CLASS_OVERLAY} ${mode}-mode`,
 	            element: this._rectangle,
-	            stopEvent: false
+	            stopEvent: true
 	        });
 	        this._map.addOverlay(this._overlay);
 	        this._view.setConstrainResolution(false);
@@ -2291,22 +2291,27 @@
 	        this._view.adjustRotation(Number(dd + rotate));
 	    }
 	    _getExtent() {
-	        const overlayFrame = this._rectangle.getBoundingClientRect();
+	        const mapBounds = this._map.getTargetElement().getBoundingClientRect();
+	        const overlayFrameBounds = this._rectangle.getBoundingClientRect();
+	        const relativePosition = {
+	            left: overlayFrameBounds.left - mapBounds.left,
+	            top: overlayFrameBounds.top - mapBounds.top
+	        };
 	        const topLeft = this._map.getCoordinateFromPixel([
-	            overlayFrame.left,
-	            overlayFrame.top
+	            relativePosition.left,
+	            relativePosition.top
 	        ]);
 	        const topRight = this._map.getCoordinateFromPixel([
-	            overlayFrame.left + overlayFrame.width,
-	            overlayFrame.top
+	            relativePosition.left + overlayFrameBounds.width,
+	            relativePosition.top
 	        ]);
 	        const bottomLeft = this._map.getCoordinateFromPixel([
-	            overlayFrame.left,
-	            overlayFrame.top + overlayFrame.height
+	            relativePosition.left,
+	            relativePosition.top + overlayFrameBounds.height
 	        ]);
 	        const bottomRight = this._map.getCoordinateFromPixel([
-	            overlayFrame.left + overlayFrame.width,
-	            overlayFrame.top + overlayFrame.height
+	            relativePosition.left + overlayFrameBounds.width,
+	            relativePosition.top + overlayFrameBounds.height
 	        ]);
 	        return new Polygon([[topLeft, topRight, bottomRight, bottomLeft]]);
 	    }
