@@ -12,6 +12,7 @@ export declare const legendsDefaultConfig: {
         bgColor: string;
         forceLabels: string;
         forceTitles: string;
+        fontSize: number;
     };
     requestParams: {};
     order: boolean;
