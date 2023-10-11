@@ -11,8 +11,6 @@ import { Extent } from 'ol/extent';
 import { Coordinate } from 'ol/coordinate.js';
 import Polygon from 'ol/geom/Polygon';
 
-import domtoimage from 'dom-to-image-more';
-
 import { Locale } from 'locale-enum';
 
 import Pdf from './components/Pdf';
@@ -78,6 +76,7 @@ export default class PdfPrinter extends Control {
     protected _initialViewResolution: number;
     protected _initialViewCoords: Coordinate;
     protected _initialConstrainRes: boolean;
+    protected _initialSize: number[];
 
     protected _options: Options;
 
@@ -167,9 +166,7 @@ export default class PdfPrinter extends Control {
      * @protected
      */
     protected _onEndPrint(): void {
-        this._mapTarget.style.width = '';
-        this._mapTarget.style.height = '';
-        this._map.updateSize();
+        this._map.setSize(this._initialSize);
         this._view.setResolution(this._initialViewResolution);
         this._view.setCenter(this._initialViewCoords);
 
@@ -276,6 +273,7 @@ export default class PdfPrinter extends Control {
             // Save current resolution to restore it later
             this._initialViewResolution = this._view.getResolution();
             this._initialViewCoords = this._view.getCenter();
+            this._initialSize = this._map.getSize();
 
             // To allow intermediate zoom levels
             this._view.setConstrainResolution(false);
@@ -312,20 +310,43 @@ export default class PdfPrinter extends Control {
                     this._view.getCenter()
                 );
 
-            this._renderCompleteKey = this._map.once('rendercomplete', () => {
-                this._processingModal.set(this._i18n.downloadFinished);
+            this._renderCompleteKey = this._map.once(
+                'rendercomplete',
+                async () => {
+                    try {
+                        const mapCanvas = document.createElement('canvas');
+                        mapCanvas.width = width;
+                        mapCanvas.height = height;
+                        const mapContext = mapCanvas.getContext('2d');
+                        Array.prototype.forEach.call(
+                            document.querySelectorAll('.ol-layer canvas'),
+                            function (canvas: HTMLCanvasElement) {
+                                if (canvas.width > 0) {
+                                    const opacity = (
+                                        canvas.parentNode as HTMLElement
+                                    ).style.opacity;
+                                    mapContext.globalAlpha =
+                                        opacity === '' ? 1 : Number(opacity);
+                                    const transform = canvas.style.transform;
+                                    // Get the transform parameters from the style's transform matrix
+                                    const matrix = transform
+                                        .match(/^matrix\(([^(]*)\)$/)[1]
+                                        .split(',')
+                                        .map(Number);
+                                    // Apply the transform to the export map context
+                                    CanvasRenderingContext2D.prototype.setTransform.apply(
+                                        mapContext,
+                                        matrix
+                                    );
+                                    mapContext.drawImage(canvas, 0, 0);
+                                }
+                            }
+                        );
+                        mapContext.globalAlpha = 1;
+                        mapContext.setTransform(1, 0, 0, 1, 0, 0);
 
-                domtoimage
-                    .toJpeg(
-                        this._mapTarget.querySelector(
-                            '.ol-unselectable.ol-layers'
-                        ),
-                        {
-                            width,
-                            height
-                        }
-                    )
-                    .then(async (dataUrl: string) => {
+                        this._processingModal.set(this._i18n.downloadFinished);
+
                         if (this._isCanceled) return;
 
                         this._pdf = new Pdf({
@@ -338,7 +359,10 @@ export default class PdfPrinter extends Control {
                             width: widthPaper
                         });
 
-                        this._pdf.addMapImage(dataUrl);
+                        this._pdf.addMapImage(
+                            mapCanvas.toDataURL('image/jpeg')
+                        );
+
                         await this._pdf.addMapHelpers();
 
                         if (this._isCanceled) return;
@@ -349,22 +373,18 @@ export default class PdfPrinter extends Control {
                         this._onEndPrint();
 
                         if (showLoading) this._disableLoading();
-                    })
-                    .catch((err: Error) => {
+                    } catch (err) {
                         const message =
                             typeof err === 'string' ? err : this._i18n.error;
                         console.error(err);
                         this._onEndPrint();
                         this._processingModal.set(message);
-                    });
-            });
+                    }
+                }
+            );
 
-            // Adjust the size of the map target
-            this._mapTarget.style.width = width + 'px';
-            this._mapTarget.style.height = height + 'px';
-
+            this._map.setSize([width, height]);
             this._map.getView().setResolution(scaleResolution);
-            this._map.updateSize();
 
             if (form.regionOfInterest) {
                 this._view.fit(form.regionOfInterest, {
