@@ -30,6 +30,7 @@ export default class PdfPrinter extends Control {
     protected _initialViewResolution: number;
     protected _initialViewCoords: Coordinate;
     protected _initialConstrainRes: boolean;
+    protected _initialSize: number[];
     protected _options: Options;
     protected _renderCompleteKey: EventsKey | EventsKey[];
     protected _isCanceled: boolean;
