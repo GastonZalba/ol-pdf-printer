@@ -1,6 +1,7 @@
 .hideControls {
-    /* Desactivamos todos los controles */
-    .ol-overlaycontainer-stopevent {
+    /* Hide controls */
+    .ol-overlaycontainer *,
+    .ol-overlaycontainer-stopevent > *:not(.opp-overlay-frame) {
         display: none !important;
     }
 }

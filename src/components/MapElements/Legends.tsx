@@ -94,7 +94,7 @@ export default class Legends {
             }
         }
 
-        if (this._order) {
+        if (this._order && images.length) {
             return this._orderImagesByIndex(images);
         }
 

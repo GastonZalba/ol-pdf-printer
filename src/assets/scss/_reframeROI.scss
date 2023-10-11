@@ -12,7 +12,7 @@
     display: grid !important;
     position: absolute;
     z-index: 9;
-    pointer-events: none;
+    pointer-events: none !important;
 
     .opp-overlay-frame-reframe-hint {
         color: #fff;
@@ -40,6 +40,10 @@
         justify-content: center;
         border-radius: $opp-overlayRadius;
         flex-direction: column;
+        pointer-events: none;
+        > * {
+            pointer-events: all;
+        }
 
         .opp-overlay-frame-save-btn {
             box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.692);
@@ -72,6 +76,8 @@
                     margin: 0 5px;
                     border-radius: 50px;
                     color: var(--ol-subtle-foreground-color);
+                    outline: 1px solid var(--ol-subtle-foreground-color);
+                    opacity: 0.65;
 
                     svg {
                         fill: var(--ol-subtle-foreground-color);
@@ -81,6 +87,7 @@
 
                     &:hover,
                     &:focus {
+                        opacity: 1;
                         color: var(--ol-foreground-color);
                         svg {
                             fill: var(--ol-foreground-color);
