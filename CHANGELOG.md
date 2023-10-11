@@ -141,3 +141,5 @@
 
 ## v2.0.6
 * Improved pointer events and stop event overlay
+* Fixed reframe position when map is not full height and width
+* Added some transparency to the reframe control buttons
