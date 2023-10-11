@@ -41,10 +41,10 @@ function deepObjectAssign(target, ...sources) {
             const t_val = target[key];
             target[key] =
                 t_val &&
-                    s_val &&
-                    typeof t_val === 'object' &&
-                    typeof s_val === 'object' &&
-                    !Array.isArray(t_val) // Don't merge arrays
+                s_val &&
+                typeof t_val === 'object' &&
+                typeof s_val === 'object' &&
+                !Array.isArray(t_val) // Don't merge arrays
                     ? deepObjectAssign(t_val, s_val)
                     : s_val;
         });
@@ -249,7 +249,6 @@ export default class PdfPrinter extends Control {
         showLoading = true,
         delay = 0
     ): void {
-        
         // the print was canceled on the reframe instance
         if (!form) {
             return this._restoreConstrains();
@@ -311,71 +310,78 @@ export default class PdfPrinter extends Control {
                     this._view.getCenter()
                 );
 
-            this._renderCompleteKey = this._map.once('rendercomplete', async () => {
-                try {
-                    const mapCanvas = document.createElement('canvas');
-                    mapCanvas.width = width;
-                    mapCanvas.height = height;
-                    const mapContext = mapCanvas.getContext('2d');
-                    Array.prototype.forEach.call(
-                        document.querySelectorAll('.ol-layer canvas'),
-                        function (canvas:HTMLCanvasElement) {
-                            if (canvas.width > 0) {
-                                const opacity = (canvas.parentNode as HTMLElement).style.opacity;
-                                mapContext.globalAlpha = opacity === '' ? 1 : Number(opacity);
-                                const transform = canvas.style.transform;
-                                // Get the transform parameters from the style's transform matrix
-                                const matrix = transform
-                                    .match(/^matrix\(([^\(]*)\)$/)[1]
-                                    .split(',')
-                                    .map(Number);
-                                // Apply the transform to the export map context
-                                CanvasRenderingContext2D.prototype.setTransform.apply(
-                                    mapContext,
-                                    matrix
-                                );
-                                mapContext.drawImage(canvas, 0, 0);
+            this._renderCompleteKey = this._map.once(
+                'rendercomplete',
+                async () => {
+                    try {
+                        const mapCanvas = document.createElement('canvas');
+                        mapCanvas.width = width;
+                        mapCanvas.height = height;
+                        const mapContext = mapCanvas.getContext('2d');
+                        Array.prototype.forEach.call(
+                            document.querySelectorAll('.ol-layer canvas'),
+                            function (canvas: HTMLCanvasElement) {
+                                if (canvas.width > 0) {
+                                    const opacity = (
+                                        canvas.parentNode as HTMLElement
+                                    ).style.opacity;
+                                    mapContext.globalAlpha =
+                                        opacity === '' ? 1 : Number(opacity);
+                                    const transform = canvas.style.transform;
+                                    // Get the transform parameters from the style's transform matrix
+                                    const matrix = transform
+                                        .match(/^matrix\(([^(]*)\)$/)[1]
+                                        .split(',')
+                                        .map(Number);
+                                    // Apply the transform to the export map context
+                                    CanvasRenderingContext2D.prototype.setTransform.apply(
+                                        mapContext,
+                                        matrix
+                                    );
+                                    mapContext.drawImage(canvas, 0, 0);
+                                }
                             }
-                        }
-                    );
-                    mapContext.globalAlpha = 1;
-                    mapContext.setTransform(1, 0, 0, 1, 0, 0);
+                        );
+                        mapContext.globalAlpha = 1;
+                        mapContext.setTransform(1, 0, 0, 1, 0, 0);
 
-                    this._processingModal.set(this._i18n.downloadFinished);
+                        this._processingModal.set(this._i18n.downloadFinished);
 
-                    if (this._isCanceled) return;
+                        if (this._isCanceled) return;
 
-                    this._pdf = new Pdf({
-                        form,
-                        scaleResolution,
-                        map: this._map,
-                        i18n: this._i18n,
-                        config: this._options,
-                        height: heightPaper,
-                        width: widthPaper
-                    });
+                        this._pdf = new Pdf({
+                            form,
+                            scaleResolution,
+                            map: this._map,
+                            i18n: this._i18n,
+                            config: this._options,
+                            height: heightPaper,
+                            width: widthPaper
+                        });
 
-                    this._pdf.addMapImage(mapCanvas.toDataURL('image/jpeg'));
-                    
-                    await this._pdf.addMapHelpers();
+                        this._pdf.addMapImage(
+                            mapCanvas.toDataURL('image/jpeg')
+                        );
 
-                    if (this._isCanceled) return;
+                        await this._pdf.addMapHelpers();
 
-                    await this._pdf.savePdf();
+                        if (this._isCanceled) return;
 
-                    // Reset original map size
-                    this._onEndPrint();
+                        await this._pdf.savePdf();
 
-                    if (showLoading) this._disableLoading();
-                } catch (err) {
-                    const message =
-                        typeof err === 'string' ? err : this._i18n.error;
-                    console.error(err);
-                    this._onEndPrint();
-                    this._processingModal.set(message);
+                        // Reset original map size
+                        this._onEndPrint();
+
+                        if (showLoading) this._disableLoading();
+                    } catch (err) {
+                        const message =
+                            typeof err === 'string' ? err : this._i18n.error;
+                        console.error(err);
+                        this._onEndPrint();
+                        this._processingModal.set(message);
+                    }
                 }
-
-            });
+            );
 
             this._map.setSize([width, height]);
             this._map.getView().setResolution(scaleResolution);
@@ -398,9 +404,9 @@ export default class PdfPrinter extends Control {
             if (this._imageCount % 10 == 0) {
                 this._processingModal.set(
                     this._i18n.downloadingImages +
-                    ': <b>' +
-                    this._imageCount +
-                    '</b>'
+                        ': <b>' +
+                        this._imageCount +
+                        '</b>'
                 );
             }
         };
@@ -646,13 +652,13 @@ interface IStyle {
      * Only added if `Add printer margins` is checked
      */
     paperMargin?:
-    | number
-    | {
-        top: number;
-        right: number;
-        bottom: number;
-        left: number;
-    };
+        | number
+        | {
+              top: number;
+              right: number;
+              bottom: number;
+              left: number;
+          };
 
     watermark?: {
         /**

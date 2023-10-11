@@ -12,7 +12,9 @@
     </a>
 </p>
 
-Customizable Pdf Printer Open Layers controñ. It prints the current view of the map, mantaining existing raster and vector layers and allowing to customize the paper size, DPI, map elements to be displayed (compass, cale, legends, etc) and more. It can be used to export to image formats too, like png, jpeg and webp.
+Customizable PDF Printer control for Open Layers. Allows the user to select the paper size, paper orientation, DPI, map elements to be displayed (compass, scale, attributions, legends, etc), add a description and more, while printing all visible layers (vector and raster). Also it allows to reframe the view before printing, using an overlay helper to better adjust to the size and aspect ratio selected.
+
+It can export to image formats too, like png, jpeg and webp.
 
 Tested with OpenLayers version 5, 6, 7 and 8.
 

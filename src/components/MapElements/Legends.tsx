@@ -13,10 +13,11 @@ import { isWmsLayer } from '../Helpers';
 export const legendsDefaultConfig = {
     legendOptions: {
         fontAntiAliasing: 'true',
-        fontColor: '0x333333',
+        fontColor: '0x000000',
         bgColor: '0xffffff',
         forceLabels: 'on',
-        forceTitles: 'on'
+        forceTitles: 'on',
+        fontSize: 8
     },
     requestParams: {},
     order: true
@@ -164,22 +165,12 @@ export default class Legends {
 
         const proj = this.getMapProjection().getCode();
 
-        const legend_options = {
-            fontColor: '0x000000',
-            fontAntiAliasing: true,
-            bgColor: '0xffffff',
-            forceLabels: 'on',
-            forceTitles: 'on',
-            fontSize: 8,
-            ...this._legendOptions
-        };
-
         const params = {
             SERVICE: 'WMS',
             VERSION: '1.1.0',
             REQUEST: 'GetLegendGraphic',
             FORMAT: 'image/png',
-            LEGEND_OPTIONS: Object.entries(legend_options)
+            LEGEND_OPTIONS: Object.entries(this._legendOptions)
                 .map((a) => `${a[0]}:${a[1]}`)
                 .join(';'),
             STYLE: sourceParams.STYLES,

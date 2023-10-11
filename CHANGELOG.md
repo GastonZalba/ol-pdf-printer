@@ -147,3 +147,4 @@
 ## v2.1.0
 * Some refactoring
 * Removed `dom-to-image-more` dependency
+* Improved README

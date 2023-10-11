@@ -1012,10 +1012,7 @@ export default class Pdf {
 
         const position = 'bottomleft';
 
-        const { x, y } = this._calculateOffsetByPosition(
-            position,
-            offset
-        );
+        const { x, y } = this._calculateOffsetByPosition(position, offset);
 
         const maxWidth = 90; // in mm
 

@@ -1,7 +1,7 @@
 {
   "name": "ol-pdf-printer",
   "version": "2.0.6",
-  "description": "PDF Printer for Open Layers",
+  "description": "Customizable PDF Printer control for Open Layers.",
   "main": "dist/ol-pdf-printer.js",
   "module": "lib/ol-pdf-printer.js",
   "types": "lib/ol-pdf-printer.d.ts",
