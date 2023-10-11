@@ -143,3 +143,7 @@
 * Improved pointer events and stop event overlay
 * Fixed reframe position when map is not full height and width
 * Added some transparency to the reframe control buttons
+
+## v2.1.0
+* Some refactoring
+* Removed `dom-to-image-more` dependency

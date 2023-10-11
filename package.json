@@ -79,7 +79,6 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "dom-to-image-more": "^3.2.0",
     "jspdf": "^2.3.1",
     "locale-enum": "^1.1.1",
     "pdfjs-dist": "^3.5.141"

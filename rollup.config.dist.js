@@ -23,7 +23,6 @@ const banner = `/*!
 const globals = (id) => {
     const globals = {
         'jspdf': 'jsPDF',
-        'dom-to-image-more': 'domtoimage',
         'modal-vanilla': 'Modal',
         'events': 'EventEmitter',
         'pdfjs-dist': 'pdfjsLib'

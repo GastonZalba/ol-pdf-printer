@@ -11,8 +11,6 @@ import { Extent } from 'ol/extent';
 import { Coordinate } from 'ol/coordinate.js';
 import Polygon from 'ol/geom/Polygon';
 
-import domtoimage from 'dom-to-image-more';
-
 import { Locale } from 'locale-enum';
 
 import Pdf from './components/Pdf';
@@ -43,10 +41,10 @@ function deepObjectAssign(target, ...sources) {
             const t_val = target[key];
             target[key] =
                 t_val &&
-                s_val &&
-                typeof t_val === 'object' &&
-                typeof s_val === 'object' &&
-                !Array.isArray(t_val) // Don't merge arrays
+                    s_val &&
+                    typeof t_val === 'object' &&
+                    typeof s_val === 'object' &&
+                    !Array.isArray(t_val) // Don't merge arrays
                     ? deepObjectAssign(t_val, s_val)
                     : s_val;
         });
@@ -78,6 +76,7 @@ export default class PdfPrinter extends Control {
     protected _initialViewResolution: number;
     protected _initialViewCoords: Coordinate;
     protected _initialConstrainRes: boolean;
+    protected _initialSize: number[];
 
     protected _options: Options;
 
@@ -167,9 +166,7 @@ export default class PdfPrinter extends Control {
      * @protected
      */
     protected _onEndPrint(): void {
-        this._mapTarget.style.width = '';
-        this._mapTarget.style.height = '';
-        this._map.updateSize();
+        this._map.setSize(this._initialSize);
         this._view.setResolution(this._initialViewResolution);
         this._view.setCenter(this._initialViewCoords);
 
@@ -252,6 +249,7 @@ export default class PdfPrinter extends Control {
         showLoading = true,
         delay = 0
     ): void {
+        
         // the print was canceled on the reframe instance
         if (!form) {
             return this._restoreConstrains();
@@ -276,6 +274,7 @@ export default class PdfPrinter extends Control {
             // Save current resolution to restore it later
             this._initialViewResolution = this._view.getResolution();
             this._initialViewCoords = this._view.getCenter();
+            this._initialSize = this._map.getSize();
 
             // To allow intermediate zoom levels
             this._view.setConstrainResolution(false);
@@ -312,59 +311,74 @@ export default class PdfPrinter extends Control {
                     this._view.getCenter()
                 );
 
-            this._renderCompleteKey = this._map.once('rendercomplete', () => {
-                this._processingModal.set(this._i18n.downloadFinished);
-
-                domtoimage
-                    .toJpeg(
-                        this._mapTarget.querySelector(
-                            '.ol-unselectable.ol-layers'
-                        ),
-                        {
-                            width,
-                            height
+            this._renderCompleteKey = this._map.once('rendercomplete', async () => {
+                try {
+                    const mapCanvas = document.createElement('canvas');
+                    mapCanvas.width = width;
+                    mapCanvas.height = height;
+                    const mapContext = mapCanvas.getContext('2d');
+                    Array.prototype.forEach.call(
+                        document.querySelectorAll('.ol-layer canvas'),
+                        function (canvas:HTMLCanvasElement) {
+                            if (canvas.width > 0) {
+                                const opacity = (canvas.parentNode as HTMLElement).style.opacity;
+                                mapContext.globalAlpha = opacity === '' ? 1 : Number(opacity);
+                                const transform = canvas.style.transform;
+                                // Get the transform parameters from the style's transform matrix
+                                const matrix = transform
+                                    .match(/^matrix\(([^\(]*)\)$/)[1]
+                                    .split(',')
+                                    .map(Number);
+                                // Apply the transform to the export map context
+                                CanvasRenderingContext2D.prototype.setTransform.apply(
+                                    mapContext,
+                                    matrix
+                                );
+                                mapContext.drawImage(canvas, 0, 0);
+                            }
                         }
-                    )
-                    .then(async (dataUrl: string) => {
-                        if (this._isCanceled) return;
+                    );
+                    mapContext.globalAlpha = 1;
+                    mapContext.setTransform(1, 0, 0, 1, 0, 0);
 
-                        this._pdf = new Pdf({
-                            form,
-                            scaleResolution,
-                            map: this._map,
-                            i18n: this._i18n,
-                            config: this._options,
-                            height: heightPaper,
-                            width: widthPaper
-                        });
+                    this._processingModal.set(this._i18n.downloadFinished);
 
-                        this._pdf.addMapImage(dataUrl);
-                        await this._pdf.addMapHelpers();
+                    if (this._isCanceled) return;
 
-                        if (this._isCanceled) return;
-
-                        await this._pdf.savePdf();
-
-                        // Reset original map size
-                        this._onEndPrint();
-
-                        if (showLoading) this._disableLoading();
-                    })
-                    .catch((err: Error) => {
-                        const message =
-                            typeof err === 'string' ? err : this._i18n.error;
-                        console.error(err);
-                        this._onEndPrint();
-                        this._processingModal.set(message);
+                    this._pdf = new Pdf({
+                        form,
+                        scaleResolution,
+                        map: this._map,
+                        i18n: this._i18n,
+                        config: this._options,
+                        height: heightPaper,
+                        width: widthPaper
                     });
+
+                    this._pdf.addMapImage(mapCanvas.toDataURL('image/jpeg'));
+                    
+                    await this._pdf.addMapHelpers();
+
+                    if (this._isCanceled) return;
+
+                    await this._pdf.savePdf();
+
+                    // Reset original map size
+                    this._onEndPrint();
+
+                    if (showLoading) this._disableLoading();
+                } catch (err) {
+                    const message =
+                        typeof err === 'string' ? err : this._i18n.error;
+                    console.error(err);
+                    this._onEndPrint();
+                    this._processingModal.set(message);
+                }
+
             });
 
-            // Adjust the size of the map target
-            this._mapTarget.style.width = width + 'px';
-            this._mapTarget.style.height = height + 'px';
-
+            this._map.setSize([width, height]);
             this._map.getView().setResolution(scaleResolution);
-            this._map.updateSize();
 
             if (form.regionOfInterest) {
                 this._view.fit(form.regionOfInterest, {
@@ -384,9 +398,9 @@ export default class PdfPrinter extends Control {
             if (this._imageCount % 10 == 0) {
                 this._processingModal.set(
                     this._i18n.downloadingImages +
-                        ': <b>' +
-                        this._imageCount +
-                        '</b>'
+                    ': <b>' +
+                    this._imageCount +
+                    '</b>'
                 );
             }
         };
@@ -632,13 +646,13 @@ interface IStyle {
      * Only added if `Add printer margins` is checked
      */
     paperMargin?:
-        | number
-        | {
-              top: number;
-              right: number;
-              bottom: number;
-              left: number;
-          };
+    | number
+    | {
+        top: number;
+        right: number;
+        bottom: number;
+        left: number;
+    };
 
     watermark?: {
         /**

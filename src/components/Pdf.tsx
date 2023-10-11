@@ -619,7 +619,7 @@ export default class Pdf {
 
             if (watermark.subtitle) {
                 subtitleYPosition += 5;
-                titleYPosition -= 2.5;
+                titleYPosition -= 2;
             }
         } else {
             if (watermark.title) {
@@ -1006,9 +1006,16 @@ export default class Pdf {
                 this._config.extraInfo &&
                 ((this._form.url && this._config.extraInfo.url) ||
                     (this._form.specs && this._config.extraInfo.specs))
-                    ? this._accumulativeOffsetBottomLeft + 2
-                    : 2
+                    ? this._accumulativeOffsetBottomLeft + 12
+                    : 12
         };
+
+        const position = 'bottomleft';
+
+        const { x, y } = this._calculateOffsetByPosition(
+            position,
+            offset
+        );
 
         const maxWidth = 90; // in mm
 
@@ -1080,7 +1087,7 @@ export default class Pdf {
 
         let size = (length * unitConversionFactor) / this._scaleDenominator / 4;
 
-        const percentageMargin = this._style.paperMargin
+        const percentageMargin = this._form.safeMargins
             ? ((this._printingMargins.left + this._printingMargins.right) /
                   this._pdf.width) *
               100
@@ -1093,24 +1100,15 @@ export default class Pdf {
 
         const fullSize = size * 4;
 
-        // x/y defaults to offset for topleft corner (normal x/y coordinates)
-        const x = offset.x + this._printingMargins.left;
-        let y = offset.y + this._printingMargins.top;
-
-        y = this._pdf.height - offset.y - 10 - this._printingMargins.bottom;
-
         // to give the outer white box 4mm padding
         const scaleBarX = x + 4;
-        const scaleBarY = y + 5; // 5 because above the scalebar will be the numbers
-
-        const width = fullSize + 8;
-        const height = 10;
+        const scaleBarY = y + 5; // 5, a little more, to make space for the numbers above
 
         // draw outer box
         this._addRoundedBox(
             x,
             y,
-            width,
+            fullSize + 8,
             10,
             this._style.scalebar.bkcolor,
             this._style.scalebar.brcolor
@@ -1152,7 +1150,7 @@ export default class Pdf {
             scaleBarY - 1
         );
 
-        this._accumulativeOffsetBottomLeft = offset.y + height;
+        this._accumulativeOffsetBottomLeft = offset.y;
     };
 
     /**
