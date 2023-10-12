@@ -319,7 +319,9 @@ export default class PdfPrinter extends Control {
                         mapCanvas.height = height;
                         const mapContext = mapCanvas.getContext('2d');
                         Array.prototype.forEach.call(
-                            document.querySelectorAll('.ol-layer canvas'),
+                            this._mapTarget
+                                .querySelector('.ol-layers') // to not match map overviews
+                                .querySelectorAll('.ol-layer canvas'),
                             function (canvas: HTMLCanvasElement) {
                                 if (canvas.width > 0) {
                                     const opacity = (

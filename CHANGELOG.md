@@ -148,3 +148,6 @@
 * Some refactoring
 * Removed `dom-to-image-more` dependency
 * Improved README
+
+## v2.1.1
+* Fixed overview canvas visible in the final export (bug introduced in 2.1.0)
