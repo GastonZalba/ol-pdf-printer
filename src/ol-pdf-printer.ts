@@ -10,6 +10,7 @@ import TileWMS from 'ol/source/TileWMS.js';
 import { Extent } from 'ol/extent';
 import { Coordinate } from 'ol/coordinate.js';
 import Polygon from 'ol/geom/Polygon';
+import ImageWMS from 'ol/source/ImageWMS';
 
 import { Locale } from 'locale-enum';
 
@@ -41,10 +42,10 @@ function deepObjectAssign(target, ...sources) {
             const t_val = target[key];
             target[key] =
                 t_val &&
-                s_val &&
-                typeof t_val === 'object' &&
-                typeof s_val === 'object' &&
-                !Array.isArray(t_val) // Don't merge arrays
+                    s_val &&
+                    typeof t_val === 'object' &&
+                    typeof s_val === 'object' &&
+                    !Array.isArray(t_val) // Don't merge arrays
                     ? deepObjectAssign(t_val, s_val)
                     : s_val;
         });
@@ -62,7 +63,6 @@ export default class PdfPrinter extends Control {
 
     protected _map: Map;
     protected _view: View;
-    protected _mapTarget: HTMLElement;
 
     protected _pdf: Pdf;
 
@@ -137,7 +137,6 @@ export default class PdfPrinter extends Control {
     protected _init(): void {
         this._map = this.getMap();
         this._view = this._map.getView();
-        this._mapTarget = this._map.getTargetElement();
         this._settingsModal = new SettingsModal(
             this._map,
             this._options,
@@ -172,7 +171,7 @@ export default class PdfPrinter extends Control {
 
         this._restoreConstrains();
 
-        this._mapTarget.classList.remove(CLASS_PRINT_MODE, CLASS_HIDE_CONTROLS);
+        this._map.getTargetElement().classList.remove(CLASS_PRINT_MODE, CLASS_HIDE_CONTROLS);
 
         this._updateDPI(90);
         this._removeListeners();
@@ -230,6 +229,13 @@ export default class PdfPrinter extends Control {
                         } else {
                             source.changed();
                         }
+                    } else {
+                        let source = layer.getSource();
+                        if (source instanceof ImageWMS || source instanceof TileWMS) {
+                            let params = source.getParams();
+                            params["XX"] = Math.random();
+                            source.updateParams(params);
+                        }
                     }
                 }
             }
@@ -255,7 +261,7 @@ export default class PdfPrinter extends Control {
         }
 
         if (showLoading) {
-            this._mapTarget.classList.add(
+            this._map.getTargetElement().classList.add(
                 CLASS_PRINT_MODE,
                 CLASS_HIDE_CONTROLS
             );
@@ -319,7 +325,7 @@ export default class PdfPrinter extends Control {
                         mapCanvas.height = height;
                         const mapContext = mapCanvas.getContext('2d');
                         Array.prototype.forEach.call(
-                            this._mapTarget
+                            this._map.getTargetElement()
                                 .querySelector('.ol-layers') // to not match map overviews
                                 .querySelectorAll('.ol-layer canvas'),
                             function (canvas: HTMLCanvasElement) {
@@ -406,9 +412,9 @@ export default class PdfPrinter extends Control {
             if (this._imageCount % 10 == 0) {
                 this._processingModal.set(
                     this._i18n.downloadingImages +
-                        ': <b>' +
-                        this._imageCount +
-                        '</b>'
+                    ': <b>' +
+                    this._imageCount +
+                    '</b>'
                 );
             }
         };
@@ -654,13 +660,13 @@ interface IStyle {
      * Only added if `Add printer margins` is checked
      */
     paperMargin?:
-        | number
-        | {
-              top: number;
-              right: number;
-              bottom: number;
-              left: number;
-          };
+    | number
+    | {
+        top: number;
+        right: number;
+        bottom: number;
+        left: number;
+    };
 
     watermark?: {
         /**
