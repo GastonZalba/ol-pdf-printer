@@ -1,7 +1,7 @@
 /*!
- * ol-pdf-printer - v2.1.0
+ * ol-pdf-printer - v2.1.1
  * https://github.com/GastonZalba/ol-pdf-printer#readme
- * Built: Wed Oct 11 2023 18:47:11 GMT-0300 (Argentina Standard Time)
+ * Built: Thu Oct 12 2023 10:09:15 GMT-0300 (hora estándar de Argentina)
 */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('ol/control/Control.js'), require('ol/proj.js'), require('ol/Observable.js'), require('ol/source/Cluster.js'), require('ol/layer/Vector.js'), require('jspdf'), require('pdfjs-dist'), require('ol/uri.js'), require('ol/proj/Units.js'), require('ol/source/ImageWMS.js'), require('ol/layer/Tile.js'), require('ol/layer/Image.js'), require('ol/source/TileWMS.js'), require('ol/geom/Polygon'), require('ol/Overlay')) :
@@ -2932,7 +2932,9 @@
                         mapCanvas.width = width;
                         mapCanvas.height = height;
                         const mapContext = mapCanvas.getContext('2d');
-                        Array.prototype.forEach.call(document.querySelectorAll('.ol-layer canvas'), function (canvas) {
+                        Array.prototype.forEach.call(this._mapTarget
+                            .querySelector('.ol-layers') // to not match map overviews
+                            .querySelectorAll('.ol-layer canvas'), function (canvas) {
                             if (canvas.width > 0) {
                                 const opacity = canvas.parentNode.style.opacity;
                                 mapContext.globalAlpha =
