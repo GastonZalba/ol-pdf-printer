@@ -1064,6 +1064,7 @@ export default class Pdf {
         maxLength /= unitConversionFactor;
 
         const unroundedLength = maxLength;
+
         const numberOfDigits = Math.floor(log10(unroundedLength));
         const factor = Math.pow(10, numberOfDigits);
         const mapped = unroundedLength / factor;

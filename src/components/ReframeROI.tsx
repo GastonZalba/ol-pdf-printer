@@ -53,7 +53,7 @@ export default class ReframeROI {
             <button
                 type="button"
                 className={`btn-close btn-close-white ${CLASS_OVERLAY_CANCEL_BTN}`}
-                onclick={() => this.hideOverlay()}
+                onclick={() => this.cancel()}
                 title={i18n.escapeHint}
             >
                 <span aria-hidden="true">×</span>
@@ -157,16 +157,19 @@ export default class ReframeROI {
         };
     }
 
+    public cancel(): void {
+        this.hideOverlay();
+        if (this._callback) {
+            this._callback(null);
+        }
+    }
+
     public hideOverlay(): void {
         if (this._overlay) {
             this._map.removeOverlay(this._overlay);
         }
         this._removeEvents();
         this._map.getTargetElement().classList.remove(CLASS_HIDE_CONTROLS);
-
-        if (this._callback) {
-            this._callback(null);
-        }
     }
 
     private _zoom(direction: 'in' | 'out', delta = 0.5): void {
@@ -217,7 +220,7 @@ export default class ReframeROI {
     private _addEvents(): void {
         const escapeKeyListener = ({ key }) => {
             if (key === 'Escape') {
-                this.hideOverlay();
+                this.cancel();
             }
         };
 

@@ -42,10 +42,10 @@ function deepObjectAssign(target, ...sources) {
             const t_val = target[key];
             target[key] =
                 t_val &&
-                    s_val &&
-                    typeof t_val === 'object' &&
-                    typeof s_val === 'object' &&
-                    !Array.isArray(t_val) // Don't merge arrays
+                s_val &&
+                typeof t_val === 'object' &&
+                typeof s_val === 'object' &&
+                !Array.isArray(t_val) // Don't merge arrays
                     ? deepObjectAssign(t_val, s_val)
                     : s_val;
         });
@@ -171,7 +171,9 @@ export default class PdfPrinter extends Control {
 
         this._restoreConstrains();
 
-        this._map.getTargetElement().classList.remove(CLASS_PRINT_MODE, CLASS_HIDE_CONTROLS);
+        this._map
+            .getTargetElement()
+            .classList.remove(CLASS_PRINT_MODE, CLASS_HIDE_CONTROLS);
 
         this._updateDPI(90);
         this._removeListeners();
@@ -230,10 +232,14 @@ export default class PdfPrinter extends Control {
                             source.changed();
                         }
                     } else {
-                        let source = layer.getSource();
-                        if (source instanceof ImageWMS || source instanceof TileWMS) {
-                            let params = source.getParams();
-                            params["XX"] = Math.random();
+                        const source = layer.getSource();
+                        if (
+                            source instanceof ImageWMS ||
+                            source instanceof TileWMS
+                        ) {
+                            const params = source.getParams();
+                            // To force reload the images
+                            params['_pixelRatio'] = pixelRatio;
                             source.updateParams(params);
                         }
                     }
@@ -261,10 +267,9 @@ export default class PdfPrinter extends Control {
         }
 
         if (showLoading) {
-            this._map.getTargetElement().classList.add(
-                CLASS_PRINT_MODE,
-                CLASS_HIDE_CONTROLS
-            );
+            this._map
+                .getTargetElement()
+                .classList.add(CLASS_PRINT_MODE, CLASS_HIDE_CONTROLS);
         }
 
         setTimeout(() => {
@@ -308,6 +313,8 @@ export default class PdfPrinter extends Control {
                     ? form.scale
                     : getMapScale(this._map) / 1000;
 
+            console.log(getMapScale(this._map) / 1000);
+
             const scaleResolution =
                 scale /
                 getPointResolution(
@@ -325,7 +332,8 @@ export default class PdfPrinter extends Control {
                         mapCanvas.height = height;
                         const mapContext = mapCanvas.getContext('2d');
                         Array.prototype.forEach.call(
-                            this._map.getTargetElement()
+                            this._map
+                                .getTargetElement()
                                 .querySelector('.ol-layers') // to not match map overviews
                                 .querySelectorAll('.ol-layer canvas'),
                             function (canvas: HTMLCanvasElement) {
@@ -412,9 +420,9 @@ export default class PdfPrinter extends Control {
             if (this._imageCount % 10 == 0) {
                 this._processingModal.set(
                     this._i18n.downloadingImages +
-                    ': <b>' +
-                    this._imageCount +
-                    '</b>'
+                        ': <b>' +
+                        this._imageCount +
+                        '</b>'
                 );
             }
         };
@@ -660,13 +668,13 @@ interface IStyle {
      * Only added if `Add printer margins` is checked
      */
     paperMargin?:
-    | number
-    | {
-        top: number;
-        right: number;
-        bottom: number;
-        left: number;
-    };
+        | number
+        | {
+              top: number;
+              right: number;
+              bottom: number;
+              left: number;
+          };
 
     watermark?: {
         /**
