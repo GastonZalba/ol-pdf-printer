@@ -1,13 +1,13 @@
 /*!
- * ol-pdf-printer - v2.1.1
+ * ol-pdf-printer - v2.1.2
  * https://github.com/GastonZalba/ol-pdf-printer#readme
- * Built: Thu Oct 12 2023 10:09:15 GMT-0300 (hora estándar de Argentina)
+ * Built: Fri Oct 13 2023 14:08:34 GMT-0300 (Argentina Standard Time)
 */
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('ol/control/Control.js'), require('ol/proj.js'), require('ol/Observable.js'), require('ol/source/Cluster.js'), require('ol/layer/Vector.js'), require('jspdf'), require('pdfjs-dist'), require('ol/uri.js'), require('ol/proj/Units.js'), require('ol/source/ImageWMS.js'), require('ol/layer/Tile.js'), require('ol/layer/Image.js'), require('ol/source/TileWMS.js'), require('ol/geom/Polygon'), require('ol/Overlay')) :
-    typeof define === 'function' && define.amd ? define(['ol/control/Control.js', 'ol/proj.js', 'ol/Observable.js', 'ol/source/Cluster.js', 'ol/layer/Vector.js', 'jspdf', 'pdfjs-dist', 'ol/uri.js', 'ol/proj/Units.js', 'ol/source/ImageWMS.js', 'ol/layer/Tile.js', 'ol/layer/Image.js', 'ol/source/TileWMS.js', 'ol/geom/Polygon', 'ol/Overlay'], factory) :
-    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.PdfPrinter = factory(global.ol.control.Control, global.ol.proj, global.ol.Observable, global.ol.source.Cluster, global.ol.layer.Vector, global.jsPDF, global.pdfjsLib, global.ol.uri, global.ol.proj.Units, global.ol.source.ImageWMS, global.ol.layer.Tile, global.ol.layer.Image, global.ol.source.TileWMS, global.ol.geom.Polygon, global.ol.Overlay));
-})(this, (function (Control, proj_js, Observable_js, Cluster, VectorLayer, jspdf, pdfjsDist, uri_js, Units_js, ImageWMS, TileLayer, ImageLayer, TileWMS, Polygon, Overlay) { 'use strict';
+    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('ol/control/Control.js'), require('ol/proj.js'), require('ol/Observable.js'), require('ol/source/Cluster.js'), require('ol/layer/Vector.js'), require('ol/source/TileWMS.js'), require('ol/source/ImageWMS'), require('jspdf'), require('pdfjs-dist'), require('ol/uri.js'), require('ol/proj/Units.js'), require('ol/source/ImageWMS.js'), require('ol/layer/Tile.js'), require('ol/layer/Image.js'), require('ol/geom/Polygon'), require('ol/Overlay')) :
+    typeof define === 'function' && define.amd ? define(['ol/control/Control.js', 'ol/proj.js', 'ol/Observable.js', 'ol/source/Cluster.js', 'ol/layer/Vector.js', 'ol/source/TileWMS.js', 'ol/source/ImageWMS', 'jspdf', 'pdfjs-dist', 'ol/uri.js', 'ol/proj/Units.js', 'ol/source/ImageWMS.js', 'ol/layer/Tile.js', 'ol/layer/Image.js', 'ol/geom/Polygon', 'ol/Overlay'], factory) :
+    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.PdfPrinter = factory(global.ol.control.Control, global.ol.proj, global.ol.Observable, global.ol.source.Cluster, global.ol.layer.Vector, global.ol.source.TileWMS, global.ol.source.ImageWMS, global.jsPDF, global.pdfjsLib, global.ol.uri, global.ol.proj.Units, global.ol.source.ImageWMS, global.ol.layer.Tile, global.ol.layer.Image, global.ol.geom.Polygon, global.ol.Overlay));
+})(this, (function (Control, proj_js, Observable_js, Cluster, VectorLayer, TileWMS, ImageWMS$1, jspdf, pdfjsDist, uri_js, Units_js, ImageWMS, TileLayer, ImageLayer, Polygon, Overlay) { 'use strict';
 
     var global = window;
 
@@ -22,7 +22,7 @@
         const dpi = 25.4 / 0.28;
         const view = map.getView();
         const unit = view.getProjection().getUnits();
-        const res = view.getResolution();
+        const res = view.getResolutionForZoom(view.getZoom());
         const inchesPerMetre = 39.37;
         let scale = res * Units_js.METERS_PER_UNIT[unit] * inchesPerMetre * dpi;
         if (opt_round) {
@@ -2206,7 +2206,7 @@
             this._map = map;
             this._view = this._map.getView();
             this._saveButton = (createElement("button", { type: "button", className: `btn btn-lg btn-primary ${CLASS_OVERLAY_SAVE_BTN}` }, i18n.process));
-            this._cancelButton = (createElement("button", { type: "button", className: `btn-close btn-close-white ${CLASS_OVERLAY_CANCEL_BTN}`, onclick: () => this.hideOverlay(), title: i18n.escapeHint },
+            this._cancelButton = (createElement("button", { type: "button", className: `btn-close btn-close-white ${CLASS_OVERLAY_CANCEL_BTN}`, onclick: () => this.cancel(), title: i18n.escapeHint },
                 createElement("span", { "aria-hidden": "true" }, "\u00D7")));
             this._controlButtons = createElement("div", { className: CLASS_OVERLAY_CONTROLS });
             if (options.zoomControlOnReframe) {
@@ -2248,15 +2248,18 @@
                 }, 10);
             };
         }
+        cancel() {
+            this.hideOverlay();
+            if (this._callback) {
+                this._callback(null);
+            }
+        }
         hideOverlay() {
             if (this._overlay) {
                 this._map.removeOverlay(this._overlay);
             }
             this._removeEvents();
             this._map.getTargetElement().classList.remove(CLASS_HIDE_CONTROLS);
-            if (this._callback) {
-                this._callback(null);
-            }
         }
         _zoom(direction, delta = 0.5) {
             const rotate = 0.261799 * delta;
@@ -2296,7 +2299,7 @@
         _addEvents() {
             const escapeKeyListener = ({ key }) => {
                 if (key === 'Escape') {
-                    this.hideOverlay();
+                    this.cancel();
                 }
             };
             this._escapeKeyListener = escapeKeyListener.bind(this);
@@ -2807,7 +2810,6 @@
         _init() {
             this._map = this.getMap();
             this._view = this._map.getView();
-            this._mapTarget = this._map.getTargetElement();
             this._settingsModal = new SettingsModal(this._map, this._options, this._i18n, this._printMap.bind(this));
             this._processingModal = new ProcessingModal(this._i18n, this._options, this._onEndPrint.bind(this));
             this._initialized = true;
@@ -2827,7 +2829,9 @@
             this._view.setResolution(this._initialViewResolution);
             this._view.setCenter(this._initialViewCoords);
             this._restoreConstrains();
-            this._mapTarget.classList.remove(CLASS_PRINT_MODE, CLASS_HIDE_CONTROLS);
+            this._map
+                .getTargetElement()
+                .classList.remove(CLASS_PRINT_MODE, CLASS_HIDE_CONTROLS);
             this._updateDPI(90);
             this._removeListeners();
             clearTimeout(this._timeoutProcessing);
@@ -2878,6 +2882,16 @@
                                 source.changed();
                             }
                         }
+                        else {
+                            const source = layer.getSource();
+                            if (source instanceof ImageWMS$1 ||
+                                source instanceof TileWMS) {
+                                const params = source.getParams();
+                                // To force reload the images
+                                params['_pixelRatio'] = pixelRatio;
+                                source.updateParams(params);
+                            }
+                        }
                     }
                 }
             });
@@ -2896,7 +2910,9 @@
                 return this._restoreConstrains();
             }
             if (showLoading) {
-                this._mapTarget.classList.add(CLASS_PRINT_MODE, CLASS_HIDE_CONTROLS);
+                this._map
+                    .getTargetElement()
+                    .classList.add(CLASS_PRINT_MODE, CLASS_HIDE_CONTROLS);
             }
             setTimeout(() => {
                 if (showLoading) {
@@ -2924,6 +2940,7 @@
                 const scale = form.scale && !form.regionOfInterest
                     ? form.scale
                     : getMapScale(this._map) / 1000;
+                console.log(getMapScale(this._map) / 1000);
                 const scaleResolution = scale /
                     proj_js.getPointResolution(this._view.getProjection(), pixelsPerMapMillimeter, this._view.getCenter());
                 this._renderCompleteKey = this._map.once('rendercomplete', async () => {
@@ -2932,7 +2949,8 @@
                         mapCanvas.width = width;
                         mapCanvas.height = height;
                         const mapContext = mapCanvas.getContext('2d');
-                        Array.prototype.forEach.call(this._mapTarget
+                        Array.prototype.forEach.call(this._map
+                            .getTargetElement()
                             .querySelector('.ol-layers') // to not match map overviews
                             .querySelectorAll('.ol-layer canvas'), function (canvas) {
                             if (canvas.width > 0) {

@@ -21,7 +21,6 @@ export default class PdfPrinter extends Control {
     protected _i18n: I18n;
     protected _map: Map;
     protected _view: View;
-    protected _mapTarget: HTMLElement;
     protected _pdf: Pdf;
     protected _processingModal: ProcessingModal;
     protected _settingsModal: SettingsModal;

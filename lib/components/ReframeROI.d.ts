@@ -14,6 +14,7 @@ export default class ReframeROI {
     private _controlButtons;
     constructor(map: Map, i18n: I18n, options: Options);
     showOverlay(mode: 'landscape' | 'portrait', callback: (polygon: Extent | Polygon) => void): void;
+    cancel(): void;
     hideOverlay(): void;
     private _zoom;
     private _rotate;
