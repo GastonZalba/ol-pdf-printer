@@ -151,3 +151,7 @@
 
 ## v2.1.1
 * Fixed overview canvas visible in the final export (bug introduced in 2.1.0)
+
+## v2.1.2
+* Fixed bug with contraint resolution being restored before time (if it was enabled)
+* Improved example

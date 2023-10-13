@@ -67,13 +67,27 @@
                     '<a href="https://mapa.ign.gob.ar/">Instituto Geográfico Nacional</a>',
                 crossOrigin: 'anonymous' // Important
             })
-        }),        
+        }),    
         new ol.layer.Tile({
             zIndex: 1,
             source: new ol.source.TileWMS({
                 url: 'https://wms.ign.gob.ar/geoserver/geodesia-demarcacion/wms',
                 params: {
                     LAYERS: 'nivelacion_precision',
+                    TILED: true
+                },
+                serverType: 'geoserver',
+                attributions:
+                    '<a href="https://mapa.ign.gob.ar/">Instituto Geográfico Nacional</a>',
+                crossOrigin: 'anonymous' // Important
+            })
+        }),    
+        new ol.layer.Image({
+            zIndex: 1,
+            source: new ol.source.ImageWMS({
+                url: 'https://wms.ign.gob.ar/geoserver/hidrografia-oceanografia/wms',
+                params: {
+                    LAYERS: 'lineas_de_aguas_continentales_perenne',
                     TILED: true
                 },
                 serverType: 'geoserver',
@@ -103,10 +117,10 @@
         target: 'map',
         view: new ol.View({
             projection: 'EPSG:3857',
-            center: [-6451200, -4152584],
+            center: [-6661200, -4401584],
             constrainResolution: true,
-            zoom: 17,
-            rotation: 0.85
+            zoom: 9,
+            rotation: 0.1
         })
     });
 
