@@ -63,16 +63,12 @@ export default function (commandOptions) {
             plugins: [
                 banner2(() => banner),
                 del({ targets: 'dist/*' }),
-                resolve({ browser: true }),
                 typescript({
-                    outDir: 'dist',
+                    outDir: './dist',
+                    declarationDir: './dist',
                     outputToFilesystem: true,
-                    declarationMap: true,
                     incremental: false                       
                 }),
-                nodePolyfills(), // Events
-                commonjs(),
-                svg(),
                 postcss({
                     include: 'src/assets/scss/-ol-pdf-printer.bootstrap5.scss',
                     extensions: ['.css', '.sass', '.scss'],

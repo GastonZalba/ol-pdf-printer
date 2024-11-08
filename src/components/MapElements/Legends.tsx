@@ -211,8 +211,8 @@ export default class Legends {
             'getUrls' in source
                 ? source.getUrls()[0]
                 : 'getUrl' in source
-                ? source.getUrl()
-                : undefined;
+                  ? source.getUrl()
+                  : undefined;
 
         if (!url) return undefined;
 

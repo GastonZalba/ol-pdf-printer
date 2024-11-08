@@ -56,7 +56,7 @@ function deepObjectAssign(target, ...sources) {
 /**
  * @constructor
  * @extends {ol/control/Control~Control}
- * @params options
+ * @param options
  */
 export default class PdfPrinter extends Control {
     protected _i18n: I18n;

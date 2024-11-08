@@ -29,9 +29,9 @@ export default {
         banner2(() => banner),
         del({ targets: 'lib/*' }),
         typescript({
-            outDir: 'lib',
+            outDir: './lib',
+            declarationDir: './lib',
             outputToFilesystem: true,
-            declarationMap: true,
             incremental: false                       
         }),
         svg(),

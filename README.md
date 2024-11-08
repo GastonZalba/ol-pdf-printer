@@ -16,7 +16,7 @@ Customizable PDF Printer control for Open Layers. Allows the user to select the 
 
 It can export to image formats too, like png, jpeg and webp.
 
-Tested with OpenLayers version 5, 6, 7 and 8.
+Tested with OpenLayers version 5, 6, 7, 8, 9 y 10.
 
 ## IMPORTANT
 

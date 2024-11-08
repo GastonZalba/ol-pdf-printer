@@ -2,8 +2,10 @@
     "compilerOptions": {
         "declaration": true,
         "allowJs": true,
-        "downlevelIteration": true,
-        "target": "ES2017",
+        "baseUrl": "./",
+        "outDir": "./tmp-dist",
+        "target": "ES6",
+        "module": "esnext",
         "jsx": "react",
         "jsxFactory": "myPragma",
         "jsxFragmentFactory": "null",
@@ -11,7 +13,9 @@
         "resolveJsonModule": true,
         "esModuleInterop": true,
         "moduleResolution": "node",
-        "skipLibCheck": true
+        "declarationMap": true,
+        "skipLibCheck": true,
+        "incremental": true,
     },
     "include": ["./src"]
 }
